@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { Lecture } from '../shared/lecture';
 import { LectureService } from '../lecture.service';
 import { Recording } from '../shared/recording';
@@ -9,6 +9,9 @@ import { Recording } from '../shared/recording';
   styleUrls: ['./recording-list.component.scss']
 })
 export class RecordingListComponent implements OnInit {
+  @Output() processClick = new EventEmitter<Recording>();
+  @Output() publishClick = new EventEmitter<Recording>();
+
   private _lectureId: number;
   public recordings: Recording[];
 
@@ -27,4 +30,11 @@ export class RecordingListComponent implements OnInit {
     this.lectureService.getRecordingsByLecture(this._lectureId.toString()).subscribe(x => this.recordings = x);
   }
 
+  doProcess(recording: Recording): void {
+    this.processClick.emit(recording);
+  }
+
+  doPublish(recording: Recording): void {
+    this.publishClick.emit(recording);
+  }
 }

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace lecture_recording_manager.Models
+namespace LectureRecordingManager.Models
 {
     public class Recording
     {
@@ -15,13 +15,15 @@ namespace lecture_recording_manager.Models
 
         public Lecture Lecture { get; set; }
 
+        public RecordingType Type { get; set; }
+
         [Required]
         [Column(TypeName = "varchar(255)")]
         public string Title { get; set; }
 
         public string Description { get; set; }
 
-        public long Duration { get; set; }
+        public double Duration { get; set; }
 
         public bool Published { get; set; }
 

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace lecture_recording_manager.Models
+namespace LectureRecordingManager.Models
 {
     public class Semester
     {

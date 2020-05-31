@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace lecture_recording_manager.Models
+namespace LectureRecordingManager.Models
 {
     public class RecordingChapter
     {
@@ -11,7 +11,7 @@ namespace lecture_recording_manager.Models
 
         public Recording Recording { get; set; }
 
-        public long StartPosition { get; set; }
+        public double StartPosition { get; set; }
 
         public string Thumbnail { get; set; }
 

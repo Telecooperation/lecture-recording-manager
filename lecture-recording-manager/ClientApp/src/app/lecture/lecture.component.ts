@@ -17,8 +17,11 @@ export class LectureComponent implements OnInit {
     private route: ActivatedRoute) { }
 
   ngOnInit(): void {
-    var lectureId = this.route.snapshot.paramMap.get('lectureId');
+    const lectureId = this.route.snapshot.paramMap.get('lectureId');
     this.lectureService.getLecture(lectureId).subscribe(x => this.lecture = x);
   }
 
+  doProcess(recording: Recording): void {
+    this.lectureService.processRecording(recording).subscribe();
+  }
 }

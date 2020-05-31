@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace lecture_recording_manager.Migrations
+namespace LectureRecordingManager.Migrations
 {
     public partial class AddUploadAndPublishDateToRecording : Migration
     {

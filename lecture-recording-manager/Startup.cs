@@ -1,4 +1,4 @@
-using lecture_recording_manager.Models;
+using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -8,8 +8,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
+using Hangfire;
+using Hangfire.PostgreSql;
+using System;
+using LectureRecordingManager.Jobs;
+using RecordingProcessor.Studio;
 
-namespace lecture_recording_manager
+namespace LectureRecordingManager
 {
     public class Startup
     {
@@ -30,11 +35,19 @@ namespace lecture_recording_manager
                 configuration.RootPath = "ClientApp/dist";
             });
 
+            services.AddHangfire(config => config.UsePostgreSqlStorage(Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddDbContext<DatabaseContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+
+            // add media convertion utils
+            services.AddTransient<ChromaKeyParamGuesser, ChromaKeyParamGuesser>();
+            services.AddTransient<MediaConverter, MediaConverter>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, 
+            IWebHostEnvironment env,
+            IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -53,6 +66,13 @@ namespace lecture_recording_manager
             {
                 app.UseSpaStaticFiles();
             }
+
+            // Configure hangfire to use the new JobActivator we defined.
+            GlobalConfiguration.Configuration
+                .UseActivator(new ContainerJobActivator(serviceProvider));
+
+            app.UseHangfireServer();
+            app.UseHangfireDashboard();
 
             app.UseRouting();
 

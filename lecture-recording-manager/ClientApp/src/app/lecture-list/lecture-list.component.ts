@@ -16,7 +16,7 @@ export class LectureListComponent implements OnInit {
     private route: ActivatedRoute) { }
 
   ngOnInit(): void {
-    let semesterId = this.route.snapshot.paramMap.get('semesterId');
+    const semesterId = this.route.snapshot.paramMap.get('semesterId');
 
     if (semesterId === null) {
       this.lectureService.getLectures().subscribe(x => this.lectures = x);

@@ -1,9 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace lecture_recording_manager.Models
+namespace LectureRecordingManager.Models
 {
     public class DatabaseContext : DbContext
     {
+        public DatabaseContext() : base()
+        {
+        }
+
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         {
         }

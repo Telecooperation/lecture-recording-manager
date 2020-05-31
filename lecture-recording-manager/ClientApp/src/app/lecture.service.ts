@@ -10,7 +10,6 @@ import { Recording } from './shared/recording';
   providedIn: 'root'
 })
 export class LectureService {
-
   constructor(private http: HttpClient) { }
 
   getLecture(lectureId: string): Observable<Lecture> {
@@ -49,4 +48,9 @@ export class LectureService {
 
     return this.http.request(req);
   }
+
+  processRecording(recording: Recording) {
+    return this.http.get(environment.apiUrl + '/api/recording/process/' + recording.id);
+  }
+
 }

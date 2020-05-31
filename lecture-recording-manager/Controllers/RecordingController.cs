@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using lecture_recording_manager.Models;
+using Hangfire;
+using LectureRecordingManager.Jobs;
+using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
-namespace lecture_recording_manager.Controllers
+namespace LectureRecordingManager.Controllers
 {
     [ApiController]
     [Route("/api/[controller]")]
@@ -110,6 +112,11 @@ namespace lecture_recording_manager.Controllers
                 return NotFound();
             }
 
+            // update upload date
+            recording.UploadDate = DateTime.Now;
+            await _context.SaveChangesAsync();
+
+            // process files
             foreach (var file in files)
             {
                 if (file.Length > 0)
@@ -123,6 +130,21 @@ namespace lecture_recording_manager.Controllers
                     }
                 }
             }
+
+            return Ok();
+        }
+
+        [HttpGet("process/{id}")]
+        public async Task<IActionResult> ProcessRecording(int id)
+        {
+            var recording = await _context.Recordings.FindAsync(id);
+
+            if(recording == null)
+            {
+                return NotFound();
+            }
+
+            BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Execute(id));
 
             return Ok();
         }

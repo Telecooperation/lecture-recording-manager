@@ -1,0 +1,8 @@
+﻿################################################################################
+# Diese .gitignore-Datei wurde von Microsoft(R) Visual Studio automatisch erstellt.
+################################################################################
+
+/lecture-recording-processor/obj
+/storagePath
+/lecture-recording-processor/bin/Debug
+/.vs/lecture-recording-manager/v16/.suo

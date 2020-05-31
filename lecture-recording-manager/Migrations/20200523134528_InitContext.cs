@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace lecture_recording_manager.Migrations
+namespace LectureRecordingManager.Migrations
 {
     public partial class InitContext : Migration
     {

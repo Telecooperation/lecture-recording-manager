@@ -15,7 +15,7 @@ import { Router } from '@angular/router';
 export class LectureCreateEditComponent implements OnInit {
   form: FormGroup;
 
-  semesters: Semester[] = []
+  semesters: Semester[] = [];
   actionType: string;
 
   constructor(

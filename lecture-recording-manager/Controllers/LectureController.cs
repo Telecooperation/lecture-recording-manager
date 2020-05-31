@@ -1,5 +1,4 @@
-﻿using lecture_recording_manager.Models;
-using lecture_recording_manager.Models.Dto;
+﻿using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -8,7 +7,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-namespace lecture_recording_manager.Controllers
+namespace LectureRecordingManager.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

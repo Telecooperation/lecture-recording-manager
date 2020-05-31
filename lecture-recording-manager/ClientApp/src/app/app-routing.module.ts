@@ -3,8 +3,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { SemesterListComponent } from './semester-list/semester-list.component';
 import { LectureListComponent } from './lecture-list/lecture-list.component';
 import { LectureCreateEditComponent } from './lecture-create-edit/lecture-create-edit.component';
-import { LectureComponent } from './lecture/lecture.component';
 import { RecordingUploadComponent } from './recording-upload/recording-upload.component';
+import { LectureComponent } from './lecture/lecture.component';
 
 
 const routes: Routes = [

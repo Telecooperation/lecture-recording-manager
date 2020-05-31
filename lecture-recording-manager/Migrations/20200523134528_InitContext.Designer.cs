@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using lecture_recording_manager.Models;
+using LectureRecordingManager.Models;
 
-namespace lecture_recording_manager.Migrations
+namespace LectureRecordingManager.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
     [Migration("20200523134528_InitContext")]

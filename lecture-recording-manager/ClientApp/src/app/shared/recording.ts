@@ -1,5 +1,6 @@
 export class Recording {
   public id?: number;
+  public lectureId?: number;
   public title: string;
   public description?: string;
   public duration: number;

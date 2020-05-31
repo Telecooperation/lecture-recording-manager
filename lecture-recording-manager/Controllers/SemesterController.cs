@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using lecture_recording_manager.Models;
+using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace lecture_recording_manager.Controllers
+namespace LectureRecordingManager.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
