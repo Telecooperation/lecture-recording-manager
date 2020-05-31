@@ -1,0 +1,16 @@
+<nz-table #recordingTable [nzData]="recordings">
+  <thead>
+    <tr>
+      <th>Recording</th>
+      <th>Duration</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let recording of recordingTable.data">
+      <td>{{recording.title}}</td>
+      <td>{{recording.duration}}</td>
+      <td>{{recording.status}}</td>
+    </tr>
+  </tbody>
+</nz-table>

@@ -1,0 +1,39 @@
+<h2>Upload recording</h2>
+
+<form nz-form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7" nzRequired>Title</nz-form-label>
+    <nz-form-control [nzSpan]="12">
+      <input nz-input formControlName="title" placeholder="Title of the recording" required />
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7">Description</nz-form-label>
+    <nz-form-control [nzSpan]="12">
+      <input nz-input formControlName="description" placeholder="Detailed description of the recording"/>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7">Publishing date</nz-form-label>
+    <nz-form-control [nzSpan]="12">
+      <nz-date-picker nzShowTime
+                      nzFormat="yyyy-MM-dd HH:mm:ss"
+                      nzPlaceHolder="Select Time"
+                      formControlName="publishDate"></nz-date-picker>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7" nzRequired>Videos</nz-form-label>
+    <nz-form-control [nzSpan]="12">
+      <nz-upload [nzAction]="uploadUrl" [nzBeforeUpload]="beforeUpload" nzMultiple [nzFileList]="fileList">
+        <button nz-button type="button"><i nz-icon nzType="upload"></i>Upload</button>
+      </nz-upload>
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item>
+    <nz-form-control [nzOffset]="7" [nzSpan]="12">
+      <button nz-button nzType="primary" [disabled]="!form.valid">{{ uploading ? 'Uploading' : 'Start Upload' }}</button>
+    </nz-form-control>
+  </nz-form-item>
+</form>

@@ -1,0 +1,115 @@
+﻿using lecture_recording_manager.Models;
+using lecture_recording_manager.Models.Dto;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
+
+namespace lecture_recording_manager.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class LectureController : ControllerBase
+    {
+        private readonly DatabaseContext _context;
+
+        public LectureController(DatabaseContext context)
+        {
+            this._context = context;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Lecture>>> GetLectures()
+        {
+            return await _context.Lectures
+                .Include(x => x.Semester)
+                .ToListAsync();
+        }
+
+        [HttpGet("semester/{semesterId}")]
+        public async Task<ActionResult<IEnumerable<Lecture>>> GetLectureBySemester(int semesterId)
+        {
+            return await _context.Lectures
+                .Include(x => x.Semester)
+                .Where(x => x.Semester.Id == semesterId)
+                .ToListAsync();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Lecture>> GetLecture(int id)
+        {
+            var lecture = await _context.Lectures
+                .Include(x => x.Semester)
+                .Where(x => x.Id == id)
+                .SingleAsync();
+
+            if (lecture == null)
+            {
+                return NotFound();
+            }
+
+            return lecture;
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutLecture(int id, Lecture lecture)
+        {
+            if (id != lecture.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(lecture).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!LectureExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Lecture>> PostLecture(Lecture lecture)
+        {
+            _context.Lectures.Add(lecture);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetLecture), new { id = lecture.Id }, lecture);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Lecture>> DeleteLecture(int id)
+        {
+            var lecture = await _context.Lectures.FindAsync(id);
+            if (lecture == null)
+            {
+                return NotFound();
+            }
+
+            _context.Lectures.Remove(lecture);
+            await _context.SaveChangesAsync();
+
+            return lecture;
+        }
+
+        private bool LectureExists(int id)
+        {
+            return _context.Lectures.Any(e => e.Id == id);
+        }
+    }
+}

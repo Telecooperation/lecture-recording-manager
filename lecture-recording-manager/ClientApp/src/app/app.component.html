@@ -1,0 +1,13 @@
+<nz-layout>
+  <nz-header>
+    <div class="logo">Lecture Recording Manager</div>
+
+    <ul nz-menu nzTheme="dark" nzMode="horizontal">
+      <li nz-menu-item [routerLink]="['/', 'semesters']" nzMatchRouter>Semesters</li>
+      <li nz-menu-item [routerLink]="['/', 'lectures']" nzMatchRouter>Lectures</li>
+    </ul>
+  </nz-header>
+  <nz-content>
+    <router-outlet></router-outlet>
+  </nz-content>
+</nz-layout>

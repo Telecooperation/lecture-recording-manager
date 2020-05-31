@@ -1,0 +1,14 @@
+<div *ngIf="lecture">
+  <h2>{{lecture.title}}</h2>
+
+  <nz-descriptions nzTitle="Lecture details" nzBordered>
+    <nz-descriptions-item nzTitle="Title" nzSpan="3">{{lecture.title}}</nz-descriptions-item>
+    <nz-descriptions-item nzTitle="Description" nzSpan="3">{{lecture.description}}</nz-descriptions-item>
+    <nz-descriptions-item nzTitle="Semester">{{lecture.semester.name}}</nz-descriptions-item>
+    <nz-descriptions-item nzTitle="Published">{{lecture.publish}}</nz-descriptions-item>
+    <nz-descriptions-item nzTitle="Active">{{lecture.active}}</nz-descriptions-item>
+  </nz-descriptions>
+
+  <h3>Recordings</h3>
+  <app-recording-list [lecture]="lecture"></app-recording-list>
+</div>
