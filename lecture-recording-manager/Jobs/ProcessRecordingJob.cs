@@ -1,5 +1,7 @@
 ﻿using Hangfire;
+using LectureRecordingManager.Hubs;
 using LectureRecordingManager.Models;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -17,16 +19,19 @@ namespace LectureRecordingManager.Jobs
     {
         private readonly DatabaseContext _context;
         private readonly IConfiguration _config;
+        private readonly IHubContext<MessageHub> hub;
         private readonly ChromaKeyParamGuesser chromaKeyParamGuesser;
         private readonly MediaConverter converter;
 
         public ProcessRecordingJob(DatabaseContext context,
             IConfiguration config,
+            IHubContext<MessageHub> hub,
             ChromaKeyParamGuesser chromaKeyParamGuesser,
             MediaConverter converter)
         {
             this._context = context;
             this._config = config;
+            this.hub = hub;
             this.chromaKeyParamGuesser = chromaKeyParamGuesser;
             this.converter = converter;
         }
@@ -44,6 +49,7 @@ namespace LectureRecordingManager.Jobs
 
             recording.Status = RecordingStatus.PROCESSING;
             await _context.SaveChangesAsync();
+            await UpdateLectureRecordingStatus();
 
             // start encoding
             if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING)
@@ -61,35 +67,81 @@ namespace LectureRecordingManager.Jobs
                     recording.Status = RecordingStatus.ERROR;
                     recording.StatusText = "Could not find studio meta data.";
                     await _context.SaveChangesAsync();
+                    await UpdateLectureRecordingStatus();
 
                     throw new Exception("Could not find studio meta data.");
                 }
 
-                // convert files
-                var metaData = ConvertStudioRecording(inputFileName, outputFolder);
-                recording.Duration = metaData.Duration;
-
-                // add slides
-                foreach (var slide in metaData.Slides)
+                try
                 {
-                    var chapter = new RecordingChapter()
+                    // convert files
+                    var metaData = ConvertStudioRecording(inputFileName, outputFolder, false);
+                    recording.Duration = metaData.Duration;
+                    recording.Chapters.Clear();
+
+                    // add slides
+                    foreach (var slide in metaData.Slides)
                     {
-                        Recording = recording,
-                        StartPosition = slide.StartPosition,
-                        Text = slide.Ocr,
-                        Thumbnail = slide.Thumbnail
-                    };
+                        var chapter = new RecordingChapter()
+                        {
+                            Recording = recording,
+                            StartPosition = slide.StartPosition,
+                            Text = slide.Ocr,
+                            Thumbnail = slide.Thumbnail
+                        };
 
-                    _context.RecordingChapters.Add(chapter);
+                        _context.RecordingChapters.Add(chapter);
+                    }
+
+                    recording.Status = RecordingStatus.PROCESSED;
+                    recording.StatusText = null;
+                    await _context.SaveChangesAsync();
+                    await UpdateLectureRecordingStatus();
                 }
+                catch (Exception ex)
+                {
+                    recording.Status = RecordingStatus.ERROR;
+                    recording.StatusText = ex.Message;
+                    await _context.SaveChangesAsync();
+                    await UpdateLectureRecordingStatus();
 
-                recording.Status = RecordingStatus.PROCESSED;
-                recording.StatusText = null;
-                await _context.SaveChangesAsync();
+                    throw ex;
+                }
             }
         }
 
-        private RecordingMetadata ConvertStudioRecording(string inputFileName, string outputFolder)
+        [AutomaticRetry(Attempts = 1)]
+        public async Task Preview(int recordingId)
+        {
+            // set status
+            var recording = await _context.Recordings.FindAsync(recordingId);
+
+            // start encoding preview
+            if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING)
+            {
+                var filePath = Path.Combine(_config["UploadVideoPath"], recording.Id.ToString());
+                var outputFolder = Path.Combine(filePath, "preview");
+                Directory.CreateDirectory(outputFolder);
+
+                var inputFileName = Directory.GetFiles(filePath)
+                    .Where(x => x.EndsWith("_meta.json"))
+                    .SingleOrDefault();
+
+                if (inputFileName == null)
+                {
+                    throw new Exception("Could not find studio meta data.");
+                }
+
+                // convert files
+                ConvertStudioRecording(inputFileName, outputFolder, true);
+
+                recording.Preview = true;
+                await _context.SaveChangesAsync();
+                await UpdateLectureRecordingStatus();
+            }
+        }
+
+        private RecordingMetadata ConvertStudioRecording(string inputFileName, string outputFolder, bool preview)
         {
             // identify file paths
             var slideVideoPath = inputFileName.Replace("_meta.json", "_slides.mp4");
@@ -132,8 +184,22 @@ namespace LectureRecordingManager.Jobs
                 ExportJson = false
             };
 
-            return converter.ConvertMedia(config);
+            if (preview)
+            {
+                return converter.ConvertPreviewMedia(config);
+            }
+            else
+            {
+                return converter.ConvertMedia(config);
+            }
         }
 
+        private async Task UpdateLectureRecordingStatus()
+        {
+            await hub.Clients.All.SendAsync("StatusChanged", new Message()
+            {
+                Type = "UPDATE_LECTURE_RECORDING_STATUS"
+            });
+        }
     }
 }

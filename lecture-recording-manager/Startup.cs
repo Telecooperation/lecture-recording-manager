@@ -13,6 +13,8 @@ using Hangfire.PostgreSql;
 using System;
 using LectureRecordingManager.Jobs;
 using RecordingProcessor.Studio;
+using Microsoft.AspNetCore.Http.Features;
+using LectureRecordingManager.Hubs;
 
 namespace LectureRecordingManager
 {
@@ -42,6 +44,14 @@ namespace LectureRecordingManager
             // add media convertion utils
             services.AddTransient<ChromaKeyParamGuesser, ChromaKeyParamGuesser>();
             services.AddTransient<MediaConverter, MediaConverter>();
+
+            services.Configure<FormOptions>(x =>
+            {
+                x.ValueLengthLimit = int.MaxValue;
+                x.MultipartBodyLengthLimit = int.MaxValue;
+            });
+
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -78,6 +88,8 @@ namespace LectureRecordingManager
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHub<MessageHub>("/messagehub");
+
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");

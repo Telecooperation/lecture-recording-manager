@@ -37,6 +37,8 @@ namespace LectureRecordingManager.Models
 
         public int Sorting { get; set; }
 
+        public bool Preview { get; set; }
+
         public List<RecordingChapter> Chapters { get; set; }
     }
 }

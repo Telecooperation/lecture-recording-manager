@@ -14,6 +14,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LectureComponent } from './lecture/lecture.component';
 import { RecordingListComponent } from './recording-list/recording-list.component';
 import { RecordingUploadComponent } from './recording-upload/recording-upload.component';
+import { DurationPipe } from './pipes/duration.pipe';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { RecordingUploadComponent } from './recording-upload/recording-upload.co
     LectureCreateEditComponent,
     LectureComponent,
     RecordingListComponent,
-    RecordingUploadComponent
+    RecordingUploadComponent,
+    DurationPipe
   ],
   imports: [
     BrowserModule,

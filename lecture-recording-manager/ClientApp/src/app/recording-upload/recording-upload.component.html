@@ -2,9 +2,26 @@
 
 <form nz-form [formGroup]="form" (ngSubmit)="onSubmit()">
   <nz-form-item>
+    <nz-form-label [nzSpan]="7">Lecture</nz-form-label>
+    <nz-form-control [nzSpan]="12"><b>{{lecture.title}}</b></nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7">Semester</nz-form-label>
+    <nz-form-control [nzSpan]="12"><b>{{lecture.semester.name}}</b></nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
     <nz-form-label [nzSpan]="7" nzRequired>Title</nz-form-label>
     <nz-form-control [nzSpan]="12">
       <input nz-input formControlName="title" placeholder="Title of the recording" required />
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7" nzRequired>Recording type</nz-form-label>
+    <nz-form-control [nzSpan]="12">
+      <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Select a type" formControlName="type" required>
+        <nz-option nzLabel="Green Screen Studio" [nzValue]="1"></nz-option>
+        <nz-option nzLabel="Other" [nzValue]="0"></nz-option>
+      </nz-select>
     </nz-form-control>
   </nz-form-item>
   <nz-form-item>
@@ -33,7 +50,7 @@
 
   <nz-form-item>
     <nz-form-control [nzOffset]="7" [nzSpan]="12">
-      <button nz-button nzType="primary" [disabled]="!form.valid">{{ uploading ? 'Uploading' : 'Start Upload' }}</button>
+      <button nz-button nzType="primary" [nzLoading]="uploading" [disabled]="!form.valid">{{ uploading ? 'Uploading' : 'Start Upload' }}</button>
     </nz-form-control>
   </nz-form-item>
 </form>

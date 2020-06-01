@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RecordingProcessor.Utils
+namespace LectureRecordingManager.Utils
 {
     public class StringUtils
     {

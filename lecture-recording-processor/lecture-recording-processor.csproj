@@ -5,6 +5,8 @@
     <PackageId>lecture-recording-processor</PackageId>
     <Authors>TKLabs</Authors>
     <Product>lecture-converter-app</Product>
+    <RootNamespace>RecordingProcessor</RootNamespace>
+    <AssemblyName>RecordingProcessor</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

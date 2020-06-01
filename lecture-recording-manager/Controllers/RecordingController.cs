@@ -131,11 +131,14 @@ namespace LectureRecordingManager.Controllers
                 }
             }
 
+            // process upload
+            BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Preview(recording.Id));
+
             return Ok();
         }
 
         [HttpGet("process/{id}")]
-        public async Task<IActionResult> ProcessRecording(int id)
+        public async Task<ActionResult<Recording>> ProcessRecording(int id)
         {
             var recording = await _context.Recordings.FindAsync(id);
 
@@ -144,7 +147,41 @@ namespace LectureRecordingManager.Controllers
                 return NotFound();
             }
 
+            // schedule recording
+            recording.Status = RecordingStatus.SCHEDULED;
+            await _context.SaveChangesAsync();
+
+            // enqueue processing
             BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Execute(id));
+
+            return recording;
+        }
+
+        [HttpGet("preview/{id}")]
+        public async Task<ActionResult<Recording>> PreviewImage(int id)
+        {
+            var recording = await _context.Recordings.FindAsync(id);
+
+            if (recording == null && recording.Preview)
+            {
+                return NotFound();
+            }
+
+            var stream = new FileStream(Path.Combine(_config["UploadVideoPath"], id.ToString(), "preview", "thumbnail.jpg"), FileMode.Open);
+            return File(stream, System.Net.Mime.MediaTypeNames.Image.Jpeg);
+        }
+
+        [HttpGet("previewdo/{id}")]
+        public async Task<ActionResult<Recording>> PreviewdoImage(int id)
+        {
+            var recording = await _context.Recordings.FindAsync(id);
+
+            if (recording == null)
+            {
+                return NotFound();
+            }
+
+            BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Preview(id));
 
             return Ok();
         }

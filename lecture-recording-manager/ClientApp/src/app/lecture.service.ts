@@ -49,8 +49,8 @@ export class LectureService {
     return this.http.request(req);
   }
 
-  processRecording(recording: Recording) {
-    return this.http.get(environment.apiUrl + '/api/recording/process/' + recording.id);
+  processRecording(recording: Recording): Observable<Recording> {
+    return this.http.get<Recording>(environment.apiUrl + '/api/recording/process/' + recording.id);
   }
 
 }

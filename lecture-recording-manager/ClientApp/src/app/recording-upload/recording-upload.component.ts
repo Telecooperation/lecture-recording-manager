@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
 import { Recording } from '../shared/recording';
+import { Lecture } from '../shared/lecture';
 
 @Component({
   selector: 'app-recording-upload',
@@ -20,6 +21,8 @@ export class RecordingUploadComponent implements OnInit {
   public form: FormGroup;
   public uploading = false;
 
+  public lecture: Lecture;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -27,15 +30,19 @@ export class RecordingUploadComponent implements OnInit {
     private lectureService: LectureService) {
     this.form = this.fb.group({
       title: [null, [Validators.required]],
+      type: [null, [Validators.required]],
       description: [null],
       publishDate: [null]
     });
   }
 
   ngOnInit(): void {
+    const lectureId = this.route.snapshot.paramMap.get('lectureId');
+    this.lectureService.getLecture(lectureId).subscribe(x => this.lecture = x);
   }
 
   onSubmit(): void {
+    this.uploading = true;
     const lectureId = this.route.snapshot.paramMap.get('lectureId');
 
     const recording: Recording = Object.assign({}, this.form.value);

@@ -25,10 +25,13 @@ namespace RecordingProcessor.Studio
         public RecordingMetadata ConvertMedia(ConversionConfiguration config)
         {
             // generate output directory
+            if (Directory.Exists(config.OutputDirectory))
+                Directory.Delete(config.OutputDirectory, true);
+
             Directory.CreateDirectory(config.OutputDirectory);
 
             // convert file
-            ConvertVideoFiles(config);
+            ConvertVideoFiles(config, false);
 
             // generate recording object
             var finalRecording = new RecordingMetadata();
@@ -37,6 +40,29 @@ namespace RecordingProcessor.Studio
             finalRecording.StageVideo = "stage.mp4";
             finalRecording.Slides = BuildThumbnails(config, "slides.mp4");
             finalRecording.Duration = FFmpegHelper.GetMediaLength(config.SlideVideoPath).TotalSeconds;
+
+            return finalRecording;
+        }
+
+        public RecordingMetadata ConvertPreviewMedia(ConversionConfiguration config)
+        {
+            // generate output directory
+            if (Directory.Exists(config.OutputDirectory))
+                Directory.Delete(config.OutputDirectory, true);
+
+            Directory.CreateDirectory(config.OutputDirectory);
+
+            // convert file
+            ConvertVideoFiles(config, true);
+
+            // generate recording object
+            var finalRecording = new RecordingMetadata();
+            finalRecording.FileName = "slides.mp4";
+            finalRecording.PresenterFileName = "talkinghead.mp4";
+            finalRecording.StageVideo = "stage.mp4";
+            finalRecording.Duration = FFmpegHelper.GetMediaLength(config.SlideVideoPath).TotalSeconds;
+
+            FFmpegHelper.ExportThumbnail(5f, Path.Combine(config.OutputDirectory, "stage.mp4"), config.OutputDirectory, "thumbnail");
 
             return finalRecording;
         }
@@ -183,10 +209,8 @@ namespace RecordingProcessor.Studio
             return result;
         }
 
-        public void ConvertVideoFiles(ConversionConfiguration config)
+        public void ConvertVideoFiles(ConversionConfiguration config, bool preview)
         {
-            return;
-
             var lenSlideVideo = FFmpegHelper.GetMediaLength(config.SlideVideoPath);
             var lenTHVideo = FFmpegHelper.GetMediaLength(config.TalkingHeadVideoPath);
 
@@ -199,10 +223,6 @@ namespace RecordingProcessor.Studio
                             "\"" +
                             "[1:v]trim=start=" + trimTHVideo.TotalSeconds.ToString("0.00000", CultureInfo.InvariantCulture) + ",setpts=PTS-STARTPTS[1v];" +
                             "[1:a]atrim=start=" + trimTHVideo.TotalSeconds.ToString("0.00000", CultureInfo.InvariantCulture) + ",asetpts=PTS-STARTPTS,asplit=2[1a1][1a2];" +
-                            //"[0:v]scale=" + config.recordingStyle.targetDimension.width + ":" +
-                            //  config.recordingStyle.targetDimension.height + ",split=2[slides1][slides2];" +
-                            //"scale=" + targetDimension.width + ":-2, crop=" + targetDimension.width + ":" +
-                            //targetDimension.height + "\"
                             "[0:v]scale=" + config.RecordingStyle.targetDimension.width + ":-2, crop=" + config.RecordingStyle.targetDimension.width + ":" +
                             config.RecordingStyle.targetDimension.height + ",fps=fps=30,split=2[slides1][slides2];" +
                             "[1v]scale=" + config.RecordingStyle.targetDimension.width + ":" +
@@ -223,9 +243,9 @@ namespace RecordingProcessor.Studio
                             "[2][slides_perspective]overlay=0:0[slides_with_background];" +
                             "[slides_with_background][th_ck_tr]overlay=0:0[stage]" +
                             "\" " +
-                            "-map \"[slides1]\" -f mp4 -vcodec libx264 -crf 23 -preset veryfast -tune stillimage -profile:v baseline -level 3.0 -pix_fmt yuv420p -r 30 \"" + Path.Combine(config.OutputDirectory, "slides.mp4") + "\" " +
-                            "-map \"[th_ck_ct]\" -map \"[1a1]\" -f mp4 -vcodec libx264 -crf 23 -preset veryfast -profile:v baseline -level 3.0 -pix_fmt yuv420p -r 30 -acodec aac -b:a 192k \"" + Path.Combine(config.OutputDirectory, "talkinghead.mp4") + "\" " +
-                            "-map \"[stage]\" -map \"[1a2]\" -f mp4 -vcodec libx264 -crf 23 -preset veryfast -profile:v baseline -level 3.0 -pix_fmt yuv420p -r 30 -acodec aac -b:a 192k \"" + Path.Combine(config.OutputDirectory, "stage.mp4") + "\" ";
+                            "-map \"[slides1]\" -f mp4 -vcodec libx264 -crf 23 -preset veryfast -tune stillimage -profile:v baseline -level 3.0 -pix_fmt yuv420p -r 30 " + (preview ? " -t 10 " : "") + "\"" + Path.Combine(config.OutputDirectory, "slides.mp4") + "\" " +
+                            "-map \"[th_ck_ct]\" -map \"[1a1]\" -f mp4 -vcodec libx264 -crf 23 -preset veryfast -profile:v baseline -level 3.0 -pix_fmt yuv420p -r 30 -acodec aac -b:a 192k " + (preview ? " -t 10 " : "") + "\"" + Path.Combine(config.OutputDirectory, "talkinghead.mp4") + "\" " +
+                            "-map \"[stage]\" -map \"[1a2]\" -f mp4 -vcodec libx264 -crf 23 -preset veryfast -profile:v baseline -level 3.0 -pix_fmt yuv420p -r 30 -acodec aac -b:a 192k " + (preview ? " -t 10 " : "") + "\"" + Path.Combine(config.OutputDirectory, "stage.mp4") + "\" ";
 
             _logger.LogInformation("Execute ffmpeg: {0}", args);
 
