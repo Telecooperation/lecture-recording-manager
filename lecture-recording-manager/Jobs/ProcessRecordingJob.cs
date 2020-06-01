@@ -107,6 +107,14 @@ namespace LectureRecordingManager.Jobs
                         _context.RecordingChapters.Add(chapter);
                     }
 
+                    // copy thumbnails
+                    Directory.CreateDirectory(Path.Combine(outputFolder, "..", "thumbs"));
+
+                    foreach (var thumb in Directory.GetFiles(Path.Combine(outputFolder, "thumbs")))
+                    {
+                        File.Copy(thumb, Path.Combine(outputFolder, "..", "thumbs", Path.GetFileName(thumb)));
+                    }
+
                     recording.Status = RecordingStatus.PROCESSED;
                     recording.StatusText = null;
                     await _context.SaveChangesAsync();

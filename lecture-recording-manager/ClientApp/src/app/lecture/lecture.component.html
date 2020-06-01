@@ -7,6 +7,7 @@
     <nz-descriptions-item nzTitle="Semester">{{lecture.semester.name}}</nz-descriptions-item>
     <nz-descriptions-item nzTitle="Published">{{lecture.publish}}</nz-descriptions-item>
     <nz-descriptions-item nzTitle="Active">{{lecture.active}}</nz-descriptions-item>
+    <nz-descriptions-item nzTitle="Publish path">{{lecture.publishPath}}</nz-descriptions-item>
   </nz-descriptions>
 
   <h3>Recordings</h3>
@@ -14,5 +15,5 @@
     <button nz-button nzType="primary" [routerLink]="['/', 'lecture', lecture.id, 'upload']"><i nz-icon nzType="upload" nzTheme="outline"></i> Upload recording</button>
   </p>
 
-  <app-recording-list [lecture]="lecture" (processClick)="doProcess($event)"></app-recording-list>
+  <app-recording-list [lecture]="lecture" (processClick)="doProcess($event)" (publishClick)="doPublish($event)"></app-recording-list>
 </div>

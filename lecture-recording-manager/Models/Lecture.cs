@@ -23,6 +23,10 @@ namespace LectureRecordingManager.Models
 
         public Semester Semester { get; set; }
 
+        public string SourcePath { get; set; }
+
+        public string PublishPath { get; set; }
+
         public bool Publish { get; set; }
 
         public bool Active { get; set; }

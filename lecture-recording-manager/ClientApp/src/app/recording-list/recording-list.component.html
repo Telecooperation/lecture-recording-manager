@@ -19,10 +19,10 @@
       <td>{{recording.duration | duration}}</td>
       <td nzAlign="center">
         <span>
-          <i *ngIf="recording.publish" nz-icon nzType="check-circle" nzTheme="outline"></i>
-          <i *ngIf="!recording.publish" nz-icon nzType="close-circle" nzTheme="outline"></i>
+          <i *ngIf="recording.published" nz-icon nzType="check-circle" nzTheme="outline"></i>
+          <i *ngIf="!recording.published" nz-icon nzType="close-circle" nzTheme="outline"></i>
         </span>
-        <span *ngIf="recording.publishDate && !recording.publish"><br>{{recording.publishDate | date:'medium'}}</span>
+        <span *ngIf="recording.publishDate && !recording.published"><br>{{recording.publishDate | date:'medium'}}</span>
       </td>
       <td>
         <nz-tag *ngIf="recording.status == -1" [nzColor]="'red'">Error</nz-tag>
@@ -31,6 +31,7 @@
         <nz-tag *ngIf="recording.status == 2" [nzColor]="'orange'">Processed</nz-tag>
         <nz-tag *ngIf="recording.status == 3" [nzColor]="'blue'">Scheduled</nz-tag>
         <nz-tag *ngIf="recording.status == 4" [nzColor]="'green'">Published</nz-tag>
+        <nz-tag *ngIf="recording.status == 5" [nzColor]="'blue'">Publishing</nz-tag>
       </td>
       <td>
         <button *ngIf="recording.status <= 0" nz-button (click)="doProcess(recording)">Process recording</button>

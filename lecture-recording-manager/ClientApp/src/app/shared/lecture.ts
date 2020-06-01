@@ -10,4 +10,7 @@ export class Lecture {
 
   public publish: boolean;
   public active: boolean;
+
+  public publishPath: string;
+  public sourcePath: string;
 }

@@ -18,9 +18,9 @@ export class DurationPipe implements PipeTransform {
     const minutes = Math.floor((sec_num - (hours * 3600)) / 60);
     const seconds = Math.floor(sec_num - (hours * 3600) - (minutes * 60));
 
-    let hours_s = hours;
-    let minutes_s = minutes;
-    let seconds_s = seconds;
+    let hours_s = hours.toString();
+    let minutes_s = minutes.toString();
+    let seconds_s = seconds.toString();
 
     if (hours   < 10) { hours_s   = '0' + hours; }
     if (minutes < 10) { minutes_s = '0' + minutes; }

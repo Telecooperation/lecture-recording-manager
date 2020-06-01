@@ -62,4 +62,8 @@ export class LectureService {
   getRecordingChapters(recordingId: string): Observable<RecordingChapter[]> {
     return this.http.get<RecordingChapter[]>(environment.apiUrl + '/api/recording/' + recordingId + '/chapters');
   }
+
+  publishRecording(recording: Recording): Observable<Recording> {
+    return this.http.get<Recording>(environment.apiUrl + '/api/recording/publish/' + recording.id);
+  }
 }

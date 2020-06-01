@@ -11,6 +11,8 @@ namespace LectureRecordingManager.Models
         SCHEDULED = 3,
         PROCESSING = 1,
         PROCESSED = 2,
+        SCHEDULED_PUBLISH = 5,
+        PUBLISHED = 4,
         ERROR = -1
     }
 }

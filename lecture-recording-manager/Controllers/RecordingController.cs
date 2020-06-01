@@ -191,8 +191,28 @@ namespace LectureRecordingManager.Controllers
                 return NotFound();
             }
 
-            var stream = new FileStream(Path.Combine(chapter.Recording.FilePath, "output", chapter.Thumbnail), FileMode.Open);
+            var stream = new FileStream(Path.Combine(chapter.Recording.FilePath, chapter.Thumbnail), FileMode.Open);
             return File(stream, System.Net.Mime.MediaTypeNames.Image.Jpeg);
+        }
+
+        [HttpGet("publish/{id}")]
+        public async Task<ActionResult<Recording>> PublishRecording(int id)
+        {
+            var recording = await _context.Recordings
+                .FindAsync(id);
+
+            if (recording == null || recording.Status != RecordingStatus.PROCESSED)
+            {
+                return NotFound();
+            }
+
+            // schedule publish
+            recording.Status = RecordingStatus.SCHEDULED_PUBLISH;
+            await _context.SaveChangesAsync();
+
+            BackgroundJob.Enqueue<PublishRecordingJob>(x => x.PublishRecording(recording.Id));
+
+            return recording;
         }
 
         [HttpGet("previewdo/{id}")]

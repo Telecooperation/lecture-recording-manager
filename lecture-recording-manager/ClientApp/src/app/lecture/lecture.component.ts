@@ -41,4 +41,8 @@ export class LectureComponent implements OnInit {
   doProcess(recording: Recording): void {
     this.lectureService.processRecording(recording).subscribe(x => this.recordingListComponent.loadList());
   }
+
+  doPublish(recording: Recording): void {
+    this.lectureService.publishRecording(recording).subscribe(x => this.recordingListComponent.loadList());
+  }
 }
