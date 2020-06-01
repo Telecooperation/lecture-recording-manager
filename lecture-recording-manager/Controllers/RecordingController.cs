@@ -103,7 +103,7 @@ namespace LectureRecordingManager.Controllers
         }
 
         [HttpPost("upload/{recordingId}"), DisableRequestSizeLimit]
-        public async Task<IActionResult> UploadFiles(int recordingId, [FromForm(Name ="files")] List<IFormFile> files)
+        public async Task<IActionResult> UploadFiles(int recordingId, [FromForm(Name = "files")] List<IFormFile> files)
         {
             var recording = await _context.Recordings.FindAsync(recordingId);
 
@@ -112,8 +112,9 @@ namespace LectureRecordingManager.Controllers
                 return NotFound();
             }
 
-            // update upload date
+            // update upload date and default file path
             recording.UploadDate = DateTime.Now;
+            recording.FilePath = Path.Combine(_config["UploadVideoPath"], recording.Id.ToString());
             await _context.SaveChangesAsync();
 
             // process files
@@ -121,10 +122,9 @@ namespace LectureRecordingManager.Controllers
             {
                 if (file.Length > 0)
                 {
-                    var filePath = Path.Combine(_config["UploadVideoPath"], recording.Id.ToString());
-                    Directory.CreateDirectory(filePath);
+                    Directory.CreateDirectory(recording.FilePath);
 
-                    using (var stream = System.IO.File.Create(Path.Combine(filePath, file.FileName)))
+                    using (var stream = System.IO.File.Create(Path.Combine(recording.FilePath, file.FileName)))
                     {
                         await file.CopyToAsync(stream);
                     }
@@ -142,7 +142,7 @@ namespace LectureRecordingManager.Controllers
         {
             var recording = await _context.Recordings.FindAsync(id);
 
-            if(recording == null)
+            if (recording == null)
             {
                 return NotFound();
             }
@@ -167,7 +167,31 @@ namespace LectureRecordingManager.Controllers
                 return NotFound();
             }
 
-            var stream = new FileStream(Path.Combine(_config["UploadVideoPath"], id.ToString(), "preview", "thumbnail.jpg"), FileMode.Open);
+            var stream = new FileStream(Path.Combine(recording.FilePath, "preview", "thumbnail.jpg"), FileMode.Open);
+            return File(stream, System.Net.Mime.MediaTypeNames.Image.Jpeg);
+        }
+
+        [HttpGet("{id}/chapters")]
+        public async Task<ActionResult<IEnumerable<RecordingChapter>>> GetRecordingChapters(int id)
+        {
+            return await _context.RecordingChapters
+                .Where(x => x.Recording.Id == id)
+                .ToListAsync();
+        }
+
+        [HttpGet("preview/chapter/{id}")]
+        public async Task<ActionResult> PreviewChapterImage(int id)
+        {
+            var chapter = await _context.RecordingChapters
+                .Include(x => x.Recording)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (chapter == null)
+            {
+                return NotFound();
+            }
+
+            var stream = new FileStream(Path.Combine(chapter.Recording.FilePath, "output", chapter.Thumbnail), FileMode.Open);
             return File(stream, System.Net.Mime.MediaTypeNames.Image.Jpeg);
         }
 

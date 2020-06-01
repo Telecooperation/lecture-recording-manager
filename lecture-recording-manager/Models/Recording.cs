@@ -39,6 +39,8 @@ namespace LectureRecordingManager.Models
 
         public bool Preview { get; set; }
 
+        public string FilePath { get; set; }
+
         public List<RecordingChapter> Chapters { get; set; }
     }
 }

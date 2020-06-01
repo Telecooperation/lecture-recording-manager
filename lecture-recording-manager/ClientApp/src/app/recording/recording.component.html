@@ -1,0 +1,41 @@
+<div *ngIf="recording">
+    <h2>{{recording.title}}</h2>
+
+    <nz-descriptions nzTitle="Recording details" nzBordered>
+        <nz-descriptions-item nzTitle="Title" nzSpan="3">{{recording.title}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Description" nzSpan="3">{{recording.description}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Duration">{{recording.duration | duration}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Upload Date">{{recording.uploadDate | date:'medium'}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Publish Date">{{recording.publishDate | date:'medium'}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Storage Path">{{recording.filePath}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Status">
+            <nz-tag *ngIf="recording.status == -1" [nzColor]="'red'">Error</nz-tag>
+            <nz-tag *ngIf="recording.status == 0" [nzColor]="'grey'">Uploaded</nz-tag>
+            <nz-tag *ngIf="recording.status == 1" [nzColor]="'blue'">Processing...</nz-tag>
+            <nz-tag *ngIf="recording.status == 2" [nzColor]="'orange'">Processed</nz-tag>
+            <nz-tag *ngIf="recording.status == 3" [nzColor]="'blue'">Scheduled</nz-tag>
+            <nz-tag *ngIf="recording.status == 4" [nzColor]="'green'">Published</nz-tag>
+        </nz-descriptions-item>
+    </nz-descriptions>
+
+    <h2>Chapters</h2>
+
+    <nz-table #chapterTable [nzData]="chapters">
+        <thead>
+          <tr>
+            <th nzWidth="60px">Chapter</th>
+            <th>Text</th>
+            <th nzWidth="150px">Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let chapter of chapterTable.data">
+            <td>
+                <img src="/api/recording/preview/chapter/{{chapter.id}}" height="45px" />
+            </td>
+            <td>{{chapter.text | slice: 0:100}}</td>
+            <td>{{chapter.startPosition | duration : true}}</td>
+          </tr>
+        </tbody>
+    </nz-table>
+</div>

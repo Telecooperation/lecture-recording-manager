@@ -5,11 +5,13 @@ import { HttpClient, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Lecture } from './shared/lecture';
 import { Recording } from './shared/recording';
+import { RecordingChapter } from './shared/recording-chapter';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LectureService {
+
   constructor(private http: HttpClient) { }
 
   getLecture(lectureId: string): Observable<Lecture> {
@@ -30,6 +32,10 @@ export class LectureService {
 
   getRecordingsByLecture(lectureId: string): Observable<Recording[]> {
     return this.http.get<Recording[]>(environment.apiUrl + '/api/recording/lecture/' + lectureId);
+  }
+
+  getRecording(recordingId: string): Observable<Recording> {
+    return this.http.get<Recording>(environment.apiUrl + '/api/recording/' + recordingId);
   }
 
   postRecording(recording: Recording): Observable<Recording> {
@@ -53,4 +59,7 @@ export class LectureService {
     return this.http.get<Recording>(environment.apiUrl + '/api/recording/process/' + recording.id);
   }
 
+  getRecordingChapters(recordingId: string): Observable<RecordingChapter[]> {
+    return this.http.get<RecordingChapter[]>(environment.apiUrl + '/api/recording/' + recordingId + '/chapters');
+  }
 }

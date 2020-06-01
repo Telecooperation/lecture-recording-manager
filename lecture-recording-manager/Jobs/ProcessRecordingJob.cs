@@ -2,6 +2,7 @@
 using LectureRecordingManager.Hubs;
 using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -40,7 +41,9 @@ namespace LectureRecordingManager.Jobs
         public async Task Execute(int recordingId)
         {
             // set status
-            var recording = await _context.Recordings.FindAsync(recordingId);
+            var recording = await _context.Recordings
+                .Include(x => x.Chapters)
+                .FirstOrDefaultAsync(x => x.Id == recordingId);
 
             if (recording.Status == RecordingStatus.PROCESSING)
             {
@@ -54,13 +57,24 @@ namespace LectureRecordingManager.Jobs
             // start encoding
             if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING)
             {
-                var filePath = Path.Combine(_config["UploadVideoPath"], recording.Id.ToString());
-                var outputFolder = Path.Combine(filePath, "output");
-                Directory.CreateDirectory(outputFolder);
+                // file path is file?
+                string outputFolder = "";
+                string inputFileName = "";
 
-                var inputFileName = Directory.GetFiles(filePath)
-                    .Where(x => x.EndsWith("_meta.json"))
-                    .SingleOrDefault();
+                if (File.Exists(recording.FilePath))
+                {
+                    outputFolder = Path.Combine(Path.GetDirectoryName(recording.FilePath), "output");
+                    inputFileName = recording.FilePath;
+                }
+                else
+                {
+                    outputFolder = Path.Combine(recording.FilePath, "output");
+                    inputFileName = Directory.GetFiles(recording.FilePath)
+                        .Where(x => x.EndsWith("_meta.json"))
+                        .SingleOrDefault();
+                }
+
+                Directory.CreateDirectory(outputFolder);
 
                 if (inputFileName == null)
                 {
@@ -77,7 +91,7 @@ namespace LectureRecordingManager.Jobs
                     // convert files
                     var metaData = ConvertStudioRecording(inputFileName, outputFolder, false);
                     recording.Duration = metaData.Duration;
-                    recording.Chapters.Clear();
+                    _context.RecordingChapters.RemoveRange(recording.Chapters);
 
                     // add slides
                     foreach (var slide in metaData.Slides)
@@ -119,13 +133,22 @@ namespace LectureRecordingManager.Jobs
             // start encoding preview
             if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING)
             {
-                var filePath = Path.Combine(_config["UploadVideoPath"], recording.Id.ToString());
-                var outputFolder = Path.Combine(filePath, "preview");
-                Directory.CreateDirectory(outputFolder);
+                // file path is file?
+                string outputFolder = "";
+                string inputFileName = "";
 
-                var inputFileName = Directory.GetFiles(filePath)
-                    .Where(x => x.EndsWith("_meta.json"))
-                    .SingleOrDefault();
+                if (File.Exists(recording.FilePath))
+                {
+                    outputFolder = Path.Combine(Path.GetDirectoryName(recording.FilePath), "preview");
+                    inputFileName = recording.FilePath;
+                }
+                else
+                {
+                    outputFolder = Path.Combine(recording.FilePath, "preview");
+                    inputFileName = Directory.GetFiles(recording.FilePath)
+                        .Where(x => x.EndsWith("_meta.json"))
+                        .SingleOrDefault();
+                }
 
                 if (inputFileName == null)
                 {
@@ -133,9 +156,11 @@ namespace LectureRecordingManager.Jobs
                 }
 
                 // convert files
-                ConvertStudioRecording(inputFileName, outputFolder, true);
+                var metaData = ConvertStudioRecording(inputFileName, outputFolder, true);
 
                 recording.Preview = true;
+                recording.Duration = metaData.Duration;
+
                 await _context.SaveChangesAsync();
                 await UpdateLectureRecordingStatus();
             }

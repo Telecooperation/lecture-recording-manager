@@ -11,6 +11,7 @@ export class Recording {
   public uploadDate?: Date;
   public publishDate?: Date;
   public sorting?: number;
+  public filePath: string;
 }
 
 export enum RecordingStatus {

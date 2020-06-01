@@ -15,6 +15,7 @@ import { LectureComponent } from './lecture/lecture.component';
 import { RecordingListComponent } from './recording-list/recording-list.component';
 import { RecordingUploadComponent } from './recording-upload/recording-upload.component';
 import { DurationPipe } from './pipes/duration.pipe';
+import { RecordingComponent } from './recording/recording.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { DurationPipe } from './pipes/duration.pipe';
     LectureComponent,
     RecordingListComponent,
     RecordingUploadComponent,
-    DurationPipe
+    DurationPipe,
+    RecordingComponent
   ],
   imports: [
     BrowserModule,

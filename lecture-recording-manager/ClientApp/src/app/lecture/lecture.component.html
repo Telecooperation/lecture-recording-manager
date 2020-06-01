@@ -11,7 +11,7 @@
 
   <h3>Recordings</h3>
   <p>
-    <button nz-button nzType="primary" [routerLink]="['/', 'lecture', lecture.id, 'upload']">Upload recording</button>
+    <button nz-button nzType="primary" [routerLink]="['/', 'lecture', lecture.id, 'upload']"><i nz-icon nzType="upload" nzTheme="outline"></i> Upload recording</button>
   </p>
 
   <app-recording-list [lecture]="lecture" (processClick)="doProcess($event)"></app-recording-list>
