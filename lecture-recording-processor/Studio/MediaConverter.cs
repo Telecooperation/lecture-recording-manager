@@ -25,8 +25,8 @@ namespace RecordingProcessor.Studio
         public RecordingMetadata ConvertMedia(ConversionConfiguration config)
         {
             // generate output directory
-            if (Directory.Exists(config.OutputDirectory))
-                Directory.Delete(config.OutputDirectory, true);
+            //if (Directory.Exists(config.OutputDirectory))
+            //    Directory.Delete(config.OutputDirectory, true);
 
             Directory.CreateDirectory(config.OutputDirectory);
 
@@ -124,12 +124,14 @@ namespace RecordingProcessor.Studio
                         slide.StartPosition = 0.0f;
                     result.Add(slide);
                 }
-
-                ocrEngine.Dispose();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
+            }
+            finally
+            {
+                ocrEngine.Dispose();
             }
 
             return result.ToArray();
@@ -211,6 +213,8 @@ namespace RecordingProcessor.Studio
 
         public void ConvertVideoFiles(ConversionConfiguration config, bool preview)
         {
+            return;
+
             var lenSlideVideo = FFmpegHelper.GetMediaLength(config.SlideVideoPath);
             var lenTHVideo = FFmpegHelper.GetMediaLength(config.TalkingHeadVideoPath);
 
