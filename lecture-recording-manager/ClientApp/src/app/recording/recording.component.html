@@ -14,6 +14,9 @@
 
       <nz-dropdown-menu #menu1="nzDropdownMenu">
         <ul nz-menu>
+          <li nz-menu-item *ngIf="recording.status <= 0" (click)="doProcess()">Process Recording</li>
+          <li nz-menu-item *ngIf="recording.status == 2" (click)="doPublish()">Publish Now</li>
+
           <li nz-menu-item (click)="doDelete()"><span nz-typography nzType="danger"><i nz-icon nzType="delete" nzTheme="outline"></i> Delete Recording</span></li>
         </ul>
       </nz-dropdown-menu>
@@ -35,7 +38,9 @@
             <nz-tag *ngIf="recording.status == 4" [nzColor]="'green'">Published</nz-tag>
             <nz-tag *ngIf="recording.status == 5" [nzColor]="'blue'">Publishing</nz-tag>
         </nz-descriptions-item>
-    </nz-descriptions>
+      </nz-descriptions>
+
+      <nz-alert *ngIf="recording.status == -1" nzType="error" [nzMessage]="recording.statusText"></nz-alert>
     </nz-page-header-content>
   </nz-page-header>
 

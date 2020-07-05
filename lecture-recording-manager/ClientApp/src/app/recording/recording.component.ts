@@ -23,6 +23,10 @@ export class RecordingComponent implements OnInit {
 
   ngOnInit(): void {
     const recordingId = this.route.snapshot.paramMap.get('recordingId');
+    this.loadRecording(recordingId);
+  }
+
+  loadRecording(recordingId: string): void {
     this.lectureService.getRecording(recordingId).subscribe(x => this.recording = x);
     this.lectureService.getRecordingChapters(recordingId).subscribe(x => this.chapters = x);
   }
@@ -39,5 +43,13 @@ export class RecordingComponent implements OnInit {
         { nzPlacement: 'bottomRight'});
       this.router.navigate(['/', 'lecture', this.recording.lectureId]);
     });
+  }
+
+  doProcess(): void {
+    this.lectureService.processRecording(this.recording).subscribe(x => this.loadRecording(x.id.toString()));
+  }
+
+  doPublish(): void {
+    this.lectureService.publishRecording(this.recording).subscribe(x => this.loadRecording(x.id.toString()));
   }
 }
