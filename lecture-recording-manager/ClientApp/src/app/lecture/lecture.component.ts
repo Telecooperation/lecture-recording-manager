@@ -27,6 +27,10 @@ export class LectureComponent implements OnInit {
 
   ngOnInit(): void {
     const lectureId = this.route.snapshot.paramMap.get('lectureId');
+    this.loadLecture(lectureId);
+  }
+
+  private loadLecture(lectureId: string) {
     this.lectureService.getLecture(lectureId).subscribe(x => this.lecture = x);
   }
 
@@ -34,6 +38,10 @@ export class LectureComponent implements OnInit {
     this.signalR.statusChanged.subscribe((msg: Message) => {
       if (msg.type === 'UPDATE_LECTURE_RECORDING_STATUS') {
         this.recordingListComponent.loadList();
+      }
+
+      if (msg.type === 'UPDATE_LECTURE') {
+        this.loadLecture(this.lecture.id.toString());
       }
     })
   }
@@ -44,5 +52,9 @@ export class LectureComponent implements OnInit {
 
   doPublish(recording: Recording): void {
     this.lectureService.publishRecording(recording).subscribe(x => this.recordingListComponent.loadList());
+  }
+
+  doSynchronize(): void {
+    this.lectureService.synchronizeLecture(this.lecture);
   }
 }

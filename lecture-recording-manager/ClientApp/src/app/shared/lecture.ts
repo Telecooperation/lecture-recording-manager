@@ -10,6 +10,7 @@ export class Lecture {
 
   public publish: boolean;
   public active: boolean;
+  public lastSynchronized?: Date;
 
   public publishPath: string;
   public sourcePath: string;

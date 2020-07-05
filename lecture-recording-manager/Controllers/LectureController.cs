@@ -1,4 +1,6 @@
-﻿using LectureRecordingManager.Models;
+﻿using Hangfire;
+using LectureRecordingManager.Jobs;
+using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -104,6 +106,14 @@ namespace LectureRecordingManager.Controllers
             await _context.SaveChangesAsync();
 
             return lecture;
+        }
+
+        [HttpGet("synchronize/{id}")]
+        public async Task<IActionResult> SynchronizeLecture(int id)
+        {
+            BackgroundJob.Enqueue<SynchronizePublishedRecordingsJob>(x => x.SynchronizePublishedRecordings(id));
+
+            return Ok();
         }
 
         private bool LectureExists(int id)

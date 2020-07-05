@@ -1,4 +1,5 @@
-﻿using LectureRecordingManager.Hubs;
+﻿using Hangfire;
+using LectureRecordingManager.Hubs;
 using LectureRecordingManager.Models;
 using LectureRecordingManager.Utils;
 using Microsoft.AspNetCore.SignalR;
@@ -56,38 +57,17 @@ namespace LectureRecordingManager.Jobs
             // move files to output directory
             Directory.Move(Path.Combine(recording.FilePath, "output"), outputFolder);
 
-            // generate metadata
-            if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING)
-            {
-                var metadata = new RecordingMetadata()
-                {
-                    Id = recording.Title,
-                    Name = recording.Title,
-                    FileName = targetFolderName + "/slides.mp4",
-                    StageVideo = targetFolderName + "/stage.mp4",
-                    PresenterFileName = targetFolderName + "/talkinghead.mp4",
-                    Duration = recording.Duration,
-                    Date = recording.PublishDate.Value
-                };
-
-                metadata.Slides = recording.Chapters.Select(x => new Slide()
-                {
-                    Thumbnail = targetFolderName + "/" + x.Thumbnail,
-                    Ocr = x.Text,
-                    StartPosition = (float)x.StartPosition
-                }).ToArray();
-
-                var courseJsonMetadataFile = Path.Combine(recording.Lecture.PublishPath, "assets", "lecture.json");
-                var lecture = MetadataService.LoadSettings(recording.Lecture.Title, recording.Lecture.Semester.Name, courseJsonMetadataFile);
-                lecture.Recordings.Add(metadata);
-
-                MetadataService.SaveSettings(lecture, courseJsonMetadataFile);
-            }
-
             recording.Status = RecordingStatus.PUBLISHED;
             recording.Published = true;
+            if (!recording.PublishDate.HasValue)
+            {
+                recording.PublishDate = DateTime.Now;
+            }
+
             await _context.SaveChangesAsync();
+
             await UpdateLectureRecordingStatus();
+            BackgroundJob.Enqueue<SynchronizePublishedRecordingsJob>(x => x.SynchronizePublishedRecordings(recording.LectureId));
         }
 
         private async Task UpdateLectureRecordingStatus()

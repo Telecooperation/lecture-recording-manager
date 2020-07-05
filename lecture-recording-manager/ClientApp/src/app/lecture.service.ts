@@ -30,6 +30,10 @@ export class LectureService {
     return this.http.post<Lecture>(environment.apiUrl + '/api/lecture', lecture);
   }
 
+  synchronizeLecture(lecture: Lecture) {
+    return this.http.get(environment.apiUrl + '/api/lecture/synchronize/' + lecture.id);
+  }
+
   getRecordingsByLecture(lectureId: string): Observable<Recording[]> {
     return this.http.get<Recording[]>(environment.apiUrl + '/api/recording/lecture/' + lectureId);
   }

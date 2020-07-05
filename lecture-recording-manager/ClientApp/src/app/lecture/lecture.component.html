@@ -1,19 +1,31 @@
-<div *ngIf="lecture">
-  <h2>{{lecture.title}}</h2>
+<nz-layout *ngIf="lecture">
+  <nz-page-header [nzGhost]="false">
+    <nz-avatar nz-page-header-avatar nzIcon="read" nzTheme="fill"></nz-avatar>
 
-  <nz-descriptions nzTitle="Lecture details" nzBordered>
-    <nz-descriptions-item nzTitle="Title" nzSpan="3">{{lecture.title}}</nz-descriptions-item>
-    <nz-descriptions-item nzTitle="Description" nzSpan="3">{{lecture.description}}</nz-descriptions-item>
-    <nz-descriptions-item nzTitle="Semester">{{lecture.semester.name}}</nz-descriptions-item>
-    <nz-descriptions-item nzTitle="Published">{{lecture.publish}}</nz-descriptions-item>
-    <nz-descriptions-item nzTitle="Active">{{lecture.active}}</nz-descriptions-item>
-    <nz-descriptions-item nzTitle="Publish path">{{lecture.publishPath}}</nz-descriptions-item>
-  </nz-descriptions>
+    <nz-page-header-title>{{lecture.title}}</nz-page-header-title>
 
-  <h3>Recordings</h3>
-  <p>
-    <button nz-button nzType="primary" [routerLink]="['/', 'lecture', lecture.id, 'upload']"><i nz-icon nzType="upload" nzTheme="outline"></i> Upload recording</button>
-  </p>
+    <nz-page-header-extra>
+      <button nz-button nzType="primary" [routerLink]="['/', 'lecture', lecture.id, 'upload']"><i nz-icon nzType="upload" nzTheme="outline"></i> Upload recording</button>
+      <button nz-button (click)="doSynchronize()"><i nz-icon nzType="sync" nzTheme="outline"></i> Synchronize</button>
+    </nz-page-header-extra>
 
-  <app-recording-list [lecture]="lecture" (processClick)="doProcess($event)" (publishClick)="doPublish($event)"></app-recording-list>
-</div>
+    <nz-page-header-content>
+      <nz-descriptions [nzColumn]="2" nzSize="small">
+        <nz-descriptions-item nzTitle="Title" nzSpan="3">{{lecture.title}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Description" nzSpan="3">{{lecture.description}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Semester">{{lecture.semester.name}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Published">{{lecture.publish}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Active">{{lecture.active}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Publish path">{{lecture.publishPath}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Last synchronized">{{lecture.lastSynchronized | date:'medium'}}</nz-descriptions-item>
+      </nz-descriptions>
+    </nz-page-header-content>
+  </nz-page-header>
+
+  <nz-content>
+    
+
+    <h3>Recordings</h3>
+    <app-recording-list [lecture]="lecture" (processClick)="doProcess($event)" (publishClick)="doPublish($event)"></app-recording-list>
+  </nz-content>
+</nz-layout>
