@@ -57,7 +57,9 @@ namespace LectureRecordingManager.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(recording).State = EntityState.Modified;
+            var dbRecording = await _context.Recordings.FindAsync(id);
+            dbRecording.Title = recording.Title;
+            dbRecording.Description = recording.Description;
 
             try
             {
