@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { LectureService } from '../lecture.service';
+import { LectureService } from '../services/lecture.service';
 import { Lecture } from '../shared/lecture';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Recording } from '../shared/recording';

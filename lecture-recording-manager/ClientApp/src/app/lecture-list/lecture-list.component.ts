@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Lecture } from '../shared/lecture';
-import { LectureService } from '../lecture.service';
+import { LectureService } from '../services/lecture.service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Recording } from '../shared/recording';
-import { LectureService } from '../lecture.service';
+import { LectureService } from '../services/lecture.service';
 import { RecordingChapter } from '../shared/recording-chapter';
 
 @Component({

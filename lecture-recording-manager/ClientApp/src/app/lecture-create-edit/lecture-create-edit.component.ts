@@ -3,8 +3,8 @@ import { Lecture } from '../shared/lecture';
 
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Semester } from '../shared/semester';
-import { SemesterService } from '../semester.service';
-import { LectureService } from '../lecture.service';
+import { SemesterService } from '../services/semester.service';
+import { LectureService } from '../services/lecture.service';
 import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({

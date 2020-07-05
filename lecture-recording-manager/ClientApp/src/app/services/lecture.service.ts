@@ -3,9 +3,9 @@ import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Lecture } from './shared/lecture';
-import { Recording } from './shared/recording';
-import { RecordingChapter } from './shared/recording-chapter';
+import { Lecture } from '../shared/lecture';
+import { Recording } from '../shared/recording';
+import { RecordingChapter } from '../shared/recording-chapter';
 
 @Injectable({
   providedIn: 'root'

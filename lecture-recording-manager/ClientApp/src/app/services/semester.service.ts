@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
 import { Observable, from } from 'rxjs';
-import { Semester } from './shared/semester';
+import { Semester } from '../shared/semester';
 
 import { environment } from 'src/environments/environment';
 

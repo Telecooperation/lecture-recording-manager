@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { Lecture } from '../shared/lecture';
-import { LectureService } from '../lecture.service';
+import { LectureService } from '../services/lecture.service';
 import { Recording } from '../shared/recording';
 
 @Component({

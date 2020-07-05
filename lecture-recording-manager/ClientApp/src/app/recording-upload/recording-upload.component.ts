@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { UploadFile, NzNotificationService } from 'ng-zorro-antd';
 import { environment } from '../../environments/environment';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { LectureService } from '../lecture.service';
+import { LectureService } from '../services/lecture.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
