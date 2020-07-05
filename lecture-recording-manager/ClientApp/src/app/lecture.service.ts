@@ -42,8 +42,9 @@ export class LectureService {
     return this.http.post<Recording>(environment.apiUrl + '/api/recording', recording);
   }
 
-  uploadRecording(recordingId: string, files: any[]) {
+  uploadRecording(recordingId: string, process: boolean, files: any[]) {
     const formData = new FormData();
+    formData.append('process', process ? 'true' : 'false');
     files.forEach((file: any) => {
       formData.append('files', file);
     });

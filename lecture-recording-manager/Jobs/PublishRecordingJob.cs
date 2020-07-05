@@ -44,8 +44,8 @@ namespace LectureRecordingManager.Jobs
             Directory.CreateDirectory(Path.Combine(recording.Lecture.PublishPath, "video"));
             Directory.CreateDirectory(Path.Combine(recording.Lecture.PublishPath, "assets"));
 
-            var outputFolder = Path.Combine(recording.Lecture.PublishPath, "video", recording.UploadDate.ToString("yyyy-MM-dd-HH-mm-ss"));
-            var targetFolderName = recording.UploadDate.ToString("yyyy-MM-dd-HH-mm-ss");
+            var outputFolder = Path.Combine(recording.Lecture.PublishPath, "video", recording.Id.ToString());
+            var targetFolderName = recording.Id.ToString();
 
             if (Directory.Exists(outputFolder))
             {
@@ -67,7 +67,7 @@ namespace LectureRecordingManager.Jobs
                     StageVideo = targetFolderName + "/stage.mp4",
                     PresenterFileName = targetFolderName + "/talkinghead.mp4",
                     Duration = recording.Duration,
-                    Date = recording.PublishDate
+                    Date = recording.PublishDate.Value
                 };
 
                 metadata.Slides = recording.Chapters.Select(x => new Slide()

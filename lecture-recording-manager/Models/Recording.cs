@@ -31,9 +31,9 @@ namespace LectureRecordingManager.Models
 
         public string StatusText { get; set; }
 
-        public DateTime UploadDate { get; set; }
+        public DateTime? UploadDate { get; set; }
 
-        public DateTime PublishDate { get; set; }
+        public DateTime? PublishDate { get; set; }
 
         public int Sorting { get; set; }
 

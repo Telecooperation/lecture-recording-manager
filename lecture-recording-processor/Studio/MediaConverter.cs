@@ -213,8 +213,6 @@ namespace RecordingProcessor.Studio
 
         public void ConvertVideoFiles(ConversionConfiguration config, bool preview)
         {
-            return;
-
             var lenSlideVideo = FFmpegHelper.GetMediaLength(config.SlideVideoPath);
             var lenTHVideo = FFmpegHelper.GetMediaLength(config.TalkingHeadVideoPath);
 

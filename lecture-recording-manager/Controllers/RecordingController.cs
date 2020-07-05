@@ -103,7 +103,7 @@ namespace LectureRecordingManager.Controllers
         }
 
         [HttpPost("upload/{recordingId}"), DisableRequestSizeLimit]
-        public async Task<IActionResult> UploadFiles(int recordingId, [FromForm(Name = "files")] List<IFormFile> files)
+        public async Task<IActionResult> UploadFiles(int recordingId, [FromForm(Name = "process")] bool process, [FromForm(Name = "files")] List<IFormFile> files)
         {
             var recording = await _context.Recordings.FindAsync(recordingId);
 
@@ -131,8 +131,14 @@ namespace LectureRecordingManager.Controllers
                 }
             }
 
-            // process upload
+            // process upload (preview)
             BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Preview(recording.Id));
+
+            // process upload (convert)
+            if (process)
+            {
+                BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Execute(recording.Id));
+            }
 
             return Ok();
         }

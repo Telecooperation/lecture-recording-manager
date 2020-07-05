@@ -16,7 +16,7 @@
           {{recording.title}}
         </a>
       </td>
-      <td>{{recording.duration | duration}}</td>
+      <td>{{recording.duration | duration : false}}</td>
       <td nzAlign="center">
         <span>
           <i *ngIf="recording.published" nz-icon nzType="check-circle" nzTheme="outline"></i>

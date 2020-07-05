@@ -4,7 +4,7 @@
     <nz-descriptions nzTitle="Recording details" nzBordered>
         <nz-descriptions-item nzTitle="Title" nzSpan="3">{{recording.title}}</nz-descriptions-item>
         <nz-descriptions-item nzTitle="Description" nzSpan="3">{{recording.description}}</nz-descriptions-item>
-        <nz-descriptions-item nzTitle="Duration">{{recording.duration | duration}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Duration">{{recording.duration | duration : false}}</nz-descriptions-item>
         <nz-descriptions-item nzTitle="Upload Date">{{recording.uploadDate | date:'medium'}}</nz-descriptions-item>
         <nz-descriptions-item nzTitle="Publish Date">{{recording.publishDate | date:'medium'}}</nz-descriptions-item>
         <nz-descriptions-item nzTitle="Storage Path">{{recording.filePath}}</nz-descriptions-item>

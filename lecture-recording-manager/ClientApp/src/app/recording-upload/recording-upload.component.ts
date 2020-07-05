@@ -50,7 +50,7 @@ export class RecordingUploadComponent implements OnInit {
 
     this.lectureService.postRecording(recording).subscribe(x => {
       // upload files
-      this.lectureService.uploadRecording(x.id.toString(), this.fileList)
+      this.lectureService.uploadRecording(x.id.toString(), true, this.fileList)
       .pipe(filter(e => e instanceof HttpResponse))
       .subscribe(
         () => {
