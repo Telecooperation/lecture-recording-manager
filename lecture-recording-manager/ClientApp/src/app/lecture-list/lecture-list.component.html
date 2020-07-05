@@ -1,25 +1,33 @@
-<h2>Lectures</h2>
+<nz-layout>
+  <nz-page-header [nzGhost]="false">
+    <nz-avatar nz-page-header-avatar nzIcon="read" nzTheme="full"></nz-avatar>
 
-<p>
-  <button nz-button nzType="primary" [routerLink]="['/', 'lectures', 'new']">Add Lecture</button>
-</p>
+    <nz-page-header-title>Lectures</nz-page-header-title>
 
-<nz-table #lectureTable [nzData]="lectures">
-  <thead>
-    <tr>
-      <th>Lecture</th>
-      <th>Semester</th>
-      <th>Published</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let lecture of lectureTable.data">
-      <td><a [routerLink]="['/', 'lecture', lecture.id]">{{lecture.title}}</a></td>
-      <td><nz-tag [nzColor]="'gold'">{{lecture.semester.name}}</nz-tag></td>
-      <td>
-        <i *ngIf="lecture.publish" nz-icon nzType="check-circle" nzTheme="outline"></i>
-        <i *ngIf="!lecture.publish" nz-icon nzType="close-circle" nzTheme="outline"></i>
-      </td>
-    </tr>
-  </tbody>
-</nz-table>
+    <nz-page-header-extra>
+      <button nz-button nzType="primary" [routerLink]="['/', 'lectures', 'new']"><i nz-icon nzType="plus" nzTheme="outline"></i> Add Lecture</button>
+    </nz-page-header-extra>
+  </nz-page-header>
+
+  <nz-content>
+    <nz-table #lectureTable [nzData]="lectures">
+      <thead>
+        <tr>
+          <th>Lecture</th>
+          <th>Semester</th>
+          <th>Published</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let lecture of lectureTable.data">
+          <td><a [routerLink]="['/', 'lecture', lecture.id]">{{lecture.title}}</a></td>
+          <td><nz-tag [nzColor]="'gold'">{{lecture.semester.name}}</nz-tag></td>
+          <td>
+            <i *ngIf="lecture.publish" nz-icon nzType="check-circle" nzTheme="outline"></i>
+            <i *ngIf="!lecture.publish" nz-icon nzType="close-circle" nzTheme="outline"></i>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-content>
+</nz-layout>
