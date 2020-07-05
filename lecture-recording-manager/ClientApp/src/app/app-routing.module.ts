@@ -6,6 +6,7 @@ import { LectureCreateEditComponent } from './lecture-create-edit/lecture-create
 import { RecordingUploadComponent } from './recording-upload/recording-upload.component';
 import { LectureComponent } from './lecture/lecture.component';
 import { RecordingComponent } from './recording/recording.component';
+import { RecordingEditComponent } from './recording-edit/recording-edit.component';
 
 
 const routes: Routes = [
@@ -21,7 +22,8 @@ const routes: Routes = [
   { path: 'lecture/:lectureId', component: LectureComponent },
   { path: 'lecture/:lectureId/upload', component: RecordingUploadComponent },
 
-  { path: 'recording/:recordingId', component: RecordingComponent }
+  { path: 'recording/:recordingId', component: RecordingComponent },
+  { path: 'recording/:recordingId/edit', component: RecordingEditComponent }
 ];
 
 @NgModule({

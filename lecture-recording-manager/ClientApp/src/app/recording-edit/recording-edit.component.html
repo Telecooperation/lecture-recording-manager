@@ -1,0 +1,30 @@
+<nz-layout>
+    <nz-page-header [nzGhost]="false">
+      <nz-avatar nz-page-header-avatar nzIcon="read" nzTheme="fill"></nz-avatar>
+  
+      <nz-page-header-title>{{recording.title}}</nz-page-header-title>
+  
+      <nz-page-header-extra>
+        <button nz-button nzType="primary" [disabled]="!form.valid" (click)="onSubmit()"><i nz-icon nzType="save" nzTheme="outline"></i> Save</button>
+        <button nz-button (click)="doCancel()">Cancel</button>
+      </nz-page-header-extra>
+    </nz-page-header>
+  
+    <nz-content>
+      <form nz-form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <nz-form-item>
+          <nz-form-label [nzSpan]="7" nzRequired>Title</nz-form-label>
+          <nz-form-control [nzSpan]="12">
+            <input nz-input formControlName="title" placeholder="Title of the lecture" required />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label [nzSpan]="7">Description</nz-form-label>
+          <nz-form-control [nzSpan]="12">
+            <textarea rows="4" nz-input formControlName="description" placeholder="Longer description of the lecture"></textarea>
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+    </nz-content>
+  </nz-layout>
+  
