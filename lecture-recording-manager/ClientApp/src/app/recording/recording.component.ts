@@ -25,4 +25,7 @@ export class RecordingComponent implements OnInit {
     this.lectureService.getRecordingChapters(recordingId).subscribe(x => this.chapters = x);
   }
 
+  doBack(): void {
+    this.router.navigate(['/', 'lecture', this.recording.lectureId]);
+  }
 }

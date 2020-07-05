@@ -63,7 +63,13 @@ namespace LectureRecordingManager.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(lecture).State = EntityState.Modified;
+            var dbLecture = await _context.Lectures.FindAsync(id);
+            dbLecture.Title = lecture.Title;
+            dbLecture.Description = lecture.Description;
+            dbLecture.PublishPath = lecture.PublishPath;
+            dbLecture.SourcePath = lecture.SourcePath;
+            dbLecture.Active = lecture.Active;
+            dbLecture.Publish = lecture.Publish;
 
             try
             {
@@ -109,7 +115,7 @@ namespace LectureRecordingManager.Controllers
         }
 
         [HttpGet("synchronize/{id}")]
-        public async Task<IActionResult> SynchronizeLecture(int id)
+        public IActionResult SynchronizeLecture(int id)
         {
             BackgroundJob.Enqueue<SynchronizePublishedRecordingsJob>(x => x.SynchronizePublishedRecordings(id));
 

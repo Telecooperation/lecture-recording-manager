@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UploadFile } from 'ng-zorro-antd';
+import { UploadFile, NzNotificationService } from 'ng-zorro-antd';
 import { environment } from '../../environments/environment';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { LectureService } from '../lecture.service';
@@ -27,6 +27,7 @@ export class RecordingUploadComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private fb: FormBuilder,
+    private notifications: NzNotificationService,
     private lectureService: LectureService) {
     this.form = this.fb.group({
       title: [null, [Validators.required]],
@@ -60,7 +61,10 @@ export class RecordingUploadComponent implements OnInit {
         },
         () => {
           this.uploading = false;
-          // this.msg.error('upload failed.');
+          this.notifications.error(
+            'Upload was not successful',
+            'The files could not be uploaded, please make sure that you filled all required fields.',
+            { nzPlacement: 'bottomRight' });
         }
       );
     });

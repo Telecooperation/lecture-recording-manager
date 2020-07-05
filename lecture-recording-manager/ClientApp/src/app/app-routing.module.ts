@@ -14,7 +14,9 @@ const routes: Routes = [
 
   { path: 'lectures', component: LectureListComponent },
   { path: 'lectures/semester/:semesterId', component: LectureListComponent },
+  
   { path: 'lectures/new', component: LectureCreateEditComponent },
+  { path: 'lecture/edit/:lectureId', component: LectureCreateEditComponent },
 
   { path: 'lecture/:lectureId', component: LectureComponent },
   { path: 'lecture/:lectureId/upload', component: RecordingUploadComponent },

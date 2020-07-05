@@ -1,41 +1,61 @@
-<h2>New lecture</h2>
+<nz-layout>
+  <nz-page-header [nzGhost]="false">
+    <nz-avatar nz-page-header-avatar nzIcon="read" nzTheme="fill"></nz-avatar>
 
-<form nz-form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <nz-form-item>
-    <nz-form-label [nzSpan]="7" nzRequired>Title</nz-form-label>
-    <nz-form-control [nzSpan]="12">
-      <input nz-input formControlName="title" placeholder="Title of the lecture" required />
-    </nz-form-control>
-  </nz-form-item>
-  <nz-form-item>
-    <nz-form-label [nzSpan]="7" nzRequired>Semester</nz-form-label>
-    <nz-form-control [nzSpan]="12">
-      <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Select a semester" formControlName="semesterId" required>
-        <nz-option *ngFor="let semester of semesters" [nzLabel]="semester.name" [nzValue]="semester.id"></nz-option>
-      </nz-select>
-    </nz-form-control>
-  </nz-form-item>
-  <nz-form-item>
-    <nz-form-label [nzSpan]="7">Description</nz-form-label>
-    <nz-form-control [nzSpan]="12">
-      <textarea rows="4" nz-input formControlName="description" placeholder="Longer description of the lecture"></textarea>
-    </nz-form-control>
-  </nz-form-item>
-  <nz-form-item>
-    <nz-form-label [nzSpan]="7">Published</nz-form-label>
-    <nz-form-control [nzSpan]="12">
-      <nz-switch formControlName="publish"></nz-switch>
-    </nz-form-control>
-  </nz-form-item>
-  <nz-form-item>
-    <nz-form-label [nzSpan]="7">Active</nz-form-label>
-    <nz-form-control [nzSpan]="12">
-      <nz-switch formControlName="active"></nz-switch>
-    </nz-form-control>
-  </nz-form-item>
-  <nz-form-item>
-    <nz-form-control [nzOffset]="7" [nzSpan]="12">
-      <button nz-button nzType="primary" [disabled]="!form.valid">Submit</button>
-    </nz-form-control>
-  </nz-form-item>
-</form>
+    <nz-page-header-title>Add new lecture</nz-page-header-title>
+
+    <nz-page-header-extra>
+      <button nz-button nzType="primary" [disabled]="!form.valid" (click)="onSubmit()"><i nz-icon nzType="save" nzTheme="outline"></i> Save</button>
+      <button nz-button (click)="doCancel()">Cancel</button>
+    </nz-page-header-extra>
+  </nz-page-header>
+
+  <nz-content>
+    <form nz-form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <nz-form-item>
+        <nz-form-label [nzSpan]="7" nzRequired>Title</nz-form-label>
+        <nz-form-control [nzSpan]="12">
+          <input nz-input formControlName="title" placeholder="Title of the lecture" required />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="7" nzRequired>Semester</nz-form-label>
+        <nz-form-control [nzSpan]="12">
+          <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Select a semester" formControlName="semesterId" required>
+            <nz-option *ngFor="let semester of semesters" [nzLabel]="semester.name" [nzValue]="semester.id"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="7">Description</nz-form-label>
+        <nz-form-control [nzSpan]="12">
+          <textarea rows="4" nz-input formControlName="description" placeholder="Longer description of the lecture"></textarea>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="7">Source path</nz-form-label>
+        <nz-form-control [nzSpan]="12">
+          <input nz-input formControlName="sourcePath" placeholder="Source directory where to store the video files" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="7">Publish path</nz-form-label>
+        <nz-form-control [nzSpan]="12">
+          <input nz-input formControlName="publishPath" placeholder="Publishing directory on the server" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="7">Published</nz-form-label>
+        <nz-form-control [nzSpan]="12">
+          <nz-switch formControlName="publish"></nz-switch>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="7">Active</nz-form-label>
+        <nz-form-control [nzSpan]="12">
+          <nz-switch formControlName="active"></nz-switch>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </nz-content>
+</nz-layout>
