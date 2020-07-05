@@ -58,6 +58,10 @@ export class LectureService {
     return this.http.put<Recording>(environment.apiUrl + '/api/recording/' + recording.id, recording);
   }
 
+  deleteRecording(recording: Recording) {
+    return this.http.delete(environment.apiUrl + '/api/recording/' + recording.id);
+  }
+
   uploadRecording(recordingId: string, process: boolean, files: any[]) {
     const formData = new FormData();
     formData.append('process', process ? 'true' : 'false');

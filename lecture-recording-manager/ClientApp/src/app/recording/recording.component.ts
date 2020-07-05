@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Recording } from '../shared/recording';
 import { LectureService } from '../services/lecture.service';
 import { RecordingChapter } from '../shared/recording-chapter';
+import { NzNotificationService } from 'ng-zorro-antd';
 
 @Component({
   selector: 'app-recording',
@@ -16,6 +17,7 @@ export class RecordingComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private notifications: NzNotificationService,
     private lectureService: LectureService
   ) { }
 
@@ -27,5 +29,15 @@ export class RecordingComponent implements OnInit {
 
   doBack(): void {
     this.router.navigate(['/', 'lecture', this.recording.lectureId]);
+  }
+
+  doDelete(): void {
+    this.lectureService.deleteRecording(this.recording).subscribe(x => {
+      this.notifications.success(
+        'Recording deleted successfully',
+        'The recording <b>' + this.recording.title + '</b> deleted successfully.',
+        { nzPlacement: 'bottomRight'});
+      this.router.navigate(['/', 'lecture', this.recording.lectureId]);
+    });
   }
 }

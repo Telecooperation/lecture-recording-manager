@@ -45,7 +45,7 @@ namespace LectureRecordingManager.Jobs
                 .Include(x => x.Chapters)
                 .FirstOrDefaultAsync(x => x.Id == recordingId);
 
-            if (recording.Status == RecordingStatus.PROCESSING)
+            if (recording == null || recording.Status == RecordingStatus.PROCESSING)
             {
                 return;
             }
@@ -137,6 +137,11 @@ namespace LectureRecordingManager.Jobs
         {
             // set status
             var recording = await _context.Recordings.FindAsync(recordingId);
+
+            if (recording == null)
+            {
+                return;
+            }
 
             // start encoding preview
             if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING)

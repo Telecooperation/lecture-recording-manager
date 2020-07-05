@@ -5,7 +5,18 @@
     <nz-page-header-title>{{recording.title}}</nz-page-header-title>
 
     <nz-page-header-extra>
-      <button nz-button nzType="primary" [routerLink]="['/', 'recording', recording.id, 'edit']">Edit</button>
+      <nz-button-group>
+        <button nz-button nzType="primary" [routerLink]="['/', 'recording', recording.id, 'edit']">Edit</button>
+        <button nz-button nz-dropdown [nzDropdownMenu]="menu1" nzPlacement="bottomRight">
+          <i nz-icon nzType="ellipsis"></i>
+        </button>
+      </nz-button-group>
+
+      <nz-dropdown-menu #menu1="nzDropdownMenu">
+        <ul nz-menu>
+          <li nz-menu-item (click)="doDelete()"><span nz-typography nzType="danger"><i nz-icon nzType="delete" nzTheme="outline"></i> Delete recording</span></li>
+        </ul>
+      </nz-dropdown-menu>
     </nz-page-header-extra>
 
     <nz-page-header-content>
