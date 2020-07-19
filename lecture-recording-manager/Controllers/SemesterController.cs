@@ -39,6 +39,21 @@ namespace LectureRecordingManager.Controllers
             return semester;
         }
 
+        [HttpGet("current")]
+        public async Task<ActionResult<Semester>> GetCurrentSemester()
+        {
+            var semester = await _context.Semesters
+                .Where(x => x.Active)
+                .FirstOrDefaultAsync();
+
+            if (semester == null)
+            {
+                return NotFound();
+            }
+
+            return semester;
+        }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSemester(int id, Semester semester)
         {
