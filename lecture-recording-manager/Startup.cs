@@ -84,6 +84,9 @@ namespace LectureRecordingManager
             app.UseHangfireServer();
             app.UseHangfireDashboard();
 
+            // init background
+            RecurringJob.AddOrUpdate<ScheduledPublishingRecordingJob>("scheduled-publishing-task", x => x.CheckPublishingRecordings(), Cron.MinuteInterval(5));
+
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>

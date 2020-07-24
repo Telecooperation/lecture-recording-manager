@@ -9,23 +9,23 @@ export class DurationPipe implements PipeTransform {
     return this.humanizeDuration(value, seconds);
   }
 
-  humanizeDuration(sec_num: number, showSeconds: boolean): string {
-    if (sec_num === undefined || sec_num === 0) {
+  humanizeDuration(secondAsNumber: number, showSeconds: boolean): string {
+    if (secondAsNumber === undefined || secondAsNumber === 0) {
       return '';
     }
 
-    const hours   = Math.floor(sec_num / 3600);
-    const minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-    const seconds = Math.floor(sec_num - (hours * 3600) - (minutes * 60));
+    const hours   = Math.floor(secondAsNumber / 3600);
+    const minutes = Math.floor((secondAsNumber - (hours * 3600)) / 60);
+    const seconds = Math.floor(secondAsNumber - (hours * 3600) - (minutes * 60));
 
-    let hours_s = hours.toString();
-    let minutes_s = minutes.toString();
-    let seconds_s = seconds.toString();
+    let hoursAsString = hours.toString();
+    let minutesAsString = minutes.toString();
+    let secondsAsString = seconds.toString();
 
-    if (hours   < 10) { hours_s   = '0' + hours; }
-    if (minutes < 10) { minutes_s = '0' + minutes; }
-    if (seconds < 10) { seconds_s = '0' + seconds; }
-    return hours_s + 'h ' + minutes_s + 'm ' + (showSeconds ? seconds_s + 's' : '');
+    if (hours   < 10) { hoursAsString   = '0' + hours; }
+    if (minutes < 10) { minutesAsString = '0' + minutes; }
+    if (seconds < 10) { secondsAsString = '0' + seconds; }
+    return hoursAsString + 'h ' + minutesAsString + 'm ' + (showSeconds ? secondsAsString + 's' : '');
   }
 
 }
