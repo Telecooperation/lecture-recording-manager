@@ -12,6 +12,7 @@ export class Recording {
   public publishDate?: Date;
   public sorting?: number;
   public filePath: string;
+  public preview: boolean;
 }
 
 export enum RecordingStatus {
