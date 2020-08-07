@@ -1,31 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.IO;
 
 namespace RecordingProcessor.Studio
 {
     public class Dimension
     {
-        public int width;
-        public int height;
-        public string background;
-        public AspectRatio aspectRatio;
+        public int Width { get; set; }
+
+        public int Height { get; set; }
+
+        public string Background { get; set; }
+
+        public AspectRatio AspectRatio { get; set; }
 
         public static Dimension Dim720p = new Dimension
         {
-            width = 1280,
-            height = 720,
-            aspectRatio = AspectRatio.Wide,
-            background = Path.Combine("resources", "defaultbg720.png")
+            Width = 1280,
+            Height = 720,
+            AspectRatio = AspectRatio.Wide,
+            Background = Path.Combine("resources", "defaultbg720.png")
         };
 
         public static Dimension Dim1080p = new Dimension
         {
-            width = 1920,
-            height = 1080,
-            aspectRatio = AspectRatio.Wide,
-            background = Path.Combine("resources", "defaultbg1080.png")
+            Width = 1920,
+            Height = 1080,
+            AspectRatio = AspectRatio.Wide,
+            Background = Path.Combine("resources", "defaultbg1080.png")
         };
     }
 

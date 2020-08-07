@@ -216,30 +216,12 @@ namespace RecordingProcessor.Studio
 
             string args = "-i \"" + config.SlideVideoPath + "\" " +
                             "-i \"" + config.TalkingHeadVideoPath + "\" " +
-                            "-i \"" + config.RecordingStyle.targetDimension.background + "\" " +
+                            "-i \"" + config.RecordingStyle.TargetDimension.Background + "\" " +
                             "-filter_complex " +
                             "\"" +
                             "[1:v]trim=start=" + trimTHVideo.TotalSeconds.ToString("0.00000", CultureInfo.InvariantCulture) + ",setpts=PTS-STARTPTS[1v];" +
                             "[1:a]atrim=start=" + trimTHVideo.TotalSeconds.ToString("0.00000", CultureInfo.InvariantCulture) + ",asetpts=PTS-STARTPTS,asplit=2[1a1][1a2];" +
-                            "[0:v]scale=" + config.RecordingStyle.targetDimension.width + ":-2, crop=" + config.RecordingStyle.targetDimension.width + ":" +
-                            config.RecordingStyle.targetDimension.height + ",fps=fps=30,split=2[slides1][slides2];" +
-                            "[1v]scale=" + config.RecordingStyle.targetDimension.width + ":" +
-                                config.RecordingStyle.targetDimension.height + ",fps=fps=30[th];" +
-                            "[th]format = rgba,chromakey=" + config.RecordingStyle.ChromaKeyParams.color + ":" +
-                            config.RecordingStyle.ChromaKeyParams.similarity + ":" +
-                            config.RecordingStyle.ChromaKeyParams.blend + ",split=2[th_ck1][th_ck2];" +
-                            "[2][th_ck1]overlay=0:0[th_ck_bg];" +
-                            "[th_ck_bg]crop=" + config.RecordingStyle.TalkingHeadConfig.Crop.width + ":" +
-                                                config.RecordingStyle.TalkingHeadConfig.Crop.height + ":" +
-                                                config.RecordingStyle.TalkingHeadConfig.Crop.x + ":" +
-                                                config.RecordingStyle.TalkingHeadConfig.Crop.y + "[th_ck_ct];" +
-                            "[slides2]format = rgba,pad = iw + 4:ih + 4:2:2:black@0," +
-                            "perspective=" + config.RecordingStyle.StageConfig.slideTransformation.ToString() + "," +
-                            "crop=" + config.RecordingStyle.targetDimension.width + ":" +
-                            config.RecordingStyle.targetDimension.height + ":2:2" + "[slides_perspective];" +
-                            "[th_ck2]pad = iw + 4:ih + 4:2:2:black@0," + "perspective=" + config.RecordingStyle.StageConfig.speakerTransformation.ToString() + "[th_ck_tr];" +
-                            "[2][slides_perspective]overlay=0:0[slides_with_background];" +
-                            "[slides_with_background][th_ck_tr]overlay=0:0[stage]" +
+                            config.RecordingStyle.getFFmpegFilterString() +
                             "\" " +
                             "-map \"[slides1]\" -f mp4 -vcodec libx264 -crf 23 -preset veryfast -tune stillimage -profile:v baseline -level 3.0 -pix_fmt yuv420p -r 30 " + (preview ? " -t 10 " : "") + "\"" + Path.Combine(config.OutputDirectory, "slides.mp4") + "\" " +
                             "-map \"[th_ck_ct]\" -map \"[1a1]\" -f mp4 -vcodec libx264 -crf 23 -preset veryfast -profile:v baseline -level 3.0 -pix_fmt yuv420p -r 30 -acodec aac -b:a 192k " + (preview ? " -t 10 " : "") + "\"" + Path.Combine(config.OutputDirectory, "talkinghead.mp4") + "\" " +
