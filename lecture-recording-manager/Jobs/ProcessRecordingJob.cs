@@ -153,7 +153,9 @@ namespace LectureRecordingManager.Jobs
         public async Task Preview(int recordingId)
         {
             // set status
-            var recording = await _context.Recordings.FindAsync(recordingId);
+            var recording = await _context.Recordings
+                .Include(x => x.Chapters)
+                .FirstOrDefaultAsync(x => x.Id == recordingId);
 
             if (recording == null)
             {
@@ -186,19 +188,52 @@ namespace LectureRecordingManager.Jobs
                 }
 
                 // convert files
+                RecordingMetadata metaData = null;
+
                 if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING)
                 {
-                    var metaData = ConvertStudioRecording(inputFileName, outputFolder, true);
+                    metaData = ConvertStudioRecording(inputFileName, outputFolder, true);
 
                     recording.Preview = true;
                     recording.Duration = metaData.Duration;
                 }
                 else if (recording.Type == RecordingType.SIMPLE_RECORDING)
                 {
-                    var metaData = ConvertSimpleRecording(inputFileName, outputFolder, true);
+                    metaData = ConvertSimpleRecording(inputFileName, outputFolder, true);
 
                     recording.Preview = true;
                     recording.Duration = metaData.Duration;
+                }
+
+                if (metaData != null)
+                {
+                    _context.RecordingChapters.RemoveRange(recording.Chapters);
+
+                    // add slides
+                    foreach (var slide in metaData.Slides)
+                    {
+                        var chapter = new RecordingChapter()
+                        {
+                            Recording = recording,
+                            StartPosition = slide.StartPosition,
+                            Text = slide.Ocr,
+                            Thumbnail = slide.Thumbnail
+                        };
+
+                        _context.RecordingChapters.Add(chapter);
+                    }
+
+                    // copy thumbnails
+                    var thumbsDirectory = Path.Combine(outputFolder, "..", "thumbs");
+                    if (Directory.Exists(thumbsDirectory))
+                        Directory.Delete(thumbsDirectory, true);
+
+                    Directory.CreateDirectory(thumbsDirectory);
+
+                    foreach (var thumb in Directory.GetFiles(Path.Combine(outputFolder, "thumbs")))
+                    {
+                        File.Copy(thumb, Path.Combine(outputFolder, "..", "thumbs", Path.GetFileName(thumb)));
+                    }
                 }
 
                 await _context.SaveChangesAsync();
@@ -249,14 +284,7 @@ namespace LectureRecordingManager.Jobs
                 ExportJson = false
             };
 
-            if (preview)
-            {
-                return converter.ConvertPreviewMedia(config);
-            }
-            else
-            {
-                return converter.ConvertMedia(config);
-            }
+            return preview ? converter.ConvertPreviewMedia(config) : converter.ConvertMedia(config);
         }
 
         private RecordingMetadata ConvertSimpleRecording(string inputFileName, string outputFolder, bool preview)
@@ -280,14 +308,7 @@ namespace LectureRecordingManager.Jobs
                 ExportJson = false
             };
 
-            if (preview)
-            {
-                return converter.ConvertPreviewMedia(config);
-            }
-            else
-            {
-                return converter.ConvertMedia(config);
-            }
+            return preview ? converter.ConvertPreviewMedia(config) : converter.ConvertMedia(config);
         }
 
         private async Task UpdateLectureRecordingStatus()

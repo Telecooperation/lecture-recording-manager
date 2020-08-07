@@ -60,6 +60,7 @@ namespace RecordingProcessor.Studio
             finalRecording.FileName = "slides.mp4";
             finalRecording.PresenterFileName = "talkinghead.mp4";
             finalRecording.StageVideo = "stage.mp4";
+            finalRecording.Slides = BuildThumbnails(config, "slides.mp4");
             finalRecording.Duration = FFmpegHelper.GetMediaLength(config.SlideVideoPath).TotalSeconds;
 
             FFmpegHelper.ExportThumbnail(5f, Path.Combine(config.OutputDirectory, "stage.mp4"), config.OutputDirectory, "thumbnail");
@@ -107,10 +108,10 @@ namespace RecordingProcessor.Studio
                     }
                     else
                     {
-                        nextKeyframe = FFmpegHelper.GetMediaLength(Path.Combine(config.OutputDirectory, slidesFileName));
+                        nextKeyframe = FFmpegHelper.GetMediaLength(config.SlideVideoPath);
                     }
 
-                    string thumbName = FFmpegHelper.ExportThumbnail((float)nextKeyframe.GetValueOrDefault().TotalSeconds - 2.0f, Path.Combine(config.OutputDirectory, slidesFileName), thumbOutDir,
+                    string thumbName = FFmpegHelper.ExportThumbnail((float)nextKeyframe.GetValueOrDefault().TotalSeconds - 2.0f, config.SlideVideoPath, thumbOutDir,
                         (currentId++).ToString());
 
                     var slide = new Slide
@@ -164,10 +165,10 @@ namespace RecordingProcessor.Studio
                     }
                     else
                     {
-                        nextKeyframe = FFmpegHelper.GetMediaLength(Path.Combine(config.OutputDirectory, slidesFileName));
+                        nextKeyframe = FFmpegHelper.GetMediaLength(config.SlideVideoPath);
                     }
 
-                    string thumbName = FFmpegHelper.ExportThumbnail((float)nextKeyframe.GetValueOrDefault().TotalSeconds - 2.0f, Path.Combine(config.OutputDirectory, slidesFileName), thumbOutDir,
+                    string thumbName = FFmpegHelper.ExportThumbnail((float)nextKeyframe.GetValueOrDefault().TotalSeconds - 2.0f, config.SlideVideoPath, thumbOutDir,
                         (currentId++).ToString());
 
                     var tmpFileName = Path.GetRandomFileName();

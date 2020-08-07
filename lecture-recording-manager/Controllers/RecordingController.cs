@@ -199,6 +199,7 @@ namespace LectureRecordingManager.Controllers
         {
             return await _context.RecordingChapters
                 .Where(x => x.Recording.Id == id)
+                .OrderBy(x => x.StartPosition)
                 .ToListAsync();
         }
 
