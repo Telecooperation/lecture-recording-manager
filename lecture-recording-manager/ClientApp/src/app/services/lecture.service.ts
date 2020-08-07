@@ -80,6 +80,10 @@ export class LectureService {
     return this.http.get<Recording>(environment.apiUrl + '/api/recording/process/' + recording.id);
   }
 
+  processPreview(recording: Recording): Observable<Recording> {
+    return this.http.get<Recording>(environment.apiUrl + '/api/recording/previewdo/' + recording.id);
+  }
+
   getRecordingChapters(recordingId: string): Observable<RecordingChapter[]> {
     return this.http.get<RecordingChapter[]>(environment.apiUrl + '/api/recording/' + recordingId + '/chapters');
   }

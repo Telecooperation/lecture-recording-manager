@@ -30,6 +30,9 @@ namespace LectureRecordingManager.Jobs
                 .Include(x => x.Semester)
                 .SingleAsync(x => x.Id == lectureId);
 
+            if (!lecture.Active)
+                return;
+
             var recordings = await _context.Recordings
                 .Include(x => x.Chapters)
                 .Where(x => x.LectureId == lectureId)

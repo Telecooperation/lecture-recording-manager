@@ -52,4 +52,13 @@ export class RecordingComponent implements OnInit {
   doPublish(): void {
     this.lectureService.publishRecording(this.recording).subscribe(x => this.loadRecording(x.id.toString()));
   }
+
+  doPreview(): void {
+    this.notifications.info(
+      'Recording preview started',
+      'The recording preview of <b>' + this.recording.title + '</b> will be created.',
+      { nzPlacement: 'bottomRight'});
+
+    this.lectureService.processPreview(this.recording).subscribe(x => this.loadRecording(x.id.toString()));
+  }
 }

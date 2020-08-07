@@ -94,6 +94,7 @@ namespace LectureRecordingManager
 
             // init background
             RecurringJob.AddOrUpdate<ScheduledPublishingRecordingJob>("scheduled-publishing-task", x => x.CheckPublishingRecordings(), Cron.MinuteInterval(5));
+            RecurringJob.AddOrUpdate<ScheduledScanRecordingsJob>("scheduled-scan-task", x => x.ScanRecordings(), Cron.MinuteInterval(5));
 
             app.UseRouting();
 

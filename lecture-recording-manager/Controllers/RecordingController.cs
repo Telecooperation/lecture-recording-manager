@@ -181,6 +181,19 @@ namespace LectureRecordingManager.Controllers
             return File(stream, System.Net.Mime.MediaTypeNames.Image.Jpeg);
         }
 
+        [Route("preview_video/{id}")]
+        public async Task<ActionResult> PreviewVideo(int id)
+        {
+            var recording = await _context.Recordings.FindAsync(id);
+
+            if (recording == null && recording.Preview)
+            {
+                return NotFound();
+            }
+
+            return PhysicalFile(Path.Combine(recording.FilePath, "preview", "stage.mp4"), "application/octet-stream", enableRangeProcessing: true);
+        }
+
         [HttpGet("{id}/chapters")]
         public async Task<ActionResult<IEnumerable<RecordingChapter>>> GetRecordingChapters(int id)
         {

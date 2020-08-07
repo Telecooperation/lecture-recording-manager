@@ -11,8 +11,9 @@ nz-layout {
     height: 250px;
     text-align: left;
     padding: 10px;
+    float: left;
 }
 
-.lecturePreview img {
+.lecturePreview img, .lecturePreview video {
     height: 100%;
 }
