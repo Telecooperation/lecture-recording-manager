@@ -27,7 +27,7 @@ namespace LectureRecordingManager.Models
 
         public string PublishPath { get; set; }
 
-        public DateTime? LastSynchronized { get; set; }
+        public DateTimeOffset? LastSynchronized { get; set; }
 
         public bool Publish { get; set; }
 

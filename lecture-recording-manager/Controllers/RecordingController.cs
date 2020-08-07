@@ -31,6 +31,7 @@ namespace LectureRecordingManager.Controllers
         {
             return await _context.Recordings
                 .Where(x => x.LectureId == lectureId)
+                .OrderBy(x => x.UploadDate)
                 .ToListAsync();
         }
 
@@ -60,6 +61,7 @@ namespace LectureRecordingManager.Controllers
             var dbRecording = await _context.Recordings.FindAsync(id);
             dbRecording.Title = recording.Title;
             dbRecording.Description = recording.Description;
+            dbRecording.PublishDate = recording.PublishDate;
 
             try
             {

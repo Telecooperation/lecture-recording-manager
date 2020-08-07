@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using RecordingProcessor.Model;
 using RecordingProcessor.Studio;
+using RecordingProcessor.Studio.Styles;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -55,7 +56,7 @@ namespace LectureRecordingManager.Jobs
             await UpdateLectureRecordingStatus();
 
             // start encoding
-            if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING)
+            if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING || recording.Type == RecordingType.SIMPLE_RECORDING)
             {
                 // file path is file?
                 string outputFolder = "";
@@ -89,7 +90,17 @@ namespace LectureRecordingManager.Jobs
                 try
                 {
                     // convert files
-                    var metaData = ConvertStudioRecording(inputFileName, outputFolder, false);
+                    RecordingMetadata metaData = null;
+
+                    if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING)
+                    {
+                        metaData = ConvertStudioRecording(inputFileName, outputFolder, false);
+                    }
+                    else if (recording.Type == RecordingType.SIMPLE_RECORDING)
+                    {
+                        metaData = ConvertSimpleRecording(inputFileName, outputFolder, false);
+                    }
+
                     recording.Duration = metaData.Duration;
                     _context.RecordingChapters.RemoveRange(recording.Chapters);
 
@@ -108,7 +119,11 @@ namespace LectureRecordingManager.Jobs
                     }
 
                     // copy thumbnails
-                    Directory.CreateDirectory(Path.Combine(outputFolder, "..", "thumbs"));
+                    var thumbsDirectory = Path.Combine(outputFolder, "..", "thumbs");
+                    if (Directory.Exists(thumbsDirectory))
+                        Directory.Delete(thumbsDirectory, true);
+
+                    Directory.CreateDirectory(thumbsDirectory);
 
                     foreach (var thumb in Directory.GetFiles(Path.Combine(outputFolder, "thumbs")))
                     {
@@ -117,6 +132,8 @@ namespace LectureRecordingManager.Jobs
 
                     recording.Status = RecordingStatus.PROCESSED;
                     recording.StatusText = null;
+                    recording.Published = false;
+
                     await _context.SaveChangesAsync();
                     await UpdateLectureRecordingStatus();
                 }
@@ -144,7 +161,7 @@ namespace LectureRecordingManager.Jobs
             }
 
             // start encoding preview
-            if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING)
+            if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING || recording.Type == RecordingType.SIMPLE_RECORDING)
             {
                 // file path is file?
                 string outputFolder = "";
@@ -169,10 +186,20 @@ namespace LectureRecordingManager.Jobs
                 }
 
                 // convert files
-                var metaData = ConvertStudioRecording(inputFileName, outputFolder, true);
+                if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING)
+                {
+                    var metaData = ConvertStudioRecording(inputFileName, outputFolder, true);
 
-                recording.Preview = true;
-                recording.Duration = metaData.Duration;
+                    recording.Preview = true;
+                    recording.Duration = metaData.Duration;
+                }
+                else if (recording.Type == RecordingType.SIMPLE_RECORDING)
+                {
+                    var metaData = ConvertSimpleRecording(inputFileName, outputFolder, true);
+
+                    recording.Preview = true;
+                    recording.Duration = metaData.Duration;
+                }
 
                 await _context.SaveChangesAsync();
                 await UpdateLectureRecordingStatus();
@@ -188,28 +215,59 @@ namespace LectureRecordingManager.Jobs
 
             // setup of recording
             var targetDimension = Dimension.Dim720p;
-            var recordingStyle = RecordingStyle.TkStudioStyle(targetDimension);
+            var recordingStyle = new TKStudioStyle(targetDimension);
 
             if (File.Exists(ckFile))
             {
                 dynamic ckInfo = JsonConvert.DeserializeObject(File.ReadAllText(ckFile));
 
                 if (ckInfo["color"] != null)
-                    recordingStyle.ChromaKeyParams.color = ckInfo["color"];
+                    recordingStyle.ChromaKeyParams.Color = ckInfo["color"];
                 else
                 {
-                    recordingStyle.ChromaKeyParams.color = chromaKeyParamGuesser.GuessChromaKeyParams(thVideoPath);
+                    recordingStyle.ChromaKeyParams.Color = chromaKeyParamGuesser.GuessChromaKeyParams(thVideoPath);
                 }
 
                 if (ckInfo["similarity"] != null)
-                    recordingStyle.ChromaKeyParams.similarity = ckInfo["similarity"];
+                    recordingStyle.ChromaKeyParams.Similarity = ckInfo["similarity"];
                 if (ckInfo["blend"] != null)
-                    recordingStyle.ChromaKeyParams.blend = ckInfo["blend"];
+                    recordingStyle.ChromaKeyParams.Blend = ckInfo["blend"];
             }
             else
             {
-                recordingStyle.ChromaKeyParams.color = chromaKeyParamGuesser.GuessChromaKeyParams(thVideoPath);
+                recordingStyle.ChromaKeyParams.Color = chromaKeyParamGuesser.GuessChromaKeyParams(thVideoPath);
             }
+
+            var config = new ConversionConfiguration()
+            {
+                SlideVideoPath = slideVideoPath,
+                TalkingHeadVideoPath = thVideoPath,
+                MetadataPath = inputFileName,
+                OutputDirectory = outputFolder,
+                ProjectName = Path.GetFileName(inputFileName).Replace("_meta.json", ""),
+                RecordingStyle = recordingStyle,
+                ExportJson = false
+            };
+
+            if (preview)
+            {
+                return converter.ConvertPreviewMedia(config);
+            }
+            else
+            {
+                return converter.ConvertMedia(config);
+            }
+        }
+
+        private RecordingMetadata ConvertSimpleRecording(string inputFileName, string outputFolder, bool preview)
+        {
+            // identify file paths
+            var slideVideoPath = inputFileName.Replace("_meta.json", "_slides.mp4");
+            var thVideoPath = inputFileName.Replace("_meta.json", "_talkinghead.mp4");
+
+            // setup of recording
+            var targetDimension = Dimension.Dim720p;
+            var recordingStyle = new TKSimpleStyle(targetDimension);
 
             var config = new ConversionConfiguration()
             {

@@ -31,15 +31,17 @@ namespace LectureRecordingManager.Models
 
         public string StatusText { get; set; }
 
-        public DateTime? UploadDate { get; set; }
+        public DateTimeOffset? UploadDate { get; set; }
 
-        public DateTime? PublishDate { get; set; }
+        public DateTimeOffset? PublishDate { get; set; }
 
         public int Sorting { get; set; }
 
         public bool Preview { get; set; }
 
         public string FilePath { get; set; }
+
+        public string CustomTargetName { get; set; }
 
         public List<RecordingChapter> Chapters { get; set; }
     }

@@ -48,13 +48,16 @@ namespace LectureRecordingManager.Jobs
             var outputFolder = Path.Combine(recording.Lecture.PublishPath, "video", recording.Id.ToString());
             var targetFolderName = recording.Id.ToString();
 
-            if (Directory.Exists(outputFolder))
+            if (Directory.Exists(outputFolder) && !Directory.Exists(Path.Combine(recording.FilePath, "output")))
             {
                 // ignore publishing
                 return;
             }
 
             // move files to output directory
+            if (Directory.Exists(outputFolder))
+                Directory.Delete(outputFolder, true);
+
             Directory.Move(Path.Combine(recording.FilePath, "output"), outputFolder);
 
             recording.Status = RecordingStatus.PUBLISHED;

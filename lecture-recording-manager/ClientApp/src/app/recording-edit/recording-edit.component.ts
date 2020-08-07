@@ -17,10 +17,11 @@ export class RecordingEditComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
-    private lectureService: LectureService) { 
+    private lectureService: LectureService) {
       this.form = this.fb.group({
         title: [null, [Validators.required]],
-        description: [null]
+        description: [null],
+        publishDate: [null]
       });
     }
 
@@ -32,9 +33,10 @@ export class RecordingEditComponent implements OnInit {
 
       this.form = this.fb.group({
         title: [recording.title, [Validators.required]],
-        description: [recording.description]
+        description: [recording.description],
+        publishDate: [recording.publishDate]
       });
-    })
+    });
   }
 
   onSubmit(): void {

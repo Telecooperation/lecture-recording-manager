@@ -24,6 +24,15 @@
             <textarea rows="4" nz-input formControlName="description" placeholder="Longer description of the lecture"></textarea>
           </nz-form-control>
         </nz-form-item>
+        <nz-form-item>
+          <nz-form-label [nzSpan]="7">Publishing date</nz-form-label>
+          <nz-form-control [nzSpan]="12">
+            <nz-date-picker nzShowTime
+                            nzFormat="yyyy-MM-dd HH:mm:ss"
+                            nzPlaceHolder="Select Time"
+                            formControlName="publishDate"></nz-date-picker>
+          </nz-form-control>
+        </nz-form-item>
       </form>
     </nz-content>
   </nz-layout>

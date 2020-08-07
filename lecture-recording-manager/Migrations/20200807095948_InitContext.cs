@@ -15,8 +15,8 @@ namespace LectureRecordingManager.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "varchar(255)", nullable: true),
-                    DateStart = table.Column<DateTime>(nullable: false),
-                    DateEnd = table.Column<DateTime>(nullable: false),
+                    DateStart = table.Column<DateTimeOffset>(nullable: false),
+                    DateEnd = table.Column<DateTimeOffset>(nullable: false),
                     Published = table.Column<bool>(nullable: false),
                     Active = table.Column<bool>(nullable: false)
                 },
@@ -34,6 +34,9 @@ namespace LectureRecordingManager.Migrations
                     Title = table.Column<string>(type: "varchar(255)", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
                     SemesterId = table.Column<int>(nullable: false),
+                    SourcePath = table.Column<string>(nullable: true),
+                    PublishPath = table.Column<string>(nullable: true),
+                    LastSynchronized = table.Column<DateTimeOffset>(nullable: true),
                     Publish = table.Column<bool>(nullable: false),
                     Active = table.Column<bool>(nullable: false)
                 },
@@ -55,12 +58,18 @@ namespace LectureRecordingManager.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     LectureId = table.Column<int>(nullable: false),
+                    Type = table.Column<int>(nullable: false),
                     Title = table.Column<string>(type: "varchar(255)", nullable: false),
                     Description = table.Column<string>(nullable: true),
-                    Duration = table.Column<long>(nullable: false),
+                    Duration = table.Column<double>(nullable: false),
                     Published = table.Column<bool>(nullable: false),
                     Status = table.Column<int>(nullable: false),
-                    StatusText = table.Column<string>(nullable: true)
+                    StatusText = table.Column<string>(nullable: true),
+                    UploadDate = table.Column<DateTimeOffset>(nullable: true),
+                    PublishDate = table.Column<DateTimeOffset>(nullable: true),
+                    Sorting = table.Column<int>(nullable: false),
+                    Preview = table.Column<bool>(nullable: false),
+                    FilePath = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -80,7 +89,7 @@ namespace LectureRecordingManager.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     RecordingId = table.Column<int>(nullable: true),
-                    StartPosition = table.Column<long>(nullable: false),
+                    StartPosition = table.Column<double>(nullable: false),
                     Thumbnail = table.Column<string>(nullable: true),
                     Text = table.Column<string>(nullable: true)
                 },

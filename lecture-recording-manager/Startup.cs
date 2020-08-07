@@ -15,6 +15,7 @@ using LectureRecordingManager.Jobs;
 using RecordingProcessor.Studio;
 using Microsoft.AspNetCore.Http.Features;
 using LectureRecordingManager.Hubs;
+using Newtonsoft.Json;
 
 namespace LectureRecordingManager
 {
@@ -30,7 +31,12 @@ namespace LectureRecordingManager
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc; // this should be set if you always expect UTC dates in method bodies, if not, you can use RoundTrip instead.
+            });
+
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -55,7 +61,7 @@ namespace LectureRecordingManager
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, 
+        public void Configure(IApplicationBuilder app,
             IWebHostEnvironment env,
             IServiceProvider serviceProvider)
         {
@@ -81,7 +87,9 @@ namespace LectureRecordingManager
             GlobalConfiguration.Configuration
                 .UseActivator(new ContainerJobActivator(serviceProvider));
 
-            app.UseHangfireServer();
+            var options = new BackgroundJobServerOptions { WorkerCount = Environment.ProcessorCount };
+            app.UseHangfireServer(options);
+
             app.UseHangfireDashboard();
 
             // init background

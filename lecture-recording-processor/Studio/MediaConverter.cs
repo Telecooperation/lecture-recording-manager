@@ -24,6 +24,10 @@ namespace RecordingProcessor.Studio
 
         public RecordingMetadata ConvertMedia(ConversionConfiguration config)
         {
+            // generate output directory
+            if (Directory.Exists(config.OutputDirectory))
+                Directory.Delete(config.OutputDirectory, true);
+
             Directory.CreateDirectory(config.OutputDirectory);
 
             // convert file

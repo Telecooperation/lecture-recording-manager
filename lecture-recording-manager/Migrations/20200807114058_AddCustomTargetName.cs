@@ -2,12 +2,12 @@
 
 namespace LectureRecordingManager.Migrations
 {
-    public partial class AddFilePathToRecording : Migration
+    public partial class AddCustomTargetName : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "FilePath",
+                name: "CustomTargetName",
                 table: "Recordings",
                 nullable: true);
         }
@@ -15,7 +15,7 @@ namespace LectureRecordingManager.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "FilePath",
+                name: "CustomTargetName",
                 table: "Recordings");
         }
     }

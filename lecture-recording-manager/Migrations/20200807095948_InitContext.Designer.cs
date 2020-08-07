@@ -10,15 +10,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LectureRecordingManager.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20200705092746_AddLastSynchronizedDate")]
-    partial class AddLastSynchronizedDate
+    [Migration("20200807095948_InitContext")]
+    partial class InitContext
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "3.1.4")
+                .HasAnnotation("ProductVersion", "3.1.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("LectureRecordingManager.Models.Lecture", b =>
@@ -34,8 +34,8 @@ namespace LectureRecordingManager.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("LastSynchronized")
-                        .HasColumnType("timestamp without time zone");
+                    b.Property<DateTimeOffset?>("LastSynchronized")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("Publish")
                         .HasColumnType("boolean");
@@ -82,8 +82,8 @@ namespace LectureRecordingManager.Migrations
                     b.Property<bool>("Preview")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime?>("PublishDate")
-                        .HasColumnType("timestamp without time zone");
+                    b.Property<DateTimeOffset?>("PublishDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("Published")
                         .HasColumnType("boolean");
@@ -104,8 +104,8 @@ namespace LectureRecordingManager.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime?>("UploadDate")
-                        .HasColumnType("timestamp without time zone");
+                    b.Property<DateTimeOffset?>("UploadDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -150,11 +150,11 @@ namespace LectureRecordingManager.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime>("DateEnd")
-                        .HasColumnType("timestamp without time zone");
+                    b.Property<DateTimeOffset>("DateEnd")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("DateStart")
-                        .HasColumnType("timestamp without time zone");
+                    b.Property<DateTimeOffset>("DateStart")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .HasColumnType("varchar(255)");

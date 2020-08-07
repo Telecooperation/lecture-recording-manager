@@ -18,6 +18,6 @@ namespace RecordingProcessor.Model
 
         public double Duration { get; set; }
 
-        public DateTime Date { get; set; }
+        public DateTimeOffset Date { get; set; }
     }
 }

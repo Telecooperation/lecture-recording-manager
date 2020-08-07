@@ -40,7 +40,7 @@ namespace RecordingProcessor.Studio.Styles
             sb.Append("[th_ck_bg]crop=" + this.TalkingHeadConfig.Crop.Width + ":" +
                     this.TalkingHeadConfig.Crop.Height + ":" +
                     this.TalkingHeadConfig.Crop.X + ":" +
-                    this.TalkingHeadConfig.Crop.Y + "[th_ck_ct];"));
+                    this.TalkingHeadConfig.Crop.Y + "[th_ck_ct];");
             sb.Append("[slides2]format = rgba,pad = iw + 4:ih + 4:2:2:black@0,");
             sb.Append("perspective=" + this.StageConfig.SlideTransformation.ToString() + ",");
             sb.Append("crop=" + this.TargetDimension.Width + ":" + this.TargetDimension.Height + ":2:2" + "[slides_perspective];");
