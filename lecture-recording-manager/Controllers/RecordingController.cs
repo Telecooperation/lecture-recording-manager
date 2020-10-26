@@ -100,6 +100,9 @@ namespace LectureRecordingManager.Controllers
                 return NotFound();
             }
 
+            var chapters = await _context.RecordingChapters.Where(x => x.Recording.Id == id).ToArrayAsync();
+            _context.RemoveRange(chapters);
+
             _context.Recordings.Remove(recording);
             await _context.SaveChangesAsync();
 
@@ -191,7 +194,19 @@ namespace LectureRecordingManager.Controllers
                 return NotFound();
             }
 
-            return PhysicalFile(Path.Combine(recording.FilePath, "preview", "stage.mp4"), "application/octet-stream", enableRangeProcessing: true);
+            // preview video path
+            string videoFileName = "";
+
+            if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING || recording.Type == RecordingType.SIMPLE_RECORDING)
+            {
+                videoFileName = "stage.mp4";
+            }
+            else if (recording.Type == RecordingType.ZOOM_RECORDING)
+            {
+                videoFileName = "slides.mp4";
+            }
+
+            return PhysicalFile(Path.Combine(recording.FilePath, "preview", videoFileName), "application/octet-stream", enableRangeProcessing: true);
         }
 
         [HttpGet("{id}/chapters")]

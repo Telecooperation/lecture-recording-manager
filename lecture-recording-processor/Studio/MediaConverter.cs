@@ -68,6 +68,74 @@ namespace RecordingProcessor.Studio
             return finalRecording;
         }
 
+        public RecordingMetadata ConvertZoomMedia(ConversionConfiguration config)
+        {
+            // generate output directory
+            if (Directory.Exists(config.OutputDirectory))
+                Directory.Delete(config.OutputDirectory, true);
+
+            Directory.CreateDirectory(config.OutputDirectory);
+
+            // convert file
+            ConvertZoomVideoFile(config, false);
+
+            var targetVideoPath = Path.Combine(config.OutputDirectory, "slides.mp4");
+
+            // generate preview
+            var thumbOutDir = Path.Combine(config.OutputDirectory, "thumbs");
+            Directory.CreateDirectory(thumbOutDir);
+
+            string thumbName = FFmpegHelper.ExportThumbnail(5f, targetVideoPath, Path.Combine(config.OutputDirectory, "thumbs"), "0");
+
+            // generate recording object
+            var finalRecording = new RecordingMetadata();
+            finalRecording.FileName = "slides.mp4";
+            finalRecording.Slides = new Slide[] { new Slide
+            {
+                StartPosition = 0,
+                Thumbnail = "thumbs/" + thumbName,
+                Ocr = ""
+            } };
+            finalRecording.Duration = FFmpegHelper.GetMediaLength(targetVideoPath).TotalSeconds;
+
+            return finalRecording;
+        }
+
+        public RecordingMetadata ConvertPreviewZoomMedia(ConversionConfiguration config)
+        {
+            // generate output directory
+            if (Directory.Exists(config.OutputDirectory))
+                Directory.Delete(config.OutputDirectory, true);
+
+            Directory.CreateDirectory(config.OutputDirectory);
+
+            // convert file
+            ConvertZoomVideoFile(config, true);
+
+            var targetVideoPath = Path.Combine(config.OutputDirectory, "slides.mp4");
+
+            // generate preview
+            var thumbOutDir = Path.Combine(config.OutputDirectory, "thumbs");
+            Directory.CreateDirectory(thumbOutDir);
+
+            string thumbName = FFmpegHelper.ExportThumbnail(5f, targetVideoPath, Path.Combine(config.OutputDirectory, "thumbs"), "0");
+
+            // generate recording object
+            var finalRecording = new RecordingMetadata();
+            finalRecording.FileName = "slides.mp4";
+            finalRecording.Slides = new Slide[] { new Slide
+            {
+                StartPosition = 0,
+                Thumbnail = "thumbs/" + thumbName,
+                Ocr = ""
+            } };
+            finalRecording.Duration = FFmpegHelper.GetMediaLength(targetVideoPath).TotalSeconds;
+
+            FFmpegHelper.ExportThumbnail(5f, Path.Combine(config.OutputDirectory, "slides.mp4"), config.OutputDirectory, "thumbnail");
+
+            return finalRecording;
+        }
+
         public Slide[] BuildThumbnails(ConversionConfiguration config, string slidesFileName)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
@@ -212,7 +280,7 @@ namespace RecordingProcessor.Studio
             return result;
         }
 
-        public void ConvertVideoFiles(ConversionConfiguration config, bool preview)
+        private void ConvertVideoFiles(ConversionConfiguration config, bool preview)
         {
             var lenSlideVideo = FFmpegHelper.GetMediaLength(config.SlideVideoPath);
             var lenTHVideo = FFmpegHelper.GetMediaLength(config.TalkingHeadVideoPath);
@@ -231,6 +299,18 @@ namespace RecordingProcessor.Studio
                             "-map \"[slides1]\" -f mp4 -vcodec libx264 -crf 23 -preset veryfast -tune stillimage -profile:v baseline -level 3.0 -pix_fmt yuv420p -r 30 " + (preview ? " -t 10 " : "") + "\"" + Path.Combine(config.OutputDirectory, "slides.mp4") + "\" " +
                             "-map \"[th_ck_ct]\" -map \"[1a1]\" -f mp4 -vcodec libx264 -crf 23 -preset veryfast -profile:v baseline -level 3.0 -pix_fmt yuv420p -r 30 -acodec aac -b:a 192k " + (preview ? " -t 10 " : "") + "\"" + Path.Combine(config.OutputDirectory, "talkinghead.mp4") + "\" " +
                             "-map \"[stage]\" -map \"[1a2]\" -f mp4 -vcodec libx264 -crf 23 -preset veryfast -profile:v baseline -level 3.0 -pix_fmt yuv420p -r 30 -acodec aac -b:a 192k " + (preview ? " -t 10 " : "") + "\"" + Path.Combine(config.OutputDirectory, "stage.mp4") + "\" ";
+
+            _logger.LogInformation("Execute ffmpeg: {0}", args);
+
+            Process p = FFmpegHelper.FFmpeg(args, false);
+            p.Start();
+            p.WaitForExit();
+        }
+
+        private void ConvertZoomVideoFile(ConversionConfiguration config, bool preview)
+        {
+            string args = "-i \"" + config.SlideVideoPath + "\" " +
+                            "-f mp4 -vcodec libx264 -crf 23 -preset veryfast -tune stillimage -profile:v baseline -level 3.0 -pix_fmt yuv420p -r 30 " + (preview ? " -t 10 " : "") + "\"" + Path.Combine(config.OutputDirectory, "slides.mp4") + "\" ";
 
             _logger.LogInformation("Execute ffmpeg: {0}", args);
 

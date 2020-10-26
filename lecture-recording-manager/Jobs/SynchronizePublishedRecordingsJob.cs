@@ -73,6 +73,26 @@ namespace LectureRecordingManager.Jobs
 
                     lectureMetadata.Recordings.Add(metadata);
                 }
+                else if (recording.Type == RecordingType.ZOOM_RECORDING)
+                {
+                    var metadata = new RecordingMetadata()
+                    {
+                        Id = recording.Title,
+                        Name = recording.Title,
+                        FileName = targetFolderName + "/slides.mp4",
+                        Duration = recording.Duration,
+                        Date = recording.PublishDate.Value
+                    };
+
+                    metadata.Slides = recording.Chapters.Select(x => new Slide()
+                    {
+                        Thumbnail = targetFolderName + "/" + x.Thumbnail,
+                        Ocr = x.Text,
+                        StartPosition = (float)x.StartPosition
+                    }).ToArray();
+
+                    lectureMetadata.Recordings.Add(metadata);
+                }
             }
 
             // update metadata

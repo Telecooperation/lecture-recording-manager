@@ -56,7 +56,7 @@ namespace LectureRecordingManager.Jobs
             await UpdateLectureRecordingStatus();
 
             // start encoding
-            if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING || recording.Type == RecordingType.SIMPLE_RECORDING)
+            if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING || recording.Type == RecordingType.SIMPLE_RECORDING || recording.Type == RecordingType.ZOOM_RECORDING)
             {
                 // file path is file?
                 string outputFolder = "";
@@ -66,6 +66,13 @@ namespace LectureRecordingManager.Jobs
                 {
                     outputFolder = Path.Combine(Path.GetDirectoryName(recording.FilePath), "output");
                     inputFileName = recording.FilePath;
+                }
+                else if (recording.Type == RecordingType.ZOOM_RECORDING)
+                {
+                    outputFolder = Path.Combine(recording.FilePath, "output");
+                    inputFileName = Directory.GetFiles(recording.FilePath)
+                        .Where(x => x.EndsWith(".mp4"))
+                        .SingleOrDefault();
                 }
                 else
                 {
@@ -100,6 +107,15 @@ namespace LectureRecordingManager.Jobs
                     {
                         metaData = ConvertSimpleRecording(inputFileName, outputFolder, false);
                     }
+                    else if (recording.Type == RecordingType.ZOOM_RECORDING)
+                    {
+                        metaData = ConvertZoomRecording(inputFileName, outputFolder, false);
+                    }
+
+                    // reload recording
+                    recording = await _context.Recordings
+                        .Include(x => x.Chapters)
+                        .FirstOrDefaultAsync(x => x.Id == recordingId);
 
                     recording.Duration = metaData.Duration;
                     _context.RecordingChapters.RemoveRange(recording.Chapters);
@@ -163,7 +179,7 @@ namespace LectureRecordingManager.Jobs
             }
 
             // start encoding preview
-            if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING || recording.Type == RecordingType.SIMPLE_RECORDING)
+            if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING || recording.Type == RecordingType.SIMPLE_RECORDING || recording.Type == RecordingType.ZOOM_RECORDING)
             {
                 // file path is file?
                 string outputFolder = "";
@@ -173,6 +189,13 @@ namespace LectureRecordingManager.Jobs
                 {
                     outputFolder = Path.Combine(Path.GetDirectoryName(recording.FilePath), "preview");
                     inputFileName = recording.FilePath;
+                }
+                else if (recording.Type == RecordingType.ZOOM_RECORDING)
+                {
+                    outputFolder = Path.Combine(recording.FilePath, "preview");
+                    inputFileName = Directory.GetFiles(recording.FilePath)
+                        .Where(x => x.EndsWith(".mp4"))
+                        .SingleOrDefault();
                 }
                 else
                 {
@@ -200,6 +223,13 @@ namespace LectureRecordingManager.Jobs
                 else if (recording.Type == RecordingType.SIMPLE_RECORDING)
                 {
                     metaData = ConvertSimpleRecording(inputFileName, outputFolder, true);
+
+                    recording.Preview = true;
+                    recording.Duration = metaData.Duration;
+                }
+                else if (recording.Type == RecordingType.ZOOM_RECORDING)
+                {
+                    metaData = ConvertZoomRecording(inputFileName, outputFolder, true);
 
                     recording.Preview = true;
                     recording.Duration = metaData.Duration;
@@ -309,6 +339,20 @@ namespace LectureRecordingManager.Jobs
             };
 
             return preview ? converter.ConvertPreviewMedia(config) : converter.ConvertMedia(config);
+        }
+
+        private RecordingMetadata ConvertZoomRecording(string inputFileName, string outputFolder, bool preview)
+        {
+            // setup recording
+            var config = new ConversionConfiguration()
+            {
+                SlideVideoPath = inputFileName,
+                OutputDirectory = outputFolder,
+                ProjectName = Path.GetFileName(inputFileName),
+                ExportJson = false
+            };
+
+            return preview ? converter.ConvertPreviewZoomMedia(config) : converter.ConvertZoomMedia(config);
         }
 
         private async Task UpdateLectureRecordingStatus()

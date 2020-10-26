@@ -58,6 +58,7 @@ namespace LectureRecordingManager.Jobs
             if (Directory.Exists(outputFolder))
                 Directory.Delete(outputFolder, true);
 
+            // greenscreen and simple recording?
             Directory.Move(Path.Combine(recording.FilePath, "output"), outputFolder);
 
             recording.Status = RecordingStatus.PUBLISHED;
