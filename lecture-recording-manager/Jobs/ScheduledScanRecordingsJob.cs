@@ -1,4 +1,5 @@
-﻿using LectureRecordingManager.Hubs;
+﻿using Hangfire;
+using LectureRecordingManager.Hubs;
 using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -83,11 +84,22 @@ namespace LectureRecordingManager.Jobs
                         Status = published ? RecordingStatus.PUBLISHED : RecordingStatus.UPLOADED,
                         UploadDate = DateTime.ParseExact(targetName, "yyyy-MM-dd-HH-mm-ss", CultureInfo.InvariantCulture),
                         FilePath = Path.GetDirectoryName(file),
-                        Lecture = lecture
+                        Lecture = lecture,
+                        Type = RecordingType.GREEN_SCREEN_RECORDING
                     };
 
                     _context.Recordings.Add(recording);
                     await _context.SaveChangesAsync();
+
+                    // process if not yet processed?
+                    if (lecture.Active && !published)
+                    {
+                        // process upload (preview)
+                        BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Preview(recording.Id));
+
+                        // process upload (convert)
+                        BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Execute(recording.Id));
+                    }
                 }
             }
         }
