@@ -6,10 +6,12 @@ namespace LectureRecordingManager.Models
     {
         public DatabaseContext() : base()
         {
+
         }
 
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         {
+
         }
 
         public DbSet<Lecture> Lectures { get; set; }

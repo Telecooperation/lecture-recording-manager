@@ -31,7 +31,7 @@ namespace LectureRecordingManager.Jobs
         public async Task ScanRecordings()
         {
             var lectures = await _context.Lectures
-                .Where(x => x.SourcePath != null)
+                .Where(x =>  x.SourcePath != null && x.SourcePath != "")
                 .ToListAsync();
 
             foreach (var lecture in lectures)

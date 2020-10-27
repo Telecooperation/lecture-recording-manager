@@ -11,6 +11,7 @@
     <!-- Set this to true if you enable server-side prerendering -->
     <BuildServerSideRenderer>false</BuildServerSideRenderer>
     <RootNamespace>LectureRecordingManager</RootNamespace>
+    <UserSecretsId>dd6e215e-97cf-4eaf-b3ac-fe81df061a20</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

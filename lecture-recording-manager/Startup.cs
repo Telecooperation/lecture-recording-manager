@@ -84,8 +84,7 @@ namespace LectureRecordingManager
             }
 
             // Configure hangfire to use the new JobActivator we defined.
-            GlobalConfiguration.Configuration
-                .UseActivator(new ContainerJobActivator(serviceProvider));
+            GlobalConfiguration.Configuration.UseActivator(new ContainerJobActivator(serviceProvider));
 
             var options = new BackgroundJobServerOptions { WorkerCount = Environment.ProcessorCount };
             app.UseHangfireServer(options);
@@ -95,6 +94,9 @@ namespace LectureRecordingManager
             // init background
             RecurringJob.AddOrUpdate<ScheduledPublishingRecordingJob>("scheduled-publishing-task", x => x.CheckPublishingRecordings(), Cron.MinuteInterval(5));
             RecurringJob.AddOrUpdate<ScheduledScanRecordingsJob>("scheduled-scan-task", x => x.ScanRecordings(), Cron.MinuteInterval(5));
+
+            // init db
+            UpdateDatabase(app);
 
             app.UseRouting();
 
@@ -120,6 +122,19 @@ namespace LectureRecordingManager
                     spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
                 }
             });
+        }
+
+        private static void UpdateDatabase(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices
+                .GetRequiredService<IServiceScopeFactory>()
+                .CreateScope())
+            {
+                using (var context = serviceScope.ServiceProvider.GetService<DatabaseContext>())
+                {
+                    context.Database.Migrate();
+                }
+            }
         }
     }
 }
