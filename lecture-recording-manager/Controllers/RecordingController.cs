@@ -94,16 +94,15 @@ namespace LectureRecordingManager.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Recording>> DeleteRecording(int id)
         {
-            var recording = await _context.Recordings.FindAsync(id);
+            var recording = await _context.Recordings.Include(x => x.Chapters).SingleOrDefaultAsync(x => x.Id == id);
             if (recording == null)
             {
                 return NotFound();
             }
 
-            var chapters = await _context.RecordingChapters.Where(x => x.Recording.Id == id).ToArrayAsync();
-            _context.RemoveRange(chapters);
-
+            _context.RecordingChapters.RemoveRange(recording.Chapters);
             _context.Recordings.Remove(recording);
+
             await _context.SaveChangesAsync();
 
             return recording;
