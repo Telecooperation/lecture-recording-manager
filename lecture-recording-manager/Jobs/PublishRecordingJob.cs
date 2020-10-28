@@ -33,10 +33,10 @@ namespace LectureRecordingManager.Jobs
                 .Include(x => x.Lecture)
                 .Include(x => x.Lecture.Semester)
                 .Include(x => x.Chapters)
-                .FirstOrDefaultAsync(x => x.Id == recordingId);
+                .FirstOrDefaultAsync(x => x.Id == recordingId && (x.Status == RecordingStatus.SCHEDULED_PUBLISH || x.FullHdStatus == RecordingStatus.SCHEDULED_PUBLISH));
 
             // only publish processed and existing recordings
-            if (recording == null || recording.Published)
+            if (recording == null)
             {
                 return;
             }
@@ -45,24 +45,40 @@ namespace LectureRecordingManager.Jobs
             Directory.CreateDirectory(Path.Combine(recording.Lecture.PublishPath, "video"));
             Directory.CreateDirectory(Path.Combine(recording.Lecture.PublishPath, "assets"));
 
-            var outputFolder = Path.Combine(recording.Lecture.PublishPath, "video", recording.Id.ToString());
-            var targetFolderName = recording.Id.ToString();
+            var publishFolder = Path.Combine(recording.Lecture.PublishPath, "video", recording.Id.ToString());
+            Directory.CreateDirectory(publishFolder);
 
-            if (Directory.Exists(outputFolder) && !Directory.Exists(Path.Combine(recording.FilePath, "output")))
+            var output720pFolder = Path.Combine(recording.Lecture.ConvertedPath, recording.Id.ToString(), "output_720p");
+            var output1080pFolder = Path.Combine(recording.Lecture.ConvertedPath, recording.Id.ToString(), "output_1080p");
+
+            // publish 720p?
+            if (recording.Status == RecordingStatus.SCHEDULED_PUBLISH && Directory.Exists(output720pFolder))
             {
-                // ignore publishing
-                return;
+                var publish720pFolder = Path.Combine(publishFolder, "output_720p");
+
+                if (Directory.Exists(publish720pFolder))
+                    Directory.Delete(publish720pFolder, true);
+
+                Directory.Move(output720pFolder, Path.Combine(publishFolder, "output_720p"));
+
+                recording.Status = RecordingStatus.PUBLISHED;
+                recording.Published = true;
             }
 
-            // move files to output directory
-            if (Directory.Exists(outputFolder))
-                Directory.Delete(outputFolder, true);
+            // publish 1080p
+            if (recording.FullHdStatus == RecordingStatus.SCHEDULED_PUBLISH && Directory.Exists(output1080pFolder))
+            {
+                var publish1080pFolder = Path.Combine(publishFolder, "output_1080p");
 
-            // greenscreen and simple recording?
-            Directory.Move(Path.Combine(recording.FilePath, "output"), outputFolder);
+                if (Directory.Exists(publish1080pFolder))
+                    Directory.Delete(publish1080pFolder, true);
 
-            recording.Status = RecordingStatus.PUBLISHED;
-            recording.Published = true;
+                Directory.Move(output1080pFolder, Path.Combine(publishFolder, "output_1080p"));
+
+                recording.FullHdStatus = RecordingStatus.PUBLISHED;
+                recording.Published = true;
+            }
+
             if (!recording.PublishDate.HasValue)
             {
                 recording.PublishDate = DateTime.Now;

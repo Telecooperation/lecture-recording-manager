@@ -43,6 +43,8 @@ namespace LectureRecordingManager.Models
 
         public string CustomTargetName { get; set; }
 
+        public RecordingStatus FullHdStatus { get; set; }
+
         public List<RecordingChapter> Chapters { get; set; }
     }
 }

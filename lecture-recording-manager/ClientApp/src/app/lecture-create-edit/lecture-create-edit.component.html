@@ -39,9 +39,21 @@
         </nz-form-control>
       </nz-form-item>
       <nz-form-item>
+        <nz-form-label [nzSpan]="7">Converted path</nz-form-label>
+        <nz-form-control [nzSpan]="12">
+          <input nz-input formControlName="convertedPath" placeholder="Converted directory where to store the rendered video files" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
         <nz-form-label [nzSpan]="7">Publish path</nz-form-label>
         <nz-form-control [nzSpan]="12">
           <input nz-input formControlName="publishPath" placeholder="Publishing directory on the server" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="7">Render Full HD</nz-form-label>
+        <nz-form-control [nzSpan]="12">
+          <nz-switch formControlName="renderFullHd"></nz-switch>
         </nz-form-control>
       </nz-form-item>
       <nz-form-item>

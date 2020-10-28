@@ -1,16 +1,24 @@
 export class Recording {
   public id?: number;
   public lectureId?: number;
+
   public type: RecordingType;
   public title: string;
   public description?: string;
+
   public duration: number;
   public published: boolean;
+
   public status?: RecordingStatus;
   public statusText?: string;
+
+  public fullHdStatus?: RecordingStatus;
+
   public uploadDate?: Date;
   public publishDate?: Date;
+
   public sorting?: number;
+
   public filePath: string;
   public preview: boolean;
 }
@@ -25,5 +33,7 @@ export enum RecordingStatus {
 
 export enum RecordingType {
   UNKNOWN = 0,
-  GREEN_SCREEN_RECORDING = 1
+  GREEN_SCREEN_RECORDING = 1,
+  SIMPLE_RECORDING = 2,
+  ZOOM_RECORDING = 3
 }

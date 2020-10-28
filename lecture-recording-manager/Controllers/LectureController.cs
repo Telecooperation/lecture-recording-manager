@@ -68,6 +68,8 @@ namespace LectureRecordingManager.Controllers
             dbLecture.Description = lecture.Description;
             dbLecture.PublishPath = lecture.PublishPath;
             dbLecture.SourcePath = lecture.SourcePath;
+            dbLecture.ConvertedPath = lecture.ConvertedPath;
+            dbLecture.RenderFullHd = lecture.RenderFullHd;
             dbLecture.Active = lecture.Active;
             dbLecture.Publish = lecture.Publish;
 

@@ -47,6 +47,15 @@
             <nz-tag *ngIf="recording.status == 4" [nzColor]="'green'">Published</nz-tag>
             <nz-tag *ngIf="recording.status == 5" [nzColor]="'blue'">Publishing</nz-tag>
         </nz-descriptions-item>
+        <nz-descriptions-item nzTitle="FullHD Status">
+          <nz-tag *ngIf="recording.fullHdStatus == -1" [nzColor]="'red'">Error</nz-tag>
+          <nz-tag *ngIf="recording.fullHdStatus == 0" [nzColor]="'grey'">Uploaded</nz-tag>
+          <nz-tag *ngIf="recording.fullHdStatus == 1" [nzColor]="'blue'">Processing...</nz-tag>
+          <nz-tag *ngIf="recording.fullHdStatus == 2" [nzColor]="'orange'">Processed</nz-tag>
+          <nz-tag *ngIf="recording.fullHdStatus == 3" [nzColor]="'blue'">Scheduled</nz-tag>
+          <nz-tag *ngIf="recording.fullHdStatus == 4" [nzColor]="'green'">Published</nz-tag>
+          <nz-tag *ngIf="recording.fullHdStatus == 5" [nzColor]="'blue'">Publishing</nz-tag>
+      </nz-descriptions-item>
       </nz-descriptions>
 
       <nz-alert *ngIf="recording.status == -1" nzType="error" [nzMessage]="recording.statusText"></nz-alert>

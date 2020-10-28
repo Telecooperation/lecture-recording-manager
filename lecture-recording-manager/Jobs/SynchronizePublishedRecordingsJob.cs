@@ -57,16 +57,30 @@ namespace LectureRecordingManager.Jobs
                     {
                         Id = recording.Title,
                         Name = recording.Title,
-                        FileName = targetFolderName + "/slides.mp4",
-                        StageVideo = targetFolderName + "/stage.mp4",
-                        PresenterFileName = targetFolderName + "/talkinghead.mp4",
+                       
                         Duration = recording.Duration,
                         Date = recording.PublishDate.Value
                     };
 
+                    // 720p processed?
+                    if(recording.Status == RecordingStatus.PUBLISHED)
+                    {
+                        metadata.FileName = targetFolderName + "/output_720p/slides.mp4";
+                        metadata.StageVideo = targetFolderName + "/output_720p/stage.mp4";
+                        metadata.PresenterFileName = targetFolderName + "/output_720p/talkinghead.mp4";
+                    }
+
+                    // 1080p processed?
+                    if (recording.FullHdStatus == RecordingStatus.PUBLISHED)
+                    {
+                        metadata.FileNameHd = targetFolderName + "/output_1080p/slides.mp4";
+                        metadata.StageVideoHd = targetFolderName + "/output_1080p/stage.mp4";
+                        metadata.PresenterFileNameHd = targetFolderName + "/output_1080p/talkinghead.mp4";
+                    }
+
                     metadata.Slides = recording.Chapters.Select(x => new Slide()
                     {
-                        Thumbnail = targetFolderName + "/" + x.Thumbnail,
+                        Thumbnail = targetFolderName + "/output_720p/" + x.Thumbnail,
                         Ocr = x.Text,
                         StartPosition = (float)x.StartPosition
                     }).ToArray();
@@ -79,7 +93,7 @@ namespace LectureRecordingManager.Jobs
                     {
                         Id = recording.Title,
                         Name = recording.Title,
-                        FileName = targetFolderName + "/slides.mp4",
+                        FileName = targetFolderName + "/output720p/slides.mp4",
                         Duration = recording.Duration,
                         Date = recording.PublishDate.Value
                     };

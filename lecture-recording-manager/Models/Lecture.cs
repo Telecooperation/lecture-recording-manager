@@ -25,6 +25,8 @@ namespace LectureRecordingManager.Models
 
         public string SourcePath { get; set; }
 
+        public string ConvertedPath { get; set; }
+
         public string PublishPath { get; set; }
 
         public DateTimeOffset? LastSynchronized { get; set; }
@@ -32,5 +34,7 @@ namespace LectureRecordingManager.Models
         public bool Publish { get; set; }
 
         public bool Active { get; set; }
+
+        public bool RenderFullHd { get; set; }
     }
 }

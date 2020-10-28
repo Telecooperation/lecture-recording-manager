@@ -10,9 +10,15 @@ namespace RecordingProcessor.Model
 
         public string FileName { get; set; }
 
+        public string FileNameHd { get; set; }
+
         public string PresenterFileName { get; set; }
 
+        public string PresenterFileNameHd { get; set; }
+
         public string StageVideo { get; set; }
+
+        public string StageVideoHd { get; set; }
 
         public Slide[] Slides { get; set; }
 

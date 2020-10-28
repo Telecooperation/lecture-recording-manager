@@ -51,37 +51,46 @@ namespace LectureRecordingManager.Jobs
                 return;
             }
 
+            // get lecture
+            var lecture = await _context.Lectures
+                .FindAsync(recording.LectureId);
+
+            // set status
             recording.Status = RecordingStatus.PROCESSING;
             await _context.SaveChangesAsync();
             await UpdateLectureRecordingStatus();
+
+            // process hd version?
+            if (lecture.RenderFullHd)
+            {
+                BackgroundJob.Enqueue<ProcessHdRecordingJob>(x => x.Execute(recordingId));
+            }
 
             // start encoding
             if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING || recording.Type == RecordingType.SIMPLE_RECORDING || recording.Type == RecordingType.ZOOM_RECORDING)
             {
                 // file path is file?
-                string outputFolder = "";
+                string outputFolder = Path.Combine(lecture.ConvertedPath, recording.Id.ToString(), "output_720p");
                 string inputFileName = "";
 
                 if (File.Exists(recording.FilePath))
                 {
-                    outputFolder = Path.Combine(Path.GetDirectoryName(recording.FilePath), "output");
                     inputFileName = recording.FilePath;
                 }
                 else if (recording.Type == RecordingType.ZOOM_RECORDING)
                 {
-                    outputFolder = Path.Combine(recording.FilePath, "output");
                     inputFileName = Directory.GetFiles(recording.FilePath)
                         .Where(x => x.EndsWith(".mp4"))
                         .SingleOrDefault();
                 }
                 else
                 {
-                    outputFolder = Path.Combine(recording.FilePath, "output");
                     inputFileName = Directory.GetFiles(recording.FilePath)
-                        .Where(x => x.EndsWith("_meta.json"))
-                        .SingleOrDefault();
+                            .Where(x => x.EndsWith("_meta.json"))
+                            .SingleOrDefault();
                 }
 
+                // create output directory
                 Directory.CreateDirectory(outputFolder);
 
                 if (inputFileName == null)
@@ -134,18 +143,6 @@ namespace LectureRecordingManager.Jobs
                         _context.RecordingChapters.Add(chapter);
                     }
 
-                    // copy thumbnails
-                    var thumbsDirectory = Path.Combine(outputFolder, "..", "thumbs");
-                    if (Directory.Exists(thumbsDirectory))
-                        Directory.Delete(thumbsDirectory, true);
-
-                    Directory.CreateDirectory(thumbsDirectory);
-
-                    foreach (var thumb in Directory.GetFiles(Path.Combine(outputFolder, "thumbs")))
-                    {
-                        File.Copy(thumb, Path.Combine(outputFolder, "..", "thumbs", Path.GetFileName(thumb)));
-                    }
-
                     recording.Status = RecordingStatus.PROCESSED;
                     recording.StatusText = null;
                     recording.Published = false;
@@ -178,28 +175,29 @@ namespace LectureRecordingManager.Jobs
                 return;
             }
 
+            // get lecture
+            var lecture = await _context.Lectures
+                .FindAsync(recording.LectureId);
+
             // start encoding preview
             if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING || recording.Type == RecordingType.SIMPLE_RECORDING || recording.Type == RecordingType.ZOOM_RECORDING)
             {
                 // file path is file?
-                string outputFolder = "";
+                string outputFolder = Path.Combine(lecture.ConvertedPath, recording.Id.ToString(), "preview");
                 string inputFileName = "";
 
                 if (File.Exists(recording.FilePath))
                 {
-                    outputFolder = Path.Combine(Path.GetDirectoryName(recording.FilePath), "preview");
                     inputFileName = recording.FilePath;
                 }
                 else if (recording.Type == RecordingType.ZOOM_RECORDING)
                 {
-                    outputFolder = Path.Combine(recording.FilePath, "preview");
                     inputFileName = Directory.GetFiles(recording.FilePath)
                         .Where(x => x.EndsWith(".mp4"))
                         .SingleOrDefault();
                 }
                 else
                 {
-                    outputFolder = Path.Combine(recording.FilePath, "preview");
                     inputFileName = Directory.GetFiles(recording.FilePath)
                         .Where(x => x.EndsWith("_meta.json"))
                         .SingleOrDefault();
@@ -251,18 +249,6 @@ namespace LectureRecordingManager.Jobs
                         };
 
                         _context.RecordingChapters.Add(chapter);
-                    }
-
-                    // copy thumbnails
-                    var thumbsDirectory = Path.Combine(outputFolder, "..", "thumbs");
-                    if (Directory.Exists(thumbsDirectory))
-                        Directory.Delete(thumbsDirectory, true);
-
-                    Directory.CreateDirectory(thumbsDirectory);
-
-                    foreach (var thumb in Directory.GetFiles(Path.Combine(outputFolder, "thumbs")))
-                    {
-                        File.Copy(thumb, Path.Combine(outputFolder, "..", "thumbs", Path.GetFileName(thumb)));
                     }
                 }
 

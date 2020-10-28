@@ -173,21 +173,27 @@ namespace LectureRecordingManager.Controllers
         [HttpGet("preview/{id}")]
         public async Task<ActionResult<Recording>> PreviewImage(int id)
         {
-            var recording = await _context.Recordings.FindAsync(id);
+            var recording = await _context.Recordings
+                .Include(x => x.Lecture)
+                .Where(x => x.Id == id)
+                .SingleOrDefaultAsync();
 
             if (recording == null && recording.Preview)
             {
                 return NotFound();
             }
 
-            var stream = new FileStream(Path.Combine(recording.FilePath, "preview", "thumbnail.jpg"), FileMode.Open);
+            var stream = new FileStream(Path.Combine(recording.Lecture.ConvertedPath, recording.Id.ToString(), "preview", "thumbnail.jpg"), FileMode.Open);
             return File(stream, System.Net.Mime.MediaTypeNames.Image.Jpeg);
         }
 
         [Route("preview_video/{id}")]
         public async Task<ActionResult> PreviewVideo(int id)
         {
-            var recording = await _context.Recordings.FindAsync(id);
+            var recording = await _context.Recordings
+                .Include(x => x.Lecture)
+                .Where(x => x.Id == id)
+                .SingleOrDefaultAsync();
 
             if (recording == null && recording.Preview)
             {
@@ -206,7 +212,7 @@ namespace LectureRecordingManager.Controllers
                 videoFileName = "slides.mp4";
             }
 
-            return PhysicalFile(Path.Combine(recording.FilePath, "preview", videoFileName), "application/octet-stream", enableRangeProcessing: true);
+            return PhysicalFile(Path.Combine(recording.Lecture.ConvertedPath, recording.Id.ToString(), "preview", videoFileName), "application/octet-stream", enableRangeProcessing: true);
         }
 
         [HttpGet("{id}/chapters")]
@@ -223,6 +229,7 @@ namespace LectureRecordingManager.Controllers
         {
             var chapter = await _context.RecordingChapters
                 .Include(x => x.Recording)
+                .Include(x => x.Recording.Lecture)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             if (chapter == null)
@@ -230,7 +237,7 @@ namespace LectureRecordingManager.Controllers
                 return NotFound();
             }
 
-            var stream = new FileStream(Path.Combine(chapter.Recording.FilePath, chapter.Thumbnail), FileMode.Open);
+            var stream = new FileStream(Path.Combine(chapter.Recording.Lecture.ConvertedPath, chapter.Recording.Id.ToString(), "preview", chapter.Thumbnail), FileMode.Open);
             return File(stream, System.Net.Mime.MediaTypeNames.Image.Jpeg);
         }
 
@@ -246,7 +253,16 @@ namespace LectureRecordingManager.Controllers
             }
 
             // schedule publish
-            recording.Status = RecordingStatus.SCHEDULED_PUBLISH;
+            if (recording.Status == RecordingStatus.PROCESSED)
+            {
+                recording.Status = RecordingStatus.SCHEDULED_PUBLISH;
+            }
+
+            if (recording.FullHdStatus == RecordingStatus.PROCESSED)
+            {
+                recording.FullHdStatus = RecordingStatus.SCHEDULED_PUBLISH;
+            }
+
             await _context.SaveChangesAsync();
 
             BackgroundJob.Enqueue<PublishRecordingJob>(x => x.PublishRecording(recording.Id));

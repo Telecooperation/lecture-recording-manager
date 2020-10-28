@@ -26,7 +26,7 @@ namespace LectureRecordingManager.Jobs
         {
             // check for recordings that should be published
             var recordings = await _context.Recordings
-                .Where(x => x.Status == RecordingStatus.PROCESSED)
+                .Where(x => x.Status == RecordingStatus.PROCESSED || x.FullHdStatus == RecordingStatus.PROCESSED)
                 .Where(x => x.Lecture.Active)
                 .Where(x => x.PublishDate.HasValue && x.PublishDate < DateTime.Now)
                 .ToListAsync();
@@ -34,8 +34,18 @@ namespace LectureRecordingManager.Jobs
             foreach (var recording in recordings)
             {
                 var rec = await _context.Recordings.FindAsync(recording.Id);
+
                 // schedule publish
-                rec.Status = RecordingStatus.SCHEDULED_PUBLISH;
+                if (rec.Status == RecordingStatus.PROCESSED)
+                {
+                    rec.Status = RecordingStatus.SCHEDULED_PUBLISH;
+                }
+
+                if (rec.FullHdStatus == RecordingStatus.PROCESSED)
+                {
+                    rec.FullHdStatus = RecordingStatus.SCHEDULED_PUBLISH;
+                }
+
                 await _context.SaveChangesAsync();
 
                 BackgroundJob.Enqueue<PublishRecordingJob>(x => x.PublishRecording(recording.Id));

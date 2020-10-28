@@ -33,6 +33,8 @@ export class LectureCreateEditComponent implements OnInit {
       description: [null],
       publishPath: [null],
       sourcePath: [null],
+      convertedPath: [null],
+      renderFullHd: [null],
       publish: [false],
       active: [false]
     });
@@ -51,6 +53,8 @@ export class LectureCreateEditComponent implements OnInit {
           description: [x.description],
           publishPath: [x.publishPath],
           sourcePath: [x.sourcePath],
+          convertedPath: [x.convertedPath],
+          renderFullHd: [x.renderFullHd],
           publish: [x.publish],
           active: [x.active]
         });
