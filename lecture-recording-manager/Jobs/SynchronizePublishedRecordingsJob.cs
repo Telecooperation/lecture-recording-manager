@@ -48,7 +48,7 @@ namespace LectureRecordingManager.Jobs
 
             foreach (var recording in recordings)
             {
-                var targetFolderName = recording.Id.ToString(); // !string.IsNullOrEmpty(recording.CustomTargetName) ? recording.CustomTargetName : recording.Id.ToString();
+                var targetFolderName = "video/" + recording.Id.ToString(); // !string.IsNullOrEmpty(recording.CustomTargetName) ? recording.CustomTargetName : recording.Id.ToString();
 
                 // generate metadata
                 if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING || recording.Type == RecordingType.SIMPLE_RECORDING)

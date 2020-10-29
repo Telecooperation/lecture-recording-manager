@@ -100,7 +100,6 @@ namespace LectureRecordingManager.Controllers
                 return NotFound();
             }
 
-            _context.RecordingChapters.RemoveRange(recording.Chapters);
             _context.Recordings.Remove(recording);
 
             await _context.SaveChangesAsync();
