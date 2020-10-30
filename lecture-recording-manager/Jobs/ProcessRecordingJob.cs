@@ -152,6 +152,9 @@ namespace LectureRecordingManager.Jobs
                 }
                 catch (Exception ex)
                 {
+                    recording = await _context.Recordings
+                        .FindAsync(recordingId);
+
                     recording.Status = RecordingStatus.ERROR;
                     recording.StatusText = ex.Message;
                     await _context.SaveChangesAsync();
