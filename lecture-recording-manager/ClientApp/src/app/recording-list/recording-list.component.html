@@ -12,7 +12,7 @@
     <tr *ngFor="let recording of recordingTable.data">
       <td>
         <a [routerLink]="['/', 'recording', recording.id]">
-          <img *ngIf="recording.preview" src="/api/recording/preview/{{recording.id}}" height="45px" style="margin-right: 10px;" />
+          <img *ngIf="recording.preview" [src]="'/api/recording/preview/' + recording.id | authImage | async" height="45px" style="margin-right: 10px;" />
           {{recording.title}}
         </a>
       </td>

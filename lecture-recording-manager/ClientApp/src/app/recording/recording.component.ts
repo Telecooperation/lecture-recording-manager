@@ -4,6 +4,7 @@ import { Recording } from '../shared/recording';
 import { LectureService } from '../services/lecture.service';
 import { RecordingChapter } from '../shared/recording-chapter';
 import { NzNotificationService } from 'ng-zorro-antd';
+import { AuthenticationService } from '../services/authentication.service';
 
 @Component({
   selector: 'app-recording',
@@ -14,9 +15,12 @@ export class RecordingComponent implements OnInit {
   public recording: Recording;
   public chapters: RecordingChapter[];
 
+  public token: string;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private authenticationService: AuthenticationService,
     private notifications: NzNotificationService,
     private lectureService: LectureService
   ) { }
@@ -24,6 +28,7 @@ export class RecordingComponent implements OnInit {
   ngOnInit(): void {
     const recordingId = this.route.snapshot.paramMap.get('recordingId');
     this.loadRecording(recordingId);
+    this.token = this.authenticationService.currentUserValue.token;
   }
 
   loadRecording(recordingId: string): void {

@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using LectureRecordingManager.Jobs;
 using LectureRecordingManager.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 namespace LectureRecordingManager.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class LectureController : ControllerBase
     {

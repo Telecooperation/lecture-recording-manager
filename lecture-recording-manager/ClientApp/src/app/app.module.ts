@@ -5,7 +5,7 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SemesterListComponent } from './semester-list/semester-list.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { NgZorroAntdModule, NZ_I18N, en_US } from 'ng-zorro-antd';
 import { LectureListComponent } from './lecture-list/lecture-list.component';
@@ -17,6 +17,13 @@ import { RecordingUploadComponent } from './recording-upload/recording-upload.co
 import { DurationPipe } from './pipes/duration.pipe';
 import { RecordingComponent } from './recording/recording.component';
 import { RecordingEditComponent } from './recording-edit/recording-edit.component';
+import { LoginComponent } from './authentication/login/login.component';
+import { ErrorInterceptor } from './authentication/auth.interceptor';
+import { JwtInterceptor } from './authentication/jwt.interceptor';
+
+import { AuthPipe } from './authentication/auth.pipe';
+import { UsersComponent } from './authentication/users/users.component';
+import { UserAddComponent } from './authentication/user-add/user-add.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +36,14 @@ import { RecordingEditComponent } from './recording-edit/recording-edit.componen
     RecordingUploadComponent,
     DurationPipe,
     RecordingComponent,
-    RecordingEditComponent
+    RecordingEditComponent,
+    LoginComponent,
+
+    AuthPipe,
+
+    UsersComponent,
+
+    UserAddComponent
   ],
   imports: [
     BrowserModule,
@@ -42,7 +56,11 @@ import { RecordingEditComponent } from './recording-edit/recording-edit.componen
 
     NgZorroAntdModule
   ],
-  providers: [{ provide: NZ_I18N, useValue: en_US }],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+
+    { provide: NZ_I18N, useValue: en_US }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

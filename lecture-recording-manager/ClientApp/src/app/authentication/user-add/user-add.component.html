@@ -1,0 +1,33 @@
+<nz-layout>
+    <nz-page-header [nzGhost]="false">
+      <nz-page-header-title>Add new user</nz-page-header-title>
+  
+      <nz-page-header-extra>
+        <button nz-button nzType="primary" (click)="onSubmit()"><i nz-icon nzType="save" nzTheme="outline"></i> Save</button>
+      </nz-page-header-extra>
+    </nz-page-header>
+  
+    <nz-content>
+      <form nz-form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <nz-form-item>
+          <nz-form-label [nzSpan]="7" nzRequired>E-Mail</nz-form-label>
+          <nz-form-control [nzSpan]="12">
+            <input nz-input formControlName="email" required />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label [nzSpan]="7" nzRequired>Username</nz-form-label>
+          <nz-form-control [nzSpan]="12">
+            <input nz-input formControlName="username" required />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label [nzSpan]="7">Password</nz-form-label>
+          <nz-form-control [nzSpan]="12">
+            <input nz-input type="password" formControlName="password" required />
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+    </nz-content>
+  </nz-layout>
+  

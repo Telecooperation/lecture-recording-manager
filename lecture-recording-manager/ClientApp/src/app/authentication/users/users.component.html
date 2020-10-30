@@ -1,0 +1,29 @@
+<nz-layout>
+    <nz-page-header [nzGhost]="false">
+      <nz-page-header-title>Users</nz-page-header-title>
+  
+      <nz-page-header-extra>
+        <button nz-button nzType="primary" [routerLink]="['/', 'users', 'add']">New user</button>
+      </nz-page-header-extra>
+    </nz-page-header>
+  
+    <nz-content>
+        <nz-table #userTable [nzData]="users">
+            <thead>
+              <tr>
+                <th nzWidth="100%">Username</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of userTable.data">
+                    <td>{{user.userName}}</td>
+                    <td><a nz-popconfirm
+                      nzPopconfirmTitle="Are you sure delete this user?"
+                      nzPopconfirmPlacement="bottom"
+                      (nzOnConfirm)="doDelete(user)">Delete</a></td>
+                </tr>
+            </tbody>
+          </nz-table>
+    </nz-content>
+</nz-layout>

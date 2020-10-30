@@ -7,23 +7,33 @@ import { RecordingUploadComponent } from './recording-upload/recording-upload.co
 import { LectureComponent } from './lecture/lecture.component';
 import { RecordingComponent } from './recording/recording.component';
 import { RecordingEditComponent } from './recording-edit/recording-edit.component';
-
+import { LoginComponent } from './authentication/login/login.component';
+import { AuthGuard } from './authentication/auth.guard';
+import { UsersComponent } from './authentication/users/users.component';
+import { UserAddComponent } from './authentication/user-add/user-add.component';
 
 const routes: Routes = [
-  { path: '', component: SemesterListComponent },
-  { path: 'semesters', component: SemesterListComponent },
+  { path: 'login', component: LoginComponent },
 
-  { path: 'lectures', component: LectureListComponent },
-  { path: 'lectures/semester/:semesterId', component: LectureListComponent },
-  
-  { path: 'lectures/new', component: LectureCreateEditComponent },
-  { path: 'lecture/edit/:lectureId', component: LectureCreateEditComponent },
+  { path: '', component: SemesterListComponent, canActivate: [AuthGuard] },
+  { path: 'semesters', component: SemesterListComponent, canActivate: [AuthGuard] },
 
-  { path: 'lecture/:lectureId', component: LectureComponent },
-  { path: 'lecture/:lectureId/upload', component: RecordingUploadComponent },
+  { path: 'lectures', component: LectureListComponent, canActivate: [AuthGuard] },
+  { path: 'lectures/semester/:semesterId', component: LectureListComponent, canActivate: [AuthGuard] },
 
-  { path: 'recording/:recordingId', component: RecordingComponent },
-  { path: 'recording/:recordingId/edit', component: RecordingEditComponent }
+  { path: 'lectures/new', component: LectureCreateEditComponent, canActivate: [AuthGuard] },
+  { path: 'lecture/edit/:lectureId', component: LectureCreateEditComponent, canActivate: [AuthGuard] },
+
+  { path: 'lecture/:lectureId', component: LectureComponent, canActivate: [AuthGuard] },
+  { path: 'lecture/:lectureId/upload', component: RecordingUploadComponent, canActivate: [AuthGuard] },
+
+  { path: 'recording/:recordingId', component: RecordingComponent, canActivate: [AuthGuard] },
+  { path: 'recording/:recordingId/edit', component: RecordingEditComponent, canActivate: [AuthGuard] },
+
+  { path: 'users', component: UsersComponent, canActivate: [AuthGuard] },
+  { path: 'users/add', component: UserAddComponent, canActivate: [AuthGuard] },
+
+  { path: '**', redirectTo: '' }
 ];
 
 @NgModule({

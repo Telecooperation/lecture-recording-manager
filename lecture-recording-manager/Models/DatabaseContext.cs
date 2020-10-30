@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using LectureRecordingManager.Authentication;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace LectureRecordingManager.Models
 {
-    public class DatabaseContext : DbContext
+    public class DatabaseContext : IdentityDbContext<ApplicationUser>
     {
         public DatabaseContext() : base()
         {
@@ -12,6 +14,11 @@ namespace LectureRecordingManager.Models
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         {
 
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
         }
 
         public DbSet<Lecture> Lectures { get; set; }

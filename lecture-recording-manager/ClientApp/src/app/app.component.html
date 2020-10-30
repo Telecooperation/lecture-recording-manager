@@ -2,9 +2,16 @@
   <nz-header>
     <div class="logo">Lecture Recording Manager</div>
 
-    <ul nz-menu nzTheme="dark" nzMode="horizontal">
+    <div *ngIf="currentUser" class="login">
+      <ul nz-menu nzTheme="dark" nzMode="horizontal">
+        <li nz-menu-item (click)="logout()">Logout ({{currentUser.username}})</li>
+      </ul>
+    </div>
+
+    <ul *ngIf="currentUser" nz-menu nzTheme="dark" nzMode="horizontal">
       <li nz-menu-item [routerLink]="['/', 'semesters']" nzMatchRouter>Semesters</li>
       <li nz-menu-item [routerLink]="['/', 'lectures']" nzMatchRouter>Lectures</li>
+      <li nz-menu-item [routerLink]="['/', 'users']" nzMatchRouter>Users</li>
     </ul>
   </nz-header>
   <nz-content>
