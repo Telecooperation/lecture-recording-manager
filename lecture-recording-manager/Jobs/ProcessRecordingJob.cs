@@ -85,8 +85,9 @@ namespace LectureRecordingManager.Jobs
                 }
                 else
                 {
+                    string targetName = recording.CustomTargetName != null ? recording.CustomTargetName : "";
                     inputFileName = Directory.GetFiles(recording.FilePath)
-                            .Where(x => x.EndsWith("_meta.json"))
+                            .Where(x => x.EndsWith(targetName + "_meta.json"))
                             .SingleOrDefault();
                 }
 
@@ -201,8 +202,10 @@ namespace LectureRecordingManager.Jobs
                 }
                 else
                 {
+                    var targetName = recording.CustomTargetName != null ? recording.CustomTargetName : "";
+
                     inputFileName = Directory.GetFiles(recording.FilePath)
-                        .Where(x => x.EndsWith("_meta.json"))
+                        .Where(x => x.EndsWith(targetName + "_meta.json"))
                         .SingleOrDefault();
                 }
 

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace LectureRecordingManager.Controllers
 {
     [ApiController]
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {

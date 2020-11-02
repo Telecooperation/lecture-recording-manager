@@ -14,7 +14,7 @@
 
       <nz-dropdown-menu #menu1="nzDropdownMenu">
         <ul nz-menu>
-          <li nz-menu-item *ngIf="!recording.preview" (click)="doPreview()">Generate Preview</li>
+          <li nz-menu-item (click)="doPreview()">Generate Preview</li>
           <li nz-menu-item *ngIf="recording.status <= 0" (click)="doProcess()">Process Recording</li>
           <li nz-menu-item *ngIf="recording.status == 2" (click)="doPublish()">Publish Now</li>
 

@@ -50,7 +50,10 @@ namespace LectureRecordingManager
                 configuration.RootPath = "ClientApp/dist";
             });
 
-            services.AddHangfire(config => config.UsePostgreSqlStorage(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddHangfire(config => config.UsePostgreSqlStorage(Configuration.GetConnectionString("DefaultConnection"), new PostgreSqlStorageOptions()
+            {
+                InvisibilityTimeout = new TimeSpan(24, 0, 0)
+            }));
 
             services.AddDbContext<DatabaseContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
