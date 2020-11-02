@@ -78,7 +78,7 @@ namespace LectureRecordingManager.Jobs
                         metadata.PresenterFileNameHd = targetFolderName + "/output_1080p/talkinghead.mp4";
                     }
 
-                    metadata.Slides = recording.Chapters.Select(x => new Slide()
+                    metadata.Slides = recording.Chapters.OrderBy(x => x.StartPosition).Select(x => new Slide()
                     {
                         Thumbnail = targetFolderName + "/output_720p/" + x.Thumbnail,
                         Ocr = x.Text,
