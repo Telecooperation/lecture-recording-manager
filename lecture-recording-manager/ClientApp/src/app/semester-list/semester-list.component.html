@@ -3,6 +3,9 @@
     <nz-avatar nz-page-header-avatar nzIcon="calendar"></nz-avatar>
 
     <nz-page-header-title>Semesters</nz-page-header-title>
+    <nz-page-header-extra>
+      <button nz-button [nzType]="'primary'" (click)="showCreate()">Create Semester</button>
+    </nz-page-header-extra>
   </nz-page-header>
 
   <nz-content>
@@ -26,3 +29,46 @@
     </nz-table>
   </nz-content>
 </nz-layout>
+
+<nz-modal [(nzVisible)]="isCreateModalVisible" nzTitle="Create new semester" (nzOnCancel)="closeCreate()" (nzOnOk)="doCreate()">
+  <form nz-form>
+    <nz-form-item>
+      <nz-form-label [nzSpan]="7" nzRequired>Title</nz-form-label>
+      <nz-form-control [nzSpan]="12">
+        <input nz-input name="title" placeholder="Title of the semester" required [(ngModel)]="createSemester.name" />
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-label [nzSpan]="7" nzRequired>Start Date</nz-form-label>
+      <nz-form-control [nzSpan]="12">
+        <nz-date-picker 
+          name="dateStart"
+          [(ngModel)]="createSemester.dateStart"
+          nzFormat="yyyy-MM-dd HH:mm:ss"
+          [nzShowTime]="{ }"></nz-date-picker>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-label [nzSpan]="7">End Date</nz-form-label>
+      <nz-form-control [nzSpan]="12">
+        <nz-date-picker 
+          name="dateEnd"
+          [(ngModel)]="createSemester.dateEnd"
+          nzFormat="yyyy-MM-dd HH:mm:ss"
+          [nzShowTime]="{ }"></nz-date-picker>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-label [nzSpan]="7">Published</nz-form-label>
+      <nz-form-control [nzSpan]="12">
+        <nz-switch name="published" [(ngModel)]="createSemester.published"></nz-switch>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-label [nzSpan]="7">Active</nz-form-label>
+      <nz-form-control [nzSpan]="12">
+        <nz-switch name="active" [(ngModel)]="createSemester.active"></nz-switch>
+      </nz-form-control>
+    </nz-form-item>
+  </form>
+</nz-modal>

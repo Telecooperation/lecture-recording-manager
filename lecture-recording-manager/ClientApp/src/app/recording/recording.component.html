@@ -24,41 +24,13 @@
     </nz-page-header-extra>
 
     <nz-page-header-content>
-      <!-- <div class="lecturePreview" *ngIf="recording.preview">
-        <img [src]="'/api/recording/preview/' + recording.id | authImage | async" />
-      </div>
-      <div class="lecturePreview" *ngIf="recording.preview">
-        <video controls>
-          <source src="/api/recording/preview_video/{{recording.id}}?access_token={{token}}" type="video/mp4" />
-        </video>
-      </div> -->
       <nz-descriptions [nzColumn]="2" nzSize="small">
         <nz-descriptions-item nzTitle="Description" nzSpan="2">{{recording.description}}</nz-descriptions-item>
         <nz-descriptions-item nzTitle="Duration">{{recording.duration | duration : false}}</nz-descriptions-item>
         <nz-descriptions-item nzTitle="Upload Date">{{recording.uploadDate | date:'medium'}}</nz-descriptions-item>
         <nz-descriptions-item nzTitle="Publish Date">{{recording.publishDate | date:'medium'}}</nz-descriptions-item>
         <nz-descriptions-item nzTitle="Storage Path">{{recording.filePath}}</nz-descriptions-item>
-        <!-- <nz-descriptions-item nzTitle="Status">
-            <nz-tag *ngIf="recording.status == -1" [nzColor]="'red'">Error</nz-tag>
-            <nz-tag *ngIf="recording.status == 0" [nzColor]="'grey'">Uploaded</nz-tag>
-            <nz-tag *ngIf="recording.status == 1" [nzColor]="'blue'">Processing...</nz-tag>
-            <nz-tag *ngIf="recording.status == 2" [nzColor]="'orange'">Processed</nz-tag>
-            <nz-tag *ngIf="recording.status == 3" [nzColor]="'blue'">Scheduled</nz-tag>
-            <nz-tag *ngIf="recording.status == 4" [nzColor]="'green'">Published</nz-tag>
-            <nz-tag *ngIf="recording.status == 5" [nzColor]="'blue'">Publishing</nz-tag>
-        </nz-descriptions-item>
-        <nz-descriptions-item nzTitle="FullHD Status">
-          <nz-tag *ngIf="recording.fullHdStatus == -1" [nzColor]="'red'">Error</nz-tag>
-          <nz-tag *ngIf="recording.fullHdStatus == 0" [nzColor]="'grey'">Uploaded</nz-tag>
-          <nz-tag *ngIf="recording.fullHdStatus == 1" [nzColor]="'blue'">Processing...</nz-tag>
-          <nz-tag *ngIf="recording.fullHdStatus == 2" [nzColor]="'orange'">Processed</nz-tag>
-          <nz-tag *ngIf="recording.fullHdStatus == 3" [nzColor]="'blue'">Scheduled</nz-tag>
-          <nz-tag *ngIf="recording.fullHdStatus == 4" [nzColor]="'green'">Published</nz-tag>
-          <nz-tag *ngIf="recording.fullHdStatus == 5" [nzColor]="'blue'">Publishing</nz-tag>
-      </nz-descriptions-item> -->
       </nz-descriptions>
-
-      <!-- <nz-alert *ngIf="recording.status == -1" nzType="error" [nzMessage]="recording.statusText"></nz-alert> -->
     </nz-page-header-content>
   </nz-page-header>
 
@@ -87,6 +59,8 @@
             <nz-tag *ngIf="output.status == 3" [nzColor]="'blue'">Scheduled</nz-tag>
             <nz-tag *ngIf="output.status == 4" [nzColor]="'green'">Published</nz-tag>
             <nz-tag *ngIf="output.status == 5" [nzColor]="'blue'">Publishing</nz-tag>
+
+            <span *ngIf="output.status == -1">{{output.jobError}}</span>
           </td>
           <td>{{output.dateStarted | date:'medium'}}</td>
           <td>{{output.dateFinished | date:'medium'}}</td>
