@@ -15,8 +15,8 @@
       <nz-dropdown-menu #menu1="nzDropdownMenu">
         <ul nz-menu>
           <li nz-menu-item (click)="doPreview()">Generate Preview</li>
-          <li nz-menu-item *ngIf="recording.status <= 0" (click)="doProcess()">Process Recording</li>
-          <li nz-menu-item *ngIf="recording.status == 2" (click)="doPublish()">Publish Now</li>
+          <li nz-menu-item (click)="doProcess()">Process Recording</li>
+          <li nz-menu-item (click)="doPublish()">Publish Now</li>
 
           <li nz-menu-item (click)="doDelete()"><span nz-typography nzType="danger"><i nz-icon nzType="delete" nzTheme="outline"></i> Delete Recording</span></li>
         </ul>
@@ -24,21 +24,21 @@
     </nz-page-header-extra>
 
     <nz-page-header-content>
-      <div class="lecturePreview" *ngIf="recording.preview">
+      <!-- <div class="lecturePreview" *ngIf="recording.preview">
         <img [src]="'/api/recording/preview/' + recording.id | authImage | async" />
       </div>
       <div class="lecturePreview" *ngIf="recording.preview">
         <video controls>
           <source src="/api/recording/preview_video/{{recording.id}}?access_token={{token}}" type="video/mp4" />
         </video>
-      </div>
+      </div> -->
       <nz-descriptions [nzColumn]="2" nzSize="small">
         <nz-descriptions-item nzTitle="Description" nzSpan="2">{{recording.description}}</nz-descriptions-item>
         <nz-descriptions-item nzTitle="Duration">{{recording.duration | duration : false}}</nz-descriptions-item>
         <nz-descriptions-item nzTitle="Upload Date">{{recording.uploadDate | date:'medium'}}</nz-descriptions-item>
         <nz-descriptions-item nzTitle="Publish Date">{{recording.publishDate | date:'medium'}}</nz-descriptions-item>
         <nz-descriptions-item nzTitle="Storage Path">{{recording.filePath}}</nz-descriptions-item>
-        <nz-descriptions-item nzTitle="Status">
+        <!-- <nz-descriptions-item nzTitle="Status">
             <nz-tag *ngIf="recording.status == -1" [nzColor]="'red'">Error</nz-tag>
             <nz-tag *ngIf="recording.status == 0" [nzColor]="'grey'">Uploaded</nz-tag>
             <nz-tag *ngIf="recording.status == 1" [nzColor]="'blue'">Processing...</nz-tag>
@@ -55,14 +55,47 @@
           <nz-tag *ngIf="recording.fullHdStatus == 3" [nzColor]="'blue'">Scheduled</nz-tag>
           <nz-tag *ngIf="recording.fullHdStatus == 4" [nzColor]="'green'">Published</nz-tag>
           <nz-tag *ngIf="recording.fullHdStatus == 5" [nzColor]="'blue'">Publishing</nz-tag>
-      </nz-descriptions-item>
+      </nz-descriptions-item> -->
       </nz-descriptions>
 
-      <nz-alert *ngIf="recording.status == -1" nzType="error" [nzMessage]="recording.statusText"></nz-alert>
+      <!-- <nz-alert *ngIf="recording.status == -1" nzType="error" [nzMessage]="recording.statusText"></nz-alert> -->
     </nz-page-header-content>
   </nz-page-header>
 
   <nz-content>
+    <h3>Rendering Jobs</h3>
+    <nz-table [nzTemplateMode]="true" [nzSize]="'small'">
+      <thead>
+        <tr>
+          <th>Output Job</th>
+          <th>Status</th>
+          <th>Date started</th>
+          <th>Date finished</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let output of recording.outputs">
+          <td>
+            <span *ngIf="output.jobType == 'LectureRecordingManager.Jobs.ProcessRecordingJob'">Video processing <nz-tag>{{output.jobConfiguration}}</nz-tag></span>
+            <span *ngIf="output.jobType == 'LectureRecordingManager.Jobs.PreviewRecordingJob'">Generate previews and process metadata</span>
+          </td>
+          <td>
+            <nz-tag *ngIf="output.status == -1" [nzColor]="'red'">Error</nz-tag>
+            <nz-tag *ngIf="output.status == 0" [nzColor]="'grey'">Uploaded</nz-tag>
+            <nz-tag *ngIf="output.status == 1" [nzColor]="'blue'">Processing...</nz-tag>
+            <nz-tag *ngIf="output.status == 2" [nzColor]="'orange'">Processed</nz-tag>
+            <nz-tag *ngIf="output.status == 3" [nzColor]="'blue'">Scheduled</nz-tag>
+            <nz-tag *ngIf="output.status == 4" [nzColor]="'green'">Published</nz-tag>
+            <nz-tag *ngIf="output.status == 5" [nzColor]="'blue'">Publishing</nz-tag>
+          </td>
+          <td>{{output.dateStarted | date:'medium'}}</td>
+          <td>{{output.dateFinished | date:'medium'}}</td>
+        </tr>
+      </tbody>
+    </nz-table>
+
+    <br />
+    <h3>Chapters</h3>
     <nz-table #chapterTable [nzData]="chapters">
       <thead>
         <tr>
@@ -74,7 +107,7 @@
       <tbody>
         <tr *ngFor="let chapter of chapterTable.data">
           <td>
-              <img *ngIf="recording.preview" [src]="'/api/recording/preview/chapter/' + chapter.id | authImage | async" height="45px" />
+              <img [src]="'/api/recording/preview/chapter/' + chapter.id | authImage | async" height="45px" />
           </td>
           <td>{{chapter.text | slice: 0:100}}</td>
           <td>{{chapter.startPosition | duration : true}}</td>

@@ -1,9 +1,12 @@
 ﻿using LectureRecordingManager.Hubs;
+using LectureRecordingManager.Jobs.Configuration;
 using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using RecordingProcessor.Metadata;
 using RecordingProcessor.Model;
+using SixLabors.ImageSharp.ColorSpaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -35,8 +38,9 @@ namespace LectureRecordingManager.Jobs
 
             var recordings = await _context.Recordings
                 .Include(x => x.Chapters)
+                .Include(x => x.Outputs)
                 .Where(x => x.LectureId == lectureId)
-                .Where(x => x.Published)
+                .Where(x => x.Outputs.Any(x => x.Status == RecordingStatus.PUBLISHED))
                 .ToListAsync();
 
             var lectureMetadata = new RecordingProcessor.Model.Lecture()
@@ -48,22 +52,27 @@ namespace LectureRecordingManager.Jobs
 
             foreach (var recording in recordings)
             {
-                var targetFolderName = "video/" + recording.Id.ToString(); // !string.IsNullOrEmpty(recording.CustomTargetName) ? recording.CustomTargetName : recording.Id.ToString();
+                var targetFolderName = "video/" + recording.Id.ToString();
 
                 // generate metadata
-                if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING || recording.Type == RecordingType.SIMPLE_RECORDING)
+                var metadata = new RecordingMetadata()
                 {
-                    var metadata = new RecordingMetadata()
-                    {
-                        Id = recording.Title,
-                        Name = recording.Title,
-                       
-                        Duration = recording.Duration,
-                        Date = recording.PublishDate.Value
-                    };
+                    Id = recording.Title,
+                    Name = recording.Title,
+
+                    Duration = recording.Duration,
+                    Date = recording.PublishDate.Value
+                };
+
+                // check outputs
+                foreach (var output in recording.Outputs
+                    .Where(x => x.Status == RecordingStatus.PUBLISHED)
+                    .Where(x => x.JobType == typeof(ProcessRecordingJob).FullName))
+                {
+                    var configuration = JsonConvert.DeserializeObject<ProcessRecordingJobConfiguration>(output.JobConfiguration);
 
                     // 720p processed?
-                    if(recording.Status == RecordingStatus.PUBLISHED)
+                    if (configuration.OutputType == ProcessRecordingOutputType.Default || configuration.OutputType == ProcessRecordingOutputType.Video_720p)
                     {
                         metadata.FileName = targetFolderName + "/output_720p/slides.mp4";
                         metadata.StageVideo = targetFolderName + "/output_720p/stage.mp4";
@@ -71,42 +80,22 @@ namespace LectureRecordingManager.Jobs
                     }
 
                     // 1080p processed?
-                    if (recording.FullHdStatus == RecordingStatus.PUBLISHED)
+                    if (configuration.OutputType == ProcessRecordingOutputType.Video_1080P)
                     {
                         metadata.FileNameHd = targetFolderName + "/output_1080p/slides.mp4";
                         metadata.StageVideoHd = targetFolderName + "/output_1080p/stage.mp4";
                         metadata.PresenterFileNameHd = targetFolderName + "/output_1080p/talkinghead.mp4";
                     }
-
-                    metadata.Slides = recording.Chapters.OrderBy(x => x.StartPosition).Select(x => new Slide()
-                    {
-                        Thumbnail = targetFolderName + "/output_720p/" + x.Thumbnail,
-                        Ocr = x.Text,
-                        StartPosition = (float)x.StartPosition
-                    }).ToArray();
-
-                    lectureMetadata.Recordings.Add(metadata);
                 }
-                else if (recording.Type == RecordingType.ZOOM_RECORDING)
+
+                metadata.Slides = recording.Chapters.OrderBy(x => x.StartPosition).Select(x => new Slide()
                 {
-                    var metadata = new RecordingMetadata()
-                    {
-                        Id = recording.Title,
-                        Name = recording.Title,
-                        FileName = targetFolderName + "/output720p/slides.mp4",
-                        Duration = recording.Duration,
-                        Date = recording.PublishDate.Value
-                    };
+                    Thumbnail = targetFolderName + "/output_720p/" + x.Thumbnail,
+                    Ocr = x.Text,
+                    StartPosition = (float)x.StartPosition
+                }).ToArray();
 
-                    metadata.Slides = recording.Chapters.Select(x => new Slide()
-                    {
-                        Thumbnail = targetFolderName + "/" + x.Thumbnail,
-                        Ocr = x.Text,
-                        StartPosition = (float)x.StartPosition
-                    }).ToArray();
-
-                    lectureMetadata.Recordings.Add(metadata);
-                }
+                lectureMetadata.Recordings.Add(metadata);
             }
 
             // update metadata

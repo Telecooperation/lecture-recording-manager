@@ -27,24 +27,18 @@ namespace LectureRecordingManager.Models
 
         public bool Published { get; set; }
 
-        public RecordingStatus Status { get; set; }
-
-        public string StatusText { get; set; }
-
         public DateTimeOffset? UploadDate { get; set; }
 
         public DateTimeOffset? PublishDate { get; set; }
 
         public int Sorting { get; set; }
 
-        public bool Preview { get; set; }
-
         public string FilePath { get; set; }
 
         public string CustomTargetName { get; set; }
 
-        public RecordingStatus FullHdStatus { get; set; }
-
         public List<RecordingChapter> Chapters { get; set; }
+
+        public List<RecordingOutput> Outputs { get; set; }
     }
 }

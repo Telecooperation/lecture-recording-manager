@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using LectureRecordingManager.Hubs;
+using LectureRecordingManager.Jobs.Configuration;
 using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -38,39 +39,42 @@ namespace LectureRecordingManager.Jobs
             this.converter = converter;
         }
 
-        [AutomaticRetry(Attempts = 2)]
-        public async Task Execute(int recordingId)
+        [AutomaticRetry(Attempts = 1)]
+        public async Task Execute(ProcessRecordingJobConfiguration configuration)
         {
-            // set status
+            // get recording
             var recording = await _context.Recordings
                 .Include(x => x.Chapters)
-                .FirstOrDefaultAsync(x => x.Id == recordingId);
+                .Include(x => x.Outputs)
+                .FirstOrDefaultAsync(x => x.Id == configuration.RecordingId);
 
-            if (recording == null || recording.Status == RecordingStatus.PROCESSING)
+            if (recording == null)
             {
                 return;
             }
+
+            // create new recording output
+            var recordingOutput = new RecordingOutput()
+            {
+                RecordingId = configuration.RecordingId,
+                DateStarted = DateTime.Now,
+                Status = RecordingStatus.PROCESSING,
+                JobType = typeof(ProcessRecordingJob).FullName,
+                JobConfiguration = JsonConvert.SerializeObject(configuration)
+            };
+            _context.RecordingOutputs.Add(recordingOutput);
+            await _context.SaveChangesAsync();
+            await UpdateLectureRecordingStatus();
 
             // get lecture
             var lecture = await _context.Lectures
                 .FindAsync(recording.LectureId);
 
-            // set status
-            recording.Status = RecordingStatus.PROCESSING;
-            await _context.SaveChangesAsync();
-            await UpdateLectureRecordingStatus();
-
-            // process hd version?
-            if (lecture.RenderFullHd)
-            {
-                BackgroundJob.Enqueue<ProcessHdRecordingJob>(x => x.Execute(recordingId));
-            }
-
             // start encoding
             if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING || recording.Type == RecordingType.SIMPLE_RECORDING || recording.Type == RecordingType.ZOOM_RECORDING)
             {
                 // file path is file?
-                string outputFolder = Path.Combine(lecture.ConvertedPath, recording.Id.ToString(), "output_720p");
+                string outputFolder = Path.Combine(lecture.ConvertedPath, recording.Id.ToString(), "output_" + recordingOutput.Id);
                 string inputFileName = "";
 
                 if (File.Exists(recording.FilePath))
@@ -96,8 +100,8 @@ namespace LectureRecordingManager.Jobs
 
                 if (inputFileName == null)
                 {
-                    recording.Status = RecordingStatus.ERROR;
-                    recording.StatusText = "Could not find studio meta data.";
+                    recordingOutput.Status = RecordingStatus.ERROR;
+                    recordingOutput.JobError = "Could not find studio meta data.";
                     await _context.SaveChangesAsync();
                     await UpdateLectureRecordingStatus();
 
@@ -111,54 +115,30 @@ namespace LectureRecordingManager.Jobs
 
                     if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING)
                     {
-                        metaData = ConvertStudioRecording(inputFileName, outputFolder, false);
+                        metaData = ConvertStudioRecording(inputFileName, outputFolder, GetDimension(configuration.OutputType));
                     }
                     else if (recording.Type == RecordingType.SIMPLE_RECORDING)
                     {
-                        metaData = ConvertSimpleRecording(inputFileName, outputFolder, false);
+                        metaData = ConvertSimpleRecording(inputFileName, outputFolder, GetDimension(configuration.OutputType));
                     }
                     else if (recording.Type == RecordingType.ZOOM_RECORDING)
                     {
-                        metaData = ConvertZoomRecording(inputFileName, outputFolder, false);
+                        metaData = ConvertZoomRecording(inputFileName, outputFolder);
                     }
 
-                    // reload recording
-                    recording = await _context.Recordings
-                        .Include(x => x.Chapters)
-                        .FirstOrDefaultAsync(x => x.Id == recordingId);
-
-                    recording.Duration = metaData.Duration;
-                    _context.RecordingChapters.RemoveRange(recording.Chapters);
-
-                    // add slides
-                    foreach (var slide in metaData.Slides)
-                    {
-                        var chapter = new RecordingChapter()
-                        {
-                            Recording = recording,
-                            StartPosition = slide.StartPosition,
-                            Text = slide.Ocr,
-                            Thumbnail = slide.Thumbnail
-                        };
-
-                        _context.RecordingChapters.Add(chapter);
-                    }
-
-                    recording.Status = RecordingStatus.PROCESSED;
-                    recording.StatusText = null;
-                    recording.Published = false;
+                    recordingOutput.Status = RecordingStatus.PROCESSED;
+                    recordingOutput.JobError = null;
+                    recordingOutput.DateFinished = DateTime.Now;
 
                     await _context.SaveChangesAsync();
                     await UpdateLectureRecordingStatus();
                 }
                 catch (Exception ex)
                 {
-                    recording = await _context.Recordings
-                        .FindAsync(recordingId);
+                    recordingOutput.Status = RecordingStatus.ERROR;
+                    recordingOutput.JobError = ex.Message;
+                    recordingOutput.DateFinished = DateTime.Now;
 
-                    recording.Status = RecordingStatus.ERROR;
-                    recording.StatusText = ex.Message;
-                    await _context.SaveChangesAsync();
                     await UpdateLectureRecordingStatus();
 
                     throw ex;
@@ -166,104 +146,21 @@ namespace LectureRecordingManager.Jobs
             }
         }
 
-        [AutomaticRetry(Attempts = 1)]
-        public async Task Preview(int recordingId)
+        private Dimension GetDimension(ProcessRecordingOutputType outputType)
         {
-            // set status
-            var recording = await _context.Recordings
-                .Include(x => x.Chapters)
-                .FirstOrDefaultAsync(x => x.Id == recordingId);
-
-            if (recording == null)
+            if (outputType == ProcessRecordingOutputType.Default || outputType == ProcessRecordingOutputType.Video_720p)
             {
-                return;
+                return Dimension.Dim720p;
+            }
+            else if (outputType == ProcessRecordingOutputType.Video_1080P)
+            {
+                return Dimension.Dim1080p;
             }
 
-            // get lecture
-            var lecture = await _context.Lectures
-                .FindAsync(recording.LectureId);
-
-            // start encoding preview
-            if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING || recording.Type == RecordingType.SIMPLE_RECORDING || recording.Type == RecordingType.ZOOM_RECORDING)
-            {
-                // file path is file?
-                string outputFolder = Path.Combine(lecture.ConvertedPath, recording.Id.ToString(), "preview");
-                string inputFileName = "";
-
-                if (File.Exists(recording.FilePath))
-                {
-                    inputFileName = recording.FilePath;
-                }
-                else if (recording.Type == RecordingType.ZOOM_RECORDING)
-                {
-                    inputFileName = Directory.GetFiles(recording.FilePath)
-                        .Where(x => x.EndsWith(".mp4"))
-                        .SingleOrDefault();
-                }
-                else
-                {
-                    var targetName = recording.CustomTargetName != null ? recording.CustomTargetName : "";
-
-                    inputFileName = Directory.GetFiles(recording.FilePath)
-                        .Where(x => x.EndsWith(targetName + "_meta.json"))
-                        .SingleOrDefault();
-                }
-
-                if (inputFileName == null)
-                {
-                    throw new Exception("Could not find studio meta data.");
-                }
-
-                // convert files
-                RecordingMetadata metaData = null;
-
-                if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING)
-                {
-                    metaData = ConvertStudioRecording(inputFileName, outputFolder, true);
-
-                    recording.Preview = true;
-                    recording.Duration = metaData.Duration;
-                }
-                else if (recording.Type == RecordingType.SIMPLE_RECORDING)
-                {
-                    metaData = ConvertSimpleRecording(inputFileName, outputFolder, true);
-
-                    recording.Preview = true;
-                    recording.Duration = metaData.Duration;
-                }
-                else if (recording.Type == RecordingType.ZOOM_RECORDING)
-                {
-                    metaData = ConvertZoomRecording(inputFileName, outputFolder, true);
-
-                    recording.Preview = true;
-                    recording.Duration = metaData.Duration;
-                }
-
-                if (metaData != null)
-                {
-                    _context.RecordingChapters.RemoveRange(recording.Chapters);
-
-                    // add slides
-                    foreach (var slide in metaData.Slides)
-                    {
-                        var chapter = new RecordingChapter()
-                        {
-                            Recording = recording,
-                            StartPosition = slide.StartPosition,
-                            Text = slide.Ocr,
-                            Thumbnail = slide.Thumbnail
-                        };
-
-                        _context.RecordingChapters.Add(chapter);
-                    }
-                }
-
-                await _context.SaveChangesAsync();
-                await UpdateLectureRecordingStatus();
-            }
+            return Dimension.Dim720p;
         }
 
-        private RecordingMetadata ConvertStudioRecording(string inputFileName, string outputFolder, bool preview)
+        private RecordingMetadata ConvertStudioRecording(string inputFileName, string outputFolder, Dimension targetDimension)
         {
             // identify file paths
             var slideVideoPath = inputFileName.Replace("_meta.json", "_slides.mp4");
@@ -271,7 +168,6 @@ namespace LectureRecordingManager.Jobs
             var ckFile = inputFileName.Replace("_meta.json", ".ckparams");
 
             // setup of recording
-            var targetDimension = Dimension.Dim720p;
             var recordingStyle = new TKStudioStyle(targetDimension);
 
             if (File.Exists(ckFile))
@@ -306,17 +202,16 @@ namespace LectureRecordingManager.Jobs
                 ExportJson = false
             };
 
-            return preview ? converter.ConvertPreviewMedia(config) : converter.ConvertMedia(config);
+            return converter.ConvertMedia(config);
         }
 
-        private RecordingMetadata ConvertSimpleRecording(string inputFileName, string outputFolder, bool preview)
+        private RecordingMetadata ConvertSimpleRecording(string inputFileName, string outputFolder, Dimension targetDimension)
         {
             // identify file paths
             var slideVideoPath = inputFileName.Replace("_meta.json", "_slides.mp4");
             var thVideoPath = inputFileName.Replace("_meta.json", "_talkinghead.mp4");
 
             // setup of recording
-            var targetDimension = Dimension.Dim720p;
             var recordingStyle = new TKSimpleStyle(targetDimension);
 
             var config = new ConversionConfiguration()
@@ -330,10 +225,10 @@ namespace LectureRecordingManager.Jobs
                 ExportJson = false
             };
 
-            return preview ? converter.ConvertPreviewMedia(config) : converter.ConvertMedia(config);
+            return converter.ConvertMedia(config);
         }
 
-        private RecordingMetadata ConvertZoomRecording(string inputFileName, string outputFolder, bool preview)
+        private RecordingMetadata ConvertZoomRecording(string inputFileName, string outputFolder)
         {
             // setup recording
             var config = new ConversionConfiguration()
@@ -344,7 +239,7 @@ namespace LectureRecordingManager.Jobs
                 ExportJson = false
             };
 
-            return preview ? converter.ConvertPreviewZoomMedia(config) : converter.ConvertZoomMedia(config);
+            return converter.ConvertZoomMedia(config);
         }
 
         private async Task UpdateLectureRecordingStatus()

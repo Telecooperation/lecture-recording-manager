@@ -1,3 +1,5 @@
+import { RecordingOutput } from './recording-output';
+
 export class Recording {
   public id?: number;
   public lectureId?: number;
@@ -9,26 +11,14 @@ export class Recording {
   public duration: number;
   public published: boolean;
 
-  public status?: RecordingStatus;
-  public statusText?: string;
-
-  public fullHdStatus?: RecordingStatus;
-
   public uploadDate?: Date;
   public publishDate?: Date;
 
   public sorting?: number;
 
   public filePath: string;
-  public preview: boolean;
-}
 
-export enum RecordingStatus {
-  UPLOADED = 0,
-  PROCESSING = 1,
-  PROCESSED = 2,
-  SCHEDULED = 3,
-  ERROR = -1
+  public outputs: RecordingOutput[];
 }
 
 export enum RecordingType {
