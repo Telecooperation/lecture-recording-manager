@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using LectureRecordingManager.Hubs;
+using LectureRecordingManager.Jobs.Configuration;
 using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -81,7 +82,6 @@ namespace LectureRecordingManager.Jobs
                         Title = metadata["description"],
                         Published = published,
                         PublishDate = DateTime.Parse(metadata["lectureDate"].ToString()),
-                        Status = published ? RecordingStatus.PUBLISHED : RecordingStatus.UPLOADED,
                         UploadDate = DateTime.ParseExact(targetName, "yyyy-MM-dd-HH-mm-ss", CultureInfo.InvariantCulture),
                         FilePath = Path.GetDirectoryName(file),
                         Lecture = lecture,
@@ -95,10 +95,16 @@ namespace LectureRecordingManager.Jobs
                     if (lecture.Active && !published)
                     {
                         // process upload (preview)
-                        BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Preview(recording.Id));
+                        BackgroundJob.Enqueue<PreviewRecordingJob>(x => x.Preview(recording.Id));
 
-                        // process upload (convert)
-                        BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Execute(recording.Id));
+                        // render 720p
+                        BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Execute(new ProcessRecordingJobConfiguration() { RecordingId = recording.Id, OutputType = ProcessRecordingOutputType.Video_720p }));
+
+                        // render 1080p
+                        if (lecture.RenderFullHd)
+                        {
+                            BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Execute(new ProcessRecordingJobConfiguration() { RecordingId = recording.Id, OutputType = ProcessRecordingOutputType.Video_1080P }));
+                        }
                     }
                 }
             }

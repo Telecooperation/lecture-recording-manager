@@ -1,9 +1,11 @@
 ﻿using Hangfire;
 using LectureRecordingManager.Hubs;
+using LectureRecordingManager.Jobs.Configuration;
 using LectureRecordingManager.Models;
 using LectureRecordingManager.Utils;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using RecordingProcessor.Metadata;
 using RecordingProcessor.Model;
 using SixLabors.ImageSharp.ColorSpaces;
@@ -27,67 +29,66 @@ namespace LectureRecordingManager.Jobs
             this.hub = hub;
         }
 
-        public async Task PublishRecording(int recordingId)
+        public async Task PublishRecordingOutput(int outputId)
         {
-            var recording = await _context.Recordings
-                .Include(x => x.Lecture)
-                .Include(x => x.Lecture.Semester)
-                .Include(x => x.Chapters)
-                .FirstOrDefaultAsync(x => x.Id == recordingId && (x.Status == RecordingStatus.SCHEDULED_PUBLISH || x.FullHdStatus == RecordingStatus.SCHEDULED_PUBLISH));
+            var output = await _context.RecordingOutputs
+                .Include(x => x.Recording)
+                .Include(x => x.Recording.Lecture)
+                .FirstOrDefaultAsync(x => x.Id == outputId);
 
             // only publish processed and existing recordings
-            if (recording == null)
+            if (output == null ||
+                output.JobType != typeof(ProcessRecordingJob).FullName ||
+                (output.Status != RecordingStatus.PROCESSED && output.Status != RecordingStatus.SCHEDULED_PUBLISH))
             {
                 return;
             }
 
             // check if recording was already published
-            Directory.CreateDirectory(Path.Combine(recording.Lecture.PublishPath, "video"));
-            Directory.CreateDirectory(Path.Combine(recording.Lecture.PublishPath, "assets"));
+            Directory.CreateDirectory(Path.Combine(output.Recording.Lecture.PublishPath, "video"));
+            Directory.CreateDirectory(Path.Combine(output.Recording.Lecture.PublishPath, "assets"));
 
-            var publishFolder = Path.Combine(recording.Lecture.PublishPath, "video", recording.Id.ToString());
+            var publishFolder = Path.Combine(output.Recording.Lecture.PublishPath, "video", output.RecordingId.ToString());
             Directory.CreateDirectory(publishFolder);
 
-            var output720pFolder = Path.Combine(recording.Lecture.ConvertedPath, recording.Id.ToString(), "output_720p");
-            var output1080pFolder = Path.Combine(recording.Lecture.ConvertedPath, recording.Id.ToString(), "output_1080p");
+            // publish each output separately
+            var outputFolder = Path.Combine(output.Recording.Lecture.ConvertedPath, output.RecordingId.ToString(), "output_" + output.Id);
+            var configuration = JsonConvert.DeserializeObject<ProcessRecordingJobConfiguration>(output.JobConfiguration);
 
-            // publish 720p?
-            if (recording.Status == RecordingStatus.SCHEDULED_PUBLISH && Directory.Exists(output720pFolder))
+            if (configuration.OutputType == ProcessRecordingOutputType.Default || configuration.OutputType == ProcessRecordingOutputType.Video_720p)
             {
-                var publish720pFolder = Path.Combine(publishFolder, "output_720p");
+                var publishFolderOut = Path.Combine(publishFolder, "output_720p");
 
-                if (Directory.Exists(publish720pFolder))
-                    Directory.Delete(publish720pFolder, true);
+                if (Directory.Exists(publishFolderOut))
+                    Directory.Delete(publishFolderOut, true);
 
-                Directory.Move(output720pFolder, Path.Combine(publishFolder, "output_720p"));
+                Directory.Move(outputFolder, publishFolderOut);
 
-                recording.Status = RecordingStatus.PUBLISHED;
-                recording.Published = true;
+                output.Status = RecordingStatus.PUBLISHED;
+                output.Recording.Published = true;
+            }
+            else if (configuration.OutputType == ProcessRecordingOutputType.Video_1080P)
+            {
+                var publishFolderOut = Path.Combine(publishFolder, "output_1080p");
+
+                if (Directory.Exists(publishFolderOut))
+                    Directory.Delete(publishFolderOut, true);
+
+                Directory.Move(outputFolder, publishFolderOut);
+
+                output.Status = RecordingStatus.PUBLISHED;
+                output.Recording.Published = true;
             }
 
-            // publish 1080p
-            if (recording.FullHdStatus == RecordingStatus.SCHEDULED_PUBLISH && Directory.Exists(output1080pFolder))
+            if (!output.Recording.PublishDate.HasValue)
             {
-                var publish1080pFolder = Path.Combine(publishFolder, "output_1080p");
-
-                if (Directory.Exists(publish1080pFolder))
-                    Directory.Delete(publish1080pFolder, true);
-
-                Directory.Move(output1080pFolder, Path.Combine(publishFolder, "output_1080p"));
-
-                recording.FullHdStatus = RecordingStatus.PUBLISHED;
-                recording.Published = true;
-            }
-
-            if (!recording.PublishDate.HasValue)
-            {
-                recording.PublishDate = DateTime.Now;
+                output.Recording.PublishDate = DateTime.Now;
             }
 
             await _context.SaveChangesAsync();
 
             await UpdateLectureRecordingStatus();
-            BackgroundJob.Enqueue<SynchronizePublishedRecordingsJob>(x => x.SynchronizePublishedRecordings(recording.LectureId));
+            BackgroundJob.Enqueue<SynchronizePublishedRecordingsJob>(x => x.SynchronizePublishedRecordings(output.Recording.LectureId));
         }
 
         private async Task UpdateLectureRecordingStatus()

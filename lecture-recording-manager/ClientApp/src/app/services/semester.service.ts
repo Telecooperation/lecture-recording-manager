@@ -19,4 +19,8 @@ export class SemesterService {
   getSemester(id: number): Observable<Semester> {
     return this.http.get<Semester>(environment.apiUrl + '/api/semester/' + id);
   }
+
+  postSemester(semester: Semester): Observable<Semester> {
+    return this.http.post<Semester>(environment.apiUrl + '/api/semester', semester);
+  }
 }

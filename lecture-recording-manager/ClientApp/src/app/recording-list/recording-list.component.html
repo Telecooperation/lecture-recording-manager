@@ -4,7 +4,6 @@
       <th>Recording</th>
       <th nzWidth="150px">Duration</th>
       <th nzWidth="200px" nzAlign="center">Published</th>
-      <th nzWidth="150px">Status</th>
       <th nzWidth="150px">Actions</th>
     </tr>
   </thead>
@@ -12,7 +11,7 @@
     <tr *ngFor="let recording of recordingTable.data">
       <td>
         <a [routerLink]="['/', 'recording', recording.id]">
-          <img *ngIf="recording.preview" [src]="'/api/recording/preview/' + recording.id | authImage | async" height="45px" style="margin-right: 10px;" />
+          <img [src]="'/api/recording/preview/' + recording.id | authImage | async" height="45px" style="margin-right: 10px;" />
           {{recording.title}}
         </a>
       </td>
@@ -25,17 +24,8 @@
         <span *ngIf="recording.publishDate && !recording.published"><br>{{recording.publishDate | date:'medium'}}</span>
       </td>
       <td>
-        <nz-tag *ngIf="recording.status == -1" [nzColor]="'red'">Error</nz-tag>
-        <nz-tag *ngIf="recording.status == 0" [nzColor]="'grey'">Uploaded</nz-tag>
-        <nz-tag *ngIf="recording.status == 1" [nzColor]="'blue'">Processing...</nz-tag>
-        <nz-tag *ngIf="recording.status == 2" [nzColor]="'orange'">Processed</nz-tag>
-        <nz-tag *ngIf="recording.status == 3" [nzColor]="'blue'">Scheduled</nz-tag>
-        <nz-tag *ngIf="recording.status == 4" [nzColor]="'green'">Published</nz-tag>
-        <nz-tag *ngIf="recording.status == 5" [nzColor]="'blue'">Publishing</nz-tag>
-      </td>
-      <td>
-        <button *ngIf="recording.status <= 0" nz-button (click)="doProcess(recording)">Process recording</button>
-        <button *ngIf="recording.status == 2" nz-button (click)="doPublish(recording)">Publish now</button>
+        <button *ngIf="!recording.published" nz-button (click)="doPublish(recording)">Publish now</button>
+        <button *ngIf="recording.published" nz-button (click)="doPublish(recording)">Re-Publish now</button>
       </td>
     </tr>
   </tbody>

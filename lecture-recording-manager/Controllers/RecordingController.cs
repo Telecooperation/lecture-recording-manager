@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using LectureRecordingManager.Jobs;
+using LectureRecordingManager.Jobs.Configuration;
 using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -41,6 +42,7 @@ namespace LectureRecordingManager.Controllers
         public async Task<ActionResult<Recording>> GetRecording(int id)
         {
             var recording = await _context.Recordings
+                .Include(x => x.Outputs)
                 .Where(x => x.Id == id)
                 .SingleAsync();
 
@@ -112,7 +114,9 @@ namespace LectureRecordingManager.Controllers
         [HttpPost("upload/{recordingId}"), DisableRequestSizeLimit]
         public async Task<IActionResult> UploadFiles(int recordingId, [FromForm(Name = "process")] bool process, [FromForm(Name = "files")] List<IFormFile> files)
         {
-            var recording = await _context.Recordings.FindAsync(recordingId);
+            var recording = await _context.Recordings
+                .Include(x => x.Lecture)
+                .FirstOrDefaultAsync(x => x.Id == recordingId);
 
             if (recording == null)
             {
@@ -139,12 +143,19 @@ namespace LectureRecordingManager.Controllers
             }
 
             // process upload (preview)
-            BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Preview(recording.Id));
+            BackgroundJob.Enqueue<PreviewRecordingJob>(x => x.Preview(recording.Id));
 
             // process upload (convert)
             if (process)
             {
-                BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Execute(recording.Id));
+                // render 720p
+                BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Execute(new ProcessRecordingJobConfiguration() { RecordingId = recording.Id, OutputType = ProcessRecordingOutputType.Video_720p }));
+
+                // render 1080p
+                if (recording.Lecture.RenderFullHd)
+                {
+                    BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Execute(new ProcessRecordingJobConfiguration() { RecordingId = recording.Id, OutputType = ProcessRecordingOutputType.Video_1080P }));
+                }
             }
 
             return Ok();
@@ -153,19 +164,23 @@ namespace LectureRecordingManager.Controllers
         [HttpGet("process/{id}")]
         public async Task<ActionResult<Recording>> ProcessRecording(int id)
         {
-            var recording = await _context.Recordings.FindAsync(id);
+            var recording = await _context.Recordings
+                .Include(x => x.Lecture)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (recording == null)
             {
                 return NotFound();
             }
 
-            // schedule recording
-            recording.Status = RecordingStatus.SCHEDULED;
-            await _context.SaveChangesAsync();
+            // render 720p
+            BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Execute(new ProcessRecordingJobConfiguration() { RecordingId = recording.Id, OutputType = ProcessRecordingOutputType.Video_720p }));
 
-            // enqueue processing
-            BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Execute(id));
+            // render 1080p
+            if (recording.Lecture.RenderFullHd)
+            {
+                BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Execute(new ProcessRecordingJobConfiguration() { RecordingId = recording.Id, OutputType = ProcessRecordingOutputType.Video_1080P }));
+            }
 
             return recording;
         }
@@ -176,9 +191,10 @@ namespace LectureRecordingManager.Controllers
             var recording = await _context.Recordings
                 .Include(x => x.Lecture)
                 .Where(x => x.Id == id)
+                .Where(x => x.Outputs.Any(x => x.JobType == typeof(PreviewRecordingJob).FullName))
                 .SingleOrDefaultAsync();
 
-            if (recording == null && recording.Preview)
+            if (recording == null)
             {
                 return NotFound();
             }
@@ -193,9 +209,10 @@ namespace LectureRecordingManager.Controllers
             var recording = await _context.Recordings
                 .Include(x => x.Lecture)
                 .Where(x => x.Id == id)
+                .Where(x => x.Outputs.Any(x => x.JobType == typeof(PreviewRecordingJob).FullName))
                 .SingleOrDefaultAsync();
 
-            if (recording == null && recording.Preview)
+            if (recording == null)
             {
                 return NotFound();
             }
@@ -242,36 +259,28 @@ namespace LectureRecordingManager.Controllers
         }
 
         [HttpGet("publish/{id}")]
-        public async Task<ActionResult<Recording>> PublishRecording(int id)
+        public async Task<ActionResult> PublishRecording(int id)
         {
-            var recording = await _context.Recordings
-                .FindAsync(id);
+            // check for recordings that should be published
+            var outputs = await _context.RecordingOutputs
+                .Where(x => x.Status == RecordingStatus.PROCESSED)
+                .Where(x => x.JobType == typeof(ProcessRecordingJob).FullName)
+                .Where(x => x.RecordingId == id)
+                .ToListAsync();
 
-            if (recording == null || recording.Status != RecordingStatus.PROCESSED)
+            foreach (var output in outputs)
             {
-                return NotFound();
+                output.Status = RecordingStatus.SCHEDULED_PUBLISH;
+                await _context.SaveChangesAsync();
+
+                BackgroundJob.Enqueue<PublishRecordingJob>(x => x.PublishRecordingOutput(output.Id));
             }
 
-            // schedule publish
-            if (recording.Status == RecordingStatus.PROCESSED)
-            {
-                recording.Status = RecordingStatus.SCHEDULED_PUBLISH;
-            }
-
-            if (recording.FullHdStatus == RecordingStatus.PROCESSED)
-            {
-                recording.FullHdStatus = RecordingStatus.SCHEDULED_PUBLISH;
-            }
-
-            await _context.SaveChangesAsync();
-
-            BackgroundJob.Enqueue<PublishRecordingJob>(x => x.PublishRecording(recording.Id));
-
-            return recording;
+            return Ok();
         }
 
         [HttpGet("previewdo/{id}")]
-        public async Task<ActionResult<Recording>> PreviewdoImage(int id)
+        public async Task<ActionResult> PreviewdoImage(int id)
         {
             var recording = await _context.Recordings.FindAsync(id);
 
@@ -280,7 +289,7 @@ namespace LectureRecordingManager.Controllers
                 return NotFound();
             }
 
-            BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Preview(id));
+            BackgroundJob.Enqueue<PreviewRecordingJob>(x => x.Preview(id));
 
             return Ok();
         }

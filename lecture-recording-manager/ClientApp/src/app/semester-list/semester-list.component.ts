@@ -10,10 +10,34 @@ import { Semester } from '../shared/semester';
 export class SemesterListComponent implements OnInit {
   public semesters: Semester[] = [];
 
+  public createSemester: Semester = {
+    name: '',
+    dateStart: new Date(),
+    dateEnd: new Date(),
+    active: false,
+    published: false
+  };
+  public isCreateModalVisible = false;
+
   constructor(private semesterService: SemesterService) { }
 
   ngOnInit(): void {
     this.semesterService.getSemesters().subscribe(x => this.semesters = x);
+  }
+
+  showCreate(): void {
+    this.isCreateModalVisible = true;
+  }
+
+  closeCreate(): void {
+    this.isCreateModalVisible = false;
+  }
+
+  doCreate(): void {
+    this.semesterService.postSemester(this.createSemester).subscribe(x => {
+      this.isCreateModalVisible = false;
+      this.ngOnInit();
+    });
   }
 
 }

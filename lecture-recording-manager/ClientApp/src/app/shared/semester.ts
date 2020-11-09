@@ -1,5 +1,5 @@
 export class Semester {
-  public id: number;
+  public id?: number;
   public name: string;
   public dateStart: Date;
   public dateEnd: Date;

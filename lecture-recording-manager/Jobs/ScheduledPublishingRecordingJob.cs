@@ -25,33 +25,26 @@ namespace LectureRecordingManager.Jobs
         public async Task CheckPublishingRecordings()
         {
             // check for recordings that should be published
-            var recordings = await _context.Recordings
-                .Where(x => x.Status == RecordingStatus.PROCESSED || x.FullHdStatus == RecordingStatus.PROCESSED)
-                .Where(x => x.Lecture.Active)
-                .Where(x => x.PublishDate.HasValue && x.PublishDate < DateTime.Now)
+            var outputs = await _context.RecordingOutputs
+                .Where(x => x.Status == RecordingStatus.PROCESSED)
+                .Where(x => x.JobType == typeof(ProcessRecordingJob).FullName)
+                .Where(x => x.Recording.PublishDate.HasValue && x.Recording.PublishDate < DateTime.Now)
+                .Where(x => x.Recording.Lecture.Active)
                 .ToListAsync();
 
-            foreach (var recording in recordings)
+            foreach (var output in outputs)
             {
-                var rec = await _context.Recordings.FindAsync(recording.Id);
-
-                // schedule publish
-                if (rec.Status == RecordingStatus.PROCESSED)
-                {
-                    rec.Status = RecordingStatus.SCHEDULED_PUBLISH;
-                }
-
-                if (rec.FullHdStatus == RecordingStatus.PROCESSED)
-                {
-                    rec.FullHdStatus = RecordingStatus.SCHEDULED_PUBLISH;
-                }
-
+                output.Status = RecordingStatus.SCHEDULED_PUBLISH;
                 await _context.SaveChangesAsync();
 
-                BackgroundJob.Enqueue<PublishRecordingJob>(x => x.PublishRecording(recording.Id));
+                BackgroundJob.Enqueue<PublishRecordingJob>(x => x.PublishRecordingOutput(output.Id));
             }
 
-            await UpdateLectureRecordingStatus();
+            // send update notification
+            if (outputs.Count > 0)
+            {
+                await UpdateLectureRecordingStatus();
+            }
         }
 
         private async Task UpdateLectureRecordingStatus()

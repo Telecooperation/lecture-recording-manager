@@ -28,5 +28,7 @@ namespace LectureRecordingManager.Models
         public DbSet<Recording> Recordings { get; set; }
 
         public DbSet<RecordingChapter> RecordingChapters { get; set; }
+
+        public DbSet<RecordingOutput> RecordingOutputs { get; set; }
     }
 }

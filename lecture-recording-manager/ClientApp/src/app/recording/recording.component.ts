@@ -5,6 +5,8 @@ import { LectureService } from '../services/lecture.service';
 import { RecordingChapter } from '../shared/recording-chapter';
 import { NzNotificationService } from 'ng-zorro-antd';
 import { AuthenticationService } from '../services/authentication.service';
+import { SignalRService } from '../services/signal-r.service';
+import { Message } from '../shared/message';
 
 @Component({
   selector: 'app-recording',
@@ -20,15 +22,33 @@ export class RecordingComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private signalR: SignalRService,
     private authenticationService: AuthenticationService,
     private notifications: NzNotificationService,
     private lectureService: LectureService
-  ) { }
+  ) {
+    this.subscribeToEvents();
+  }
 
   ngOnInit(): void {
     const recordingId = this.route.snapshot.paramMap.get('recordingId');
     this.loadRecording(recordingId);
     this.token = this.authenticationService.currentUserValue.token;
+  }
+
+  private subscribeToEvents(): void {
+    this.signalR.statusChanged.subscribe((msg: Message) => {
+      if (!this.recording)
+        return;
+
+      if (msg.type === 'UPDATE_LECTURE_RECORDING_STATUS') {
+        this.loadRecording(this.recording.id.toString());
+      }
+
+      if (msg.type === 'UPDATE_LECTURE') {
+        this.loadRecording(this.recording.id.toString());
+      }
+    })
   }
 
   loadRecording(recordingId: string): void {
