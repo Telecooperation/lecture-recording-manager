@@ -64,6 +64,16 @@ export class RecordingComponent implements OnInit {
       .length > 0;
   }
 
+  getRecordingJobType(type: string): string {
+    const obj = JSON.parse(type);
+
+    if (obj.OutputType === 1) {
+      return '720p Video Processing';
+    } else if (obj.OutputType === 2) {
+      return '1080p Video Processing';
+    }
+  }
+
   doBack(): void {
     this.router.navigate(['/', 'lecture', this.recording.lectureId]);
   }

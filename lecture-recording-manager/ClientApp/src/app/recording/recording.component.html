@@ -57,7 +57,7 @@
       <tbody>
         <tr *ngFor="let output of recording.outputs">
           <td>
-            <span *ngIf="output.jobType == 'LectureRecordingManager.Jobs.ProcessRecordingJob'">Video processing <nz-tag>{{output.jobConfiguration}}</nz-tag></span>
+            <span *ngIf="output.jobType == 'LectureRecordingManager.Jobs.ProcessRecordingJob'">Video processing <nz-tag>{{getRecordingJobType(output.jobConfiguration)}}</nz-tag></span>
             <span *ngIf="output.jobType == 'LectureRecordingManager.Jobs.PreviewRecordingJob'">Generate previews and process metadata</span>
           </td>
           <td>

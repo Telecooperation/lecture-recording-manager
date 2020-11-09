@@ -191,7 +191,7 @@ namespace LectureRecordingManager.Controllers
             var recording = await _context.Recordings
                 .Include(x => x.Lecture)
                 .Where(x => x.Id == id)
-                .Where(x => x.Outputs.Any(x => x.JobType == typeof(PreviewRecordingJob).FullName))
+                .Where(x => x.Outputs.Any(x => x.JobType == typeof(PreviewRecordingJob).FullName && x.Status == RecordingStatus.PROCESSED))
                 .SingleOrDefaultAsync();
 
             if (recording == null)
@@ -209,7 +209,7 @@ namespace LectureRecordingManager.Controllers
             var recording = await _context.Recordings
                 .Include(x => x.Lecture)
                 .Where(x => x.Id == id)
-                .Where(x => x.Outputs.Any(x => x.JobType == typeof(PreviewRecordingJob).FullName))
+                .Where(x => x.Outputs.Any(x => x.JobType == typeof(PreviewRecordingJob).FullName && x.Status == RecordingStatus.PROCESSED))
                 .SingleOrDefaultAsync();
 
             if (recording == null)
