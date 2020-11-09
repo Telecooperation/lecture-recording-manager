@@ -24,6 +24,15 @@
     </nz-page-header-extra>
 
     <nz-page-header-content>
+      <div class="lecturePreview" *ngIf="hasPreview()">
+        <img [src]="'/api/recording/preview/' + recording.id | authImage | async" />
+      </div>
+      <div class="lecturePreview" *ngIf="hasPreview()">
+        <video controls>
+          <source src="/api/recording/preview_video/{{recording.id}}?access_token={{token}}" type="video/mp4" />
+        </video>
+      </div>
+
       <nz-descriptions [nzColumn]="2" nzSize="small">
         <nz-descriptions-item nzTitle="Description" nzSpan="2">{{recording.description}}</nz-descriptions-item>
         <nz-descriptions-item nzTitle="Duration">{{recording.duration | duration : false}}</nz-descriptions-item>
@@ -81,7 +90,7 @@
       <tbody>
         <tr *ngFor="let chapter of chapterTable.data">
           <td>
-              <img [src]="'/api/recording/preview/chapter/' + chapter.id | authImage | async" height="45px" />
+              <img *ngIf="hasPreview()" [src]="'/api/recording/preview/chapter/' + chapter.id | authImage | async" height="45px" />
           </td>
           <td>{{chapter.text | slice: 0:100}}</td>
           <td>{{chapter.startPosition | duration : true}}</td>

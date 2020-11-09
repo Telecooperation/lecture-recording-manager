@@ -38,8 +38,9 @@ export class RecordingComponent implements OnInit {
 
   private subscribeToEvents(): void {
     this.signalR.statusChanged.subscribe((msg: Message) => {
-      if (!this.recording)
+      if (!this.recording) {
         return;
+      }
 
       if (msg.type === 'UPDATE_LECTURE_RECORDING_STATUS') {
         this.loadRecording(this.recording.id.toString());
@@ -48,12 +49,19 @@ export class RecordingComponent implements OnInit {
       if (msg.type === 'UPDATE_LECTURE') {
         this.loadRecording(this.recording.id.toString());
       }
-    })
+    });
   }
 
   loadRecording(recordingId: string): void {
     this.lectureService.getRecording(recordingId).subscribe(x => this.recording = x);
     this.lectureService.getRecordingChapters(recordingId).subscribe(x => this.chapters = x);
+  }
+
+  hasPreview(): boolean {
+    return this.recording?.outputs
+      .filter(x => x.jobType === 'LectureRecordingManager.Jobs.PreviewRecordingJob')
+      .filter(x => x.status === 2)
+      .length > 0;
   }
 
   doBack(): void {
