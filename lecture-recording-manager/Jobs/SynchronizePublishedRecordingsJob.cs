@@ -37,6 +37,7 @@ namespace LectureRecordingManager.Jobs
                 .Include(x => x.Chapters)
                 .Where(x => x.LectureId == lectureId)
                 .Where(x => x.Published)
+                .OrderBy(x => x.UploadDate)
                 .ToListAsync();
 
             var lectureMetadata = new RecordingProcessor.Model.Lecture()

@@ -31,6 +31,10 @@ namespace RecordingProcessor.Utils
                 architecture = "x86";
             if (RuntimeInformation.ProcessArchitecture == Architecture.X64)
                 architecture = "x64";
+            if(RuntimeInformation.ProcessArchitecture == Architecture.Arm)
+                architecture = "arm";
+            if (RuntimeInformation.ProcessArchitecture == Architecture.Arm64)
+                architecture = "arm64";
 
             return Path.Combine("resources", "ffmpeg", os, architecture, command);
         }
