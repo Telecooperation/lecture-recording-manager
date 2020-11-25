@@ -23,7 +23,7 @@ namespace LectureRecordingManager.Jobs
             this.hub = hub;
         }
 
-        [Queue("meta-queue")]
+        [Queue("publish-queue")]
         public async Task PublishRecordingOutput(int outputId)
         {
             var output = await _context.RecordingOutputs

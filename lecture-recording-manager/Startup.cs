@@ -120,8 +120,9 @@ namespace LectureRecordingManager
             // Configure hangfire to use the new JobActivator we defined.
             GlobalConfiguration.Configuration.UseActivator(new ContainerJobActivator(serviceProvider));
 
-            ConfigureHangfireQueuesWorkers(app, new string[] { "meta-queue" }, 2);
+            ConfigureHangfireQueuesWorkers(app, new string[] { "meta-queue" }, 6);
             ConfigureHangfireQueuesWorkers(app, new string[] { "processing-queue" }, 2);
+            ConfigureHangfireQueuesWorkers(app, new string[] { "publish-queue" }, 1);
 
             app.UseHangfireDashboard();
 
