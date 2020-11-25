@@ -286,9 +286,24 @@ namespace RecordingProcessor.Studio
 
             var trimTHVideo = lenTHVideo - lenSlideVideo;
 
+            // normalize audio
+            var audioLevels = FFmpegHelper.GetAudioLevels(config.TalkingHeadVideoPath);
+            string audioFilter = "";
+
+            if (audioLevels != null)
+            {
+                audioFilter = $"-af loudnorm=I=-23:LRA=9:tp=-2:measured_I={audioLevels.Input_I}:measured_LRA={audioLevels.Input_Lra}:measured_tp={audioLevels.Input_Tp}:measured_thresh={audioLevels.Input_Thresh}:offset={audioLevels.Target_Offset} ";
+            }
+
+            // run processing
             string args = "-i \"" + config.SlideVideoPath + "\" " +
                             "-i \"" + config.TalkingHeadVideoPath + "\" " +
                             "-i \"" + config.RecordingStyle.TargetDimension.Background + "\" " +
+
+                            // audio filters
+                            audioFilter +
+
+                            // video filters
                             "-filter_complex " +
                             "\"" +
                             "[1:v]trim=start=" + trimTHVideo.TotalSeconds.ToString("0.00000", CultureInfo.InvariantCulture) + ",setpts=PTS-STARTPTS[1v];" +
