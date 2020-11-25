@@ -1,14 +1,13 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using RecordingProcessor.Model;
+using RecordingProcessor.Utils;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using RecordingProcessor.Model;
-using RecordingProcessor.Utils;
 using Tesseract;
 
 namespace RecordingProcessor.Studio

@@ -9,7 +9,6 @@ using RecordingProcessor.Model;
 using RecordingProcessor.Studio;
 using RecordingProcessor.Studio.Styles;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,6 +37,7 @@ namespace LectureRecordingManager.Jobs
         }
 
         [AutomaticRetry(Attempts = 1)]
+        [Queue("meta-queue")]
         public async Task Preview(int recordingId)
         {
             // get recording

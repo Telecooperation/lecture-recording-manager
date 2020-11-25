@@ -2,17 +2,11 @@
 using LectureRecordingManager.Hubs;
 using LectureRecordingManager.Jobs.Configuration;
 using LectureRecordingManager.Models;
-using LectureRecordingManager.Utils;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using RecordingProcessor.Metadata;
-using RecordingProcessor.Model;
-using SixLabors.ImageSharp.ColorSpaces;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace LectureRecordingManager.Jobs
@@ -29,6 +23,7 @@ namespace LectureRecordingManager.Jobs
             this.hub = hub;
         }
 
+        [Queue("meta-queue")]
         public async Task PublishRecordingOutput(int outputId)
         {
             var output = await _context.RecordingOutputs

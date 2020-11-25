@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using RecordingProcessor.Utils;
+using SixLabors.ImageSharp.PixelFormats;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using Microsoft.Extensions.Logging;
-using RecordingProcessor.Utils;
-using SixLabors.ImageSharp.PixelFormats;
 
 namespace RecordingProcessor.Studio
 {

@@ -4,7 +4,6 @@ using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -22,6 +21,7 @@ namespace LectureRecordingManager.Jobs
             this.hub = hub;
         }
 
+        [Queue("meta-queue")]
         public async Task CheckPublishingRecordings()
         {
             // check for recordings that should be published

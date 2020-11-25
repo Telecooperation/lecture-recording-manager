@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace RecordingProcessor.Studio
+﻿namespace RecordingProcessor.Studio
 {
     public class TranslateScaleAndDeformTransformation : TransformationParameters
     {

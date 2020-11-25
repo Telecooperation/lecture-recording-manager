@@ -1,4 +1,5 @@
-﻿using LectureRecordingManager.Hubs;
+﻿using Hangfire;
+using LectureRecordingManager.Hubs;
 using LectureRecordingManager.Jobs.Configuration;
 using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.SignalR;
@@ -26,6 +27,7 @@ namespace LectureRecordingManager.Jobs
             this.hub = hub;
         }
 
+        [Queue("meta-queue")]
         public async Task SynchronizePublishedRecordings(int lectureId)
         {
             var lecture = await _context.Lectures

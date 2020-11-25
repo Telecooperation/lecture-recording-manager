@@ -4,14 +4,12 @@ using LectureRecordingManager.Jobs.Configuration;
 using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using RecordingProcessor.Model;
 using RecordingProcessor.Studio;
 using RecordingProcessor.Studio.Styles;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -40,6 +38,7 @@ namespace LectureRecordingManager.Jobs
         }
 
         [AutomaticRetry(Attempts = 1)]
+        [Queue("processing-queue")]
         public async Task Execute(ProcessRecordingJobConfiguration configuration)
         {
             // get recording

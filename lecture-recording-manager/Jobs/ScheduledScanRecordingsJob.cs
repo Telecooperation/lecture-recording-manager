@@ -4,12 +4,8 @@ using LectureRecordingManager.Jobs.Configuration;
 using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Newtonsoft.Json;
-using RecordingProcessor.Metadata;
-using RecordingProcessor.Model;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -29,10 +25,11 @@ namespace LectureRecordingManager.Jobs
             this.hub = hub;
         }
 
+        [Queue("meta-queue")]
         public async Task ScanRecordings()
         {
             var lectures = await _context.Lectures
-                .Where(x =>  x.SourcePath != null && x.SourcePath != "")
+                .Where(x => x.SourcePath != null && x.SourcePath != "")
                 .ToListAsync();
 
             foreach (var lecture in lectures)
