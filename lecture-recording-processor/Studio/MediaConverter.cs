@@ -292,7 +292,7 @@ namespace RecordingProcessor.Studio
 
             if (audioLevels != null)
             {
-                audioFilter = $"-af loudnorm=I=-23:LRA=9:tp=-2:measured_I={audioLevels.Input_I}:measured_LRA={audioLevels.Input_Lra}:measured_tp={audioLevels.Input_Tp}:measured_thresh={audioLevels.Input_Thresh}:offset={audioLevels.Target_Offset} ";
+                audioFilter = $"-af loudnorm=I=-23:LRA=7:tp=-2:measured_I={audioLevels.Input_I}:measured_LRA={audioLevels.Input_Lra}:measured_tp={audioLevels.Input_Tp}:measured_thresh={audioLevels.Input_Thresh}:offset={audioLevels.Target_Offset} ";
             }
 
             // run processing
