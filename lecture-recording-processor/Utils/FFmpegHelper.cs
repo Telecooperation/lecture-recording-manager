@@ -84,7 +84,7 @@ namespace RecordingProcessor.Utils
 
         public static AudioLevelParameters GetAudioLevels(string path)
         {
-            Process p = FFmpeg("-i \"" + path + "\" -af loudnorm=print_format=json:I=-23:LRA=7:tp=-2 -t 60 -f null - ");
+            Process p = FFmpeg("-i \"" + path + "\" -af loudnorm=print_format=json:I=-23:LRA=11:tp=-1 -t 60 -f null - ");
             p.Start();
 
             // To avoid deadlocks, always read the output stream first and then wait.  
