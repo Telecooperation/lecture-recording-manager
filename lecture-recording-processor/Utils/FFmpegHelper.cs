@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using RecordingProcessor.Studio;
+using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace RecordingProcessor.Utils
@@ -52,7 +55,6 @@ namespace RecordingProcessor.Utils
                     UseShellExecute = false,
                     RedirectStandardOutput = redirectOutput,
                     RedirectStandardError = redirectOutput
-                    //CreateNoWindow = true
                 }
             };
 
@@ -78,6 +80,55 @@ namespace RecordingProcessor.Utils
             }
 
             return TimeSpan.Parse(stringDuration);
+        }
+
+        public static AudioLevelParameters GetAudioLevels(string path)
+        {
+            Process p = FFmpeg("-i \"" + path + "\" -af loudnorm=print_format=json:I=-23:LRA=7:tp=-2 -t 60 -f null - ");
+            p.Start();
+
+            // To avoid deadlocks, always read the output stream first and then wait.  
+            string output = p.StandardError.ReadToEnd();
+
+            p.WaitForExit();
+
+            // read the last rows
+            string[] rows = output.Split(Environment.NewLine);
+
+            string outputLines = "";
+            bool readLine = false;
+
+            foreach (var line in rows)
+            {
+                if (line.Contains("{"))
+                {
+                    readLine = true;
+                }
+
+                if (readLine)
+                {
+                    outputLines += line;
+                }
+            }
+
+            try
+            {
+                if (outputLines.Equals(""))
+                {
+                    return null;
+                }
+
+                return JsonConvert.DeserializeObject<AudioLevelParameters>(outputLines);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static void P_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            Console.WriteLine(e.Data);
         }
 
         public static string ExportThumbnail(float timeInSeconds, string clip, string outPath, string id)
