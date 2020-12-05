@@ -3,6 +3,8 @@ import { Lecture } from '../shared/lecture';
 import { LectureService } from '../services/lecture.service';
 import { Recording } from '../shared/recording';
 
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+
 @Component({
   selector: 'app-recording-list',
   templateUrl: './recording-list.component.html',
@@ -36,5 +38,10 @@ export class RecordingListComponent implements OnInit {
 
   doPublish(recording: Recording): void {
     this.publishClick.emit(recording);
+  }
+
+  drop(event: CdkDragDrop<string[]>): void {
+    moveItemInArray(this.recordings, event.previousIndex, event.currentIndex);
+    this.lectureService.sortRecordings(this._lectureId, this.recordings.map(x => x.id)).subscribe(x => this.recordings = x);
   }
 }

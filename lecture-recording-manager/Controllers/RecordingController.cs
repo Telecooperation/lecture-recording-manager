@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -34,7 +35,7 @@ namespace LectureRecordingManager.Controllers
         {
             return await _context.Recordings
                 .Where(x => x.LectureId == lectureId)
-                .OrderBy(x => x.UploadDate)
+                .OrderBy(x => x.Sorting).ThenBy(x => x.UploadDate)
                 .ToListAsync();
         }
 
@@ -52,6 +53,24 @@ namespace LectureRecordingManager.Controllers
             }
 
             return recording;
+        }
+
+        [HttpPost("sorting/{lectureId}")]
+        public async Task<ActionResult<IEnumerable<Recording>>> PutSorting(int lectureId, List<int> ids)
+        {
+            var order = 0;
+            foreach (var item in ids)
+            {
+                var recording = await _context.Recordings.FindAsync(item);
+                recording.Sorting = order;
+                _context.Entry(recording).State = EntityState.Modified;
+
+                order += 1;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return await GetRecordingByLecture(lectureId);
         }
 
         [HttpPut("{id}")]
@@ -230,6 +249,35 @@ namespace LectureRecordingManager.Controllers
             }
 
             return PhysicalFile(Path.Combine(recording.Lecture.ConvertedPath, recording.Id.ToString(), "preview", videoFileName), "application/octet-stream", enableRangeProcessing: true);
+        }
+
+        [Route("rendered_video/{id}")]
+        public async Task<ActionResult> RenderedVideo(int id)
+        {
+            var output = await _context.RecordingOutputs
+                .Include(x => x.Recording)
+                .Include(x => x.Recording.Lecture)
+                .Where(x => x.JobType == typeof(ProcessRecordingJob).FullName && x.Status == RecordingStatus.PROCESSED)
+                .SingleOrDefaultAsync(x => x.Id == id);
+
+            if (output == null)
+            {
+                return NotFound();
+            }
+
+            // preview video path
+            string videoFileName = "";
+
+            if (output.Recording.Type == RecordingType.GREEN_SCREEN_RECORDING || output.Recording.Type == RecordingType.SIMPLE_RECORDING)
+            {
+                videoFileName = "stage.mp4";
+            }
+            else if (output.Recording.Type == RecordingType.ZOOM_RECORDING)
+            {
+                videoFileName = "slides.mp4";
+            }
+
+            return PhysicalFile(Path.Combine(output.Recording.Lecture.ConvertedPath, output.RecordingId.ToString(), "output_" + output.Id, videoFileName), "application/octet-stream", enableRangeProcessing: true);
         }
 
         [HttpGet("{id}/chapters")]

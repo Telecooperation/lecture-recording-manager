@@ -1,4 +1,4 @@
-<nz-table #recordingTable [nzData]="recordings" [nzPageSize]="25">
+<nz-table #recordingTable [nzData]="recordings" [nzSize]="'small'" [nzPageSize]="25">
   <thead>
     <tr>
       <th>Recording</th>
@@ -7,11 +7,14 @@
       <th nzWidth="150px">Actions</th>
     </tr>
   </thead>
-  <tbody>
-    <tr *ngFor="let recording of recordingTable.data">
+  <tbody cdkDropList (cdkDropListDropped)="drop($event)">
+    <tr *ngFor="let recording of recordings" cdkDrag>
       <td>
         <a [routerLink]="['/', 'recording', recording.id]">
-          <img [src]="'/api/recording/preview/' + recording.id | authImage | async" height="45px" style="margin-right: 10px;" />
+          <div class="thumbnail">
+            <img [src]="'/api/recording/preview/' + recording.id | authImage | async" height="45px" style="margin-right: 10px;" />
+            <img class="large-hover-preview" [src]="'/api/recording/preview/' + recording.id | authImage | async" />
+          </div>
           {{recording.title}}
         </a>
       </td>

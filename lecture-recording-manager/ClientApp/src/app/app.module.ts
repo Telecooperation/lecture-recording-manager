@@ -20,6 +20,7 @@ import { RecordingEditComponent } from './recording-edit/recording-edit.componen
 import { LoginComponent } from './authentication/login/login.component';
 import { ErrorInterceptor } from './authentication/auth.interceptor';
 import { JwtInterceptor } from './authentication/jwt.interceptor';
+import { DragDropModule } from '@angular/cdk/drag-drop'
 
 import { AuthPipe } from './authentication/auth.pipe';
 import { UsersComponent } from './authentication/users/users.component';
@@ -54,7 +55,8 @@ import { UserAddComponent } from './authentication/user-add/user-add.component';
     FormsModule,
     ReactiveFormsModule,
 
-    NgZorroAntdModule
+    NgZorroAntdModule,
+    DragDropModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

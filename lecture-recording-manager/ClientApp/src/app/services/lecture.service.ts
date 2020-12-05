@@ -91,4 +91,8 @@ export class LectureService {
   publishRecording(recording: Recording): Observable<Recording> {
     return this.http.get<Recording>(environment.apiUrl + '/api/recording/publish/' + recording.id);
   }
+
+  sortRecordings(lectureId: number, ids: number[]) {
+    return this.http.post<Recording[]>(environment.apiUrl + '/api/recording/sorting/' + lectureId, ids);
+  }
 }

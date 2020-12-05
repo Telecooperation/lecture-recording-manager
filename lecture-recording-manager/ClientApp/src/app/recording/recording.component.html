@@ -49,9 +49,9 @@
       <thead>
         <tr>
           <th>Output Job</th>
-          <th>Status</th>
           <th>Date started</th>
           <th>Date finished</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
@@ -60,6 +60,8 @@
             <span *ngIf="output.jobType == 'LectureRecordingManager.Jobs.ProcessRecordingJob'">Video processing <nz-tag>{{getRecordingJobType(output.jobConfiguration)}}</nz-tag></span>
             <span *ngIf="output.jobType == 'LectureRecordingManager.Jobs.PreviewRecordingJob'">Generate previews and process metadata</span>
           </td>
+          <td>{{output.dateStarted | date:'medium'}}</td>
+          <td>{{output.dateFinished | date:'medium'}}</td>
           <td>
             <nz-tag *ngIf="output.status == -1" [nzColor]="'red'">Error</nz-tag>
             <nz-tag *ngIf="output.status == 0" [nzColor]="'grey'">Uploaded</nz-tag>
@@ -70,16 +72,18 @@
             <nz-tag *ngIf="output.status == 5" [nzColor]="'blue'">Publishing</nz-tag>
 
             <span *ngIf="output.status == -1">{{output.jobError}}</span>
+
+            <span *ngIf="output.status == 2 && output.jobType == 'LectureRecordingManager.Jobs.ProcessRecordingJob'">
+              <a (click)="doOutputPreview(output.id)">Play</a>
+            </span>
           </td>
-          <td>{{output.dateStarted | date:'medium'}}</td>
-          <td>{{output.dateFinished | date:'medium'}}</td>
         </tr>
       </tbody>
     </nz-table>
 
     <br />
     <h3>Chapters</h3>
-    <nz-table #chapterTable [nzData]="chapters">
+    <nz-table #chapterTable [nzData]="chapters" [nzSize]="'small'" style="margin-bottom: 50px;">
       <thead>
         <tr>
           <th nzWidth="60px">Chapter</th>
@@ -90,7 +94,10 @@
       <tbody>
         <tr *ngFor="let chapter of chapterTable.data">
           <td>
+            <div class="thumbnail">
               <img *ngIf="hasPreview()" [src]="'/api/recording/preview/chapter/' + chapter.id | authImage | async" height="45px" />
+              <img class="large-hover-preview" *ngIf="hasPreview()" [src]="'/api/recording/preview/chapter/' + chapter.id | authImage | async" />
+            </div>
           </td>
           <td>{{chapter.text | slice: 0:100}}</td>
           <td>{{chapter.startPosition | duration : true}}</td>
@@ -99,3 +106,11 @@
     </nz-table>
   </nz-content>
 </nz-layout>
+
+<ng-template #videoPlayer>
+  <div class="video-player">
+    <video controls>
+      <source src="/api/recording/rendered_video/{{outputIdPlayer}}?access_token={{token}}" type="video/mp4" />
+    </video>
+  </div>
+</ng-template>

@@ -17,3 +17,29 @@ nz-layout {
 .lecturePreview img, .lecturePreview video {
     height: 100%;
 }
+
+.video-player {
+    height: 720px;
+    width: 1280px;
+}
+
+.video-player video {
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.thumbnail {
+    display: inline;
+}
+
+.large-hover-preview {
+    display: none;
+}
+
+.thumbnail:hover .large-hover-preview {
+    display: inline-block;
+    height: 300px;
+    position: absolute;
+    z-index: 1000;
+    left: 100px;
+}

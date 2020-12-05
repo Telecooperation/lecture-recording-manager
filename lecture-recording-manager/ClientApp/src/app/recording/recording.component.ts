@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Recording } from '../shared/recording';
 import { LectureService } from '../services/lecture.service';
 import { RecordingChapter } from '../shared/recording-chapter';
-import { NzNotificationService } from 'ng-zorro-antd';
+import { NzModalService, NzNotificationService } from 'ng-zorro-antd';
 import { AuthenticationService } from '../services/authentication.service';
 import { SignalRService } from '../services/signal-r.service';
 import { Message } from '../shared/message';
@@ -19,7 +19,12 @@ export class RecordingComponent implements OnInit {
 
   public token: string;
 
+  @ViewChild('videoPlayer', { static: false })
+  public videoPlayerRef: TemplateRef<void>;
+  public outputIdPlayer: number;
+
   constructor(
+    private modal: NzModalService, 
     private route: ActivatedRoute,
     private router: Router,
     private signalR: SignalRService,
@@ -103,5 +108,14 @@ export class RecordingComponent implements OnInit {
       { nzPlacement: 'bottomRight'});
 
     this.lectureService.processPreview(this.recording).subscribe(x => this.loadRecording(x.id.toString()));
+  }
+
+  doOutputPreview(outputId: number):void {
+    this.outputIdPlayer = outputId;
+
+    this.modal.create({
+      nzWidth: 1328,
+      nzContent: this.videoPlayerRef
+    });
   }
 }
