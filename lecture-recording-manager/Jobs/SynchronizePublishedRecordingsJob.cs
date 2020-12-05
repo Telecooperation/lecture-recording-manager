@@ -1,4 +1,5 @@
-﻿using LectureRecordingManager.Hubs;
+﻿using Hangfire;
+using LectureRecordingManager.Hubs;
 using LectureRecordingManager.Jobs.Configuration;
 using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.SignalR;
@@ -6,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using RecordingProcessor.Metadata;
 using RecordingProcessor.Model;
-using SixLabors.ImageSharp.ColorSpaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,6 +27,7 @@ namespace LectureRecordingManager.Jobs
             this.hub = hub;
         }
 
+        [Queue("meta-queue")]
         public async Task SynchronizePublishedRecordings(int lectureId)
         {
             var lecture = await _context.Lectures
@@ -41,6 +42,7 @@ namespace LectureRecordingManager.Jobs
                 .Include(x => x.Outputs)
                 .Where(x => x.LectureId == lectureId)
                 .Where(x => x.Outputs.Any(x => x.Status == RecordingStatus.PUBLISHED))
+                .OrderBy(x => x.UploadDate)
                 .ToListAsync();
 
             var lectureMetadata = new RecordingProcessor.Model.Lecture()

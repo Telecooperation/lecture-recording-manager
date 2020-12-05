@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using LectureRecordingManager.Jobs;
 using LectureRecordingManager.Jobs.Configuration;
 using LectureRecordingManager.Models;
@@ -12,6 +7,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace LectureRecordingManager.Controllers
 {
@@ -191,7 +191,7 @@ namespace LectureRecordingManager.Controllers
             var recording = await _context.Recordings
                 .Include(x => x.Lecture)
                 .Where(x => x.Id == id)
-                .Where(x => x.Outputs.Any(x => x.JobType == typeof(PreviewRecordingJob).FullName))
+                .Where(x => x.Outputs.Any(x => x.JobType == typeof(PreviewRecordingJob).FullName && x.Status == RecordingStatus.PROCESSED))
                 .SingleOrDefaultAsync();
 
             if (recording == null)
@@ -209,7 +209,7 @@ namespace LectureRecordingManager.Controllers
             var recording = await _context.Recordings
                 .Include(x => x.Lecture)
                 .Where(x => x.Id == id)
-                .Where(x => x.Outputs.Any(x => x.JobType == typeof(PreviewRecordingJob).FullName))
+                .Where(x => x.Outputs.Any(x => x.JobType == typeof(PreviewRecordingJob).FullName && x.Status == RecordingStatus.PROCESSED))
                 .SingleOrDefaultAsync();
 
             if (recording == null)

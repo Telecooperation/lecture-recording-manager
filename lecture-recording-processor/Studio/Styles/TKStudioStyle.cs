@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace RecordingProcessor.Studio.Styles
 {
@@ -17,7 +15,7 @@ namespace RecordingProcessor.Studio.Styles
 
             TalkingHeadConfig = new TalkingHeadConfiguration
             {
-                Crop = new CropDimensions(0.2f, 0.18f, 0.6f, 0.8f, targetDim),
+                Crop = new CropDimensions(0.16f, 0.1f, 0.6f, 0.8f, targetDim),
                 ChromaKeyTalkingHead = true
             };
 
@@ -25,7 +23,7 @@ namespace RecordingProcessor.Studio.Styles
             {
                 ChromaKeyTalkingHead = true,
                 SlideTransformation = new TranslateScaleAndDeformTransformation(0.008f, 0.014f, 0.75f, 0.03f, targetDim),
-                SpeakerTransformation = new TranslateScaleAndDeformTransformation(0.40f, 0.21f, 0.80f, 0, targetDim)
+                SpeakerTransformation = new TranslateScaleAndDeformTransformation(0.49f, 0.30f, 0.75f, 0, targetDim)
             };
         }
 

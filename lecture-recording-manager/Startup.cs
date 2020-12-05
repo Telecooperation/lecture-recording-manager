@@ -1,26 +1,22 @@
+using Hangfire;
+using Hangfire.PostgreSql;
+using LectureRecordingManager.Authentication;
+using LectureRecordingManager.Hubs;
+using LectureRecordingManager.Jobs;
 using LectureRecordingManager.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using Microsoft.EntityFrameworkCore;
-using Hangfire;
-using Hangfire.PostgreSql;
-using System;
-using LectureRecordingManager.Jobs;
-using RecordingProcessor.Studio;
-using Microsoft.AspNetCore.Http.Features;
-using LectureRecordingManager.Hubs;
-using Newtonsoft.Json;
-using Hangfire.Dashboard;
-using LectureRecordingManager.Authentication;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using RecordingProcessor.Studio;
+using System;
 using System.Text;
 using System.Web;
 
@@ -124,8 +120,8 @@ namespace LectureRecordingManager
             // Configure hangfire to use the new JobActivator we defined.
             GlobalConfiguration.Configuration.UseActivator(new ContainerJobActivator(serviceProvider));
 
-            var options = new BackgroundJobServerOptions { WorkerCount = Environment.ProcessorCount };
-            app.UseHangfireServer(options);
+            ConfigureHangfireQueuesWorkers(app, new string[] { "meta-queue" }, 2);
+            ConfigureHangfireQueuesWorkers(app, new string[] { "processing-queue" }, 2);
 
             app.UseHangfireDashboard();
 
@@ -184,6 +180,17 @@ namespace LectureRecordingManager
                     spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
                 }
             });
+        }
+
+        private static void ConfigureHangfireQueuesWorkers(IApplicationBuilder app, string[] queues, int workerCount)
+        {
+            var hangfireQueueOptions = new BackgroundJobServerOptions
+            {
+                Queues = queues,
+                WorkerCount = workerCount
+            };
+
+            app.UseHangfireServer(hangfireQueueOptions);
         }
 
         private static void UpdateDatabase(IApplicationBuilder app)
