@@ -9,5 +9,5 @@
 /.vs/lecture-recording-manager/DesignTimeBuild
 /publishPath
 /sourcePath
-/lecture-recording-processor/bin/Release/netstandard2.1
+/lecture-recording-processor/bin
 /convertedPath
