@@ -7,6 +7,7 @@ import { NzModalService, NzNotificationService } from 'ng-zorro-antd';
 import { AuthenticationService } from '../services/authentication.service';
 import { SignalRService } from '../services/signal-r.service';
 import { Message } from '../shared/message';
+import { RecordingOutput } from '../shared/recording-output';
 
 @Component({
   selector: 'app-recording',
@@ -110,12 +111,20 @@ export class RecordingComponent implements OnInit {
     this.lectureService.processPreview(this.recording).subscribe(x => this.loadRecording(x.id.toString()));
   }
 
-  doOutputPreview(outputId: number):void {
+  doOutputPreview(outputId: number): void {
     this.outputIdPlayer = outputId;
 
     this.modal.create({
       nzWidth: 1328,
       nzContent: this.videoPlayerRef
     });
+  }
+
+  doDeleteOutput(output: RecordingOutput): void {
+    this.lectureService.deleteRecordingOutput(output.id)
+      .subscribe(x => {
+        this.recording = x;
+        this.notifications.info('Recording deleted successfully', 'The recording output ' + output.id + ' was deleted successfully.');
+      });
   }
 }

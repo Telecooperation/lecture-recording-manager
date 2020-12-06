@@ -43,7 +43,7 @@ namespace LectureRecordingManager.Controllers
         public async Task<ActionResult<Recording>> GetRecording(int id)
         {
             var recording = await _context.Recordings
-                .Include(x => x.Outputs)
+                .Include(x => x.Outputs.Where(y => y.Status != RecordingStatus.DELETED))
                 .Where(x => x.Id == id)
                 .SingleAsync();
 
@@ -340,6 +340,47 @@ namespace LectureRecordingManager.Controllers
             BackgroundJob.Enqueue<PreviewRecordingJob>(x => x.Preview(id));
 
             return Ok();
+        }
+
+        [HttpDelete("output/{id}")]
+        public async Task<ActionResult<Recording>> DeleteOutput(int id)
+        {
+            var output = await _context.RecordingOutputs
+                .Include(x => x.Recording)
+                .Include(x => x.Recording.Lecture)
+                .SingleOrDefaultAsync(x => x.Id == id);
+
+            if (output == null)
+            {
+                return NotFound();
+            }
+
+            // check if just processed and not published
+            if (output.Status != RecordingStatus.PROCESSED || output.JobType != typeof(ProcessRecordingJob).FullName)
+            {
+                return NotFound();
+            }
+
+            // delete output folder
+            var outputFolder = Path.Combine(output.Recording.Lecture.ConvertedPath, output.Recording.Id.ToString(), "output_" + output.Id);
+            try
+            {
+                Directory.Delete(outputFolder, true);
+            }
+            catch (Exception ex)
+            {
+                output.JobError = ex.Message;
+                output.Status = RecordingStatus.ERROR;
+
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+
+            // set deleted status
+            output.Status = RecordingStatus.DELETED;
+            await _context.SaveChangesAsync();
+
+            return await GetRecording(output.Recording.Id);
         }
 
         private bool RecordingExists(int id)

@@ -61,6 +61,7 @@ namespace LectureRecordingManager.Jobs
                 {
                     Id = recording.Title,
                     Name = recording.Title,
+                    Description = recording.Description,
 
                     Duration = recording.Duration,
                     Date = recording.PublishDate.Value

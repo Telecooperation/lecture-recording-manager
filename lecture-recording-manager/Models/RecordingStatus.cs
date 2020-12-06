@@ -8,6 +8,7 @@
         PROCESSED = 2,
         SCHEDULED_PUBLISH = 5,
         PUBLISHED = 4,
+        DELETED = 6,
         ERROR = -1
     }
 }

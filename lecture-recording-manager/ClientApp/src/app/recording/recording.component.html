@@ -45,13 +45,13 @@
 
   <nz-content>
     <h3>Rendering Jobs</h3>
-    <nz-table [nzTemplateMode]="true" [nzSize]="'small'">
+    <nz-table [nzTemplateMode]="true" [nzSize]="'small'" [nzScroll]="{ y: '200px' }">
       <thead>
         <tr>
           <th>Output Job</th>
-          <th>Date started</th>
-          <th>Date finished</th>
-          <th>Status</th>
+          <th nzWidth="200px">Date started</th>
+          <th nzWidth="200px">Date finished</th>
+          <th nzWidth="150px">Status</th>
         </tr>
       </thead>
       <tbody>
@@ -59,11 +59,14 @@
           <td>
             <span *ngIf="output.jobType == 'LectureRecordingManager.Jobs.ProcessRecordingJob'">Video processing <nz-tag>{{getRecordingJobType(output.jobConfiguration)}}</nz-tag></span>
             <span *ngIf="output.jobType == 'LectureRecordingManager.Jobs.PreviewRecordingJob'">Generate previews and process metadata</span>
+            <span *ngIf="output.status == -1">{{output.jobError}}</span>
           </td>
           <td>{{output.dateStarted | date:'medium'}}</td>
           <td>{{output.dateFinished | date:'medium'}}</td>
           <td>
             <nz-tag *ngIf="output.status == -1" [nzColor]="'red'">Error</nz-tag>
+            <nz-tag *ngIf="output.status == 6" [nzColor]="'red'">Deleted</nz-tag>
+
             <nz-tag *ngIf="output.status == 0" [nzColor]="'grey'">Uploaded</nz-tag>
             <nz-tag *ngIf="output.status == 1" [nzColor]="'blue'">Processing...</nz-tag>
             <nz-tag *ngIf="output.status == 2" [nzColor]="'orange'">Processed</nz-tag>
@@ -71,11 +74,18 @@
             <nz-tag *ngIf="output.status == 4" [nzColor]="'green'">Published</nz-tag>
             <nz-tag *ngIf="output.status == 5" [nzColor]="'blue'">Publishing</nz-tag>
 
-            <span *ngIf="output.status == -1">{{output.jobError}}</span>
+            <nz-button-group *ngIf="output.status == 2 && output.jobType == 'LectureRecordingManager.Jobs.ProcessRecordingJob'">
+              <button nz-button nz-dropdown [nzDropdownMenu]="menu1" nzPlacement="bottomRight">
+                <i nz-icon nzType="ellipsis"></i>
+              </button>
+            </nz-button-group>
 
-            <span *ngIf="output.status == 2 && output.jobType == 'LectureRecordingManager.Jobs.ProcessRecordingJob'">
-              <a (click)="doOutputPreview(output.id)">Play</a>
-            </span>
+            <nz-dropdown-menu #menu1="nzDropdownMenu">
+              <ul nz-menu>
+                <li (click)="doOutputPreview(output.id)" nz-menu-item><i nz-icon nzType="play-circle" nzTheme="outline"></i> Play Recording</li>
+                <li nz-popconfirm nzPopconfirmTitle="Are you sure delete this recording?" (nzOnConfirm)="doDeleteOutput(output)" nz-menu-item><span nz-typography nzType="danger"><i nz-icon nzType="delete" nzTheme="outline"></i> Delete Recording</span></li>
+              </ul>
+            </nz-dropdown-menu>
           </td>
         </tr>
       </tbody>

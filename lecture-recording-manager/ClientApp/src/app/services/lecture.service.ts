@@ -95,4 +95,8 @@ export class LectureService {
   sortRecordings(lectureId: number, ids: number[]) {
     return this.http.post<Recording[]>(environment.apiUrl + '/api/recording/sorting/' + lectureId, ids);
   }
+
+  deleteRecordingOutput(id: number): Observable<Recording> {
+    return this.http.delete<Recording>(environment.apiUrl + '/api/recording/output/' + id);
+  }
 }
