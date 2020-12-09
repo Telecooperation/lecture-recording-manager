@@ -4,6 +4,7 @@
     {
         Default = 0,
         Video_720p = 1,
-        Video_1080P = 2
+        Video_1080P = 2,
+        Legacy = 3
     }
 }

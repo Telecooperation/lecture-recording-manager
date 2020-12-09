@@ -55,6 +55,7 @@ namespace LectureRecordingManager.Jobs
             foreach (var recording in recordings)
             {
                 var targetFolderName = "video/" + recording.Id.ToString();
+                var legacy = false;
 
                 // generate metadata
                 var metadata = new RecordingMetadata()
@@ -89,11 +90,21 @@ namespace LectureRecordingManager.Jobs
                         metadata.StageVideoHd = targetFolderName + "/output_1080p/stage.mp4";
                         metadata.PresenterFileNameHd = targetFolderName + "/output_1080p/talkinghead.mp4";
                     }
+
+                    // legacy?
+                    if(configuration.OutputType == ProcessRecordingOutputType.Legacy)
+                    {
+                        metadata.FileName = "video/" + recording.CustomTargetName + "/slides.mp4";
+                        metadata.StageVideo = "video/" + recording.CustomTargetName + "/stage.mp4";
+                        metadata.PresenterFileName = "video/" + recording.CustomTargetName + "/talkinghead.mp4";
+
+                        legacy = true;
+                    }
                 }
 
                 metadata.Slides = recording.Chapters.OrderBy(x => x.StartPosition).Select(x => new Slide()
                 {
-                    Thumbnail = targetFolderName + "/output_720p/" + x.Thumbnail,
+                    Thumbnail = (legacy ? "video/" + recording.CustomTargetName + "/" : targetFolderName + "/output_720p/") + x.Thumbnail,
                     Ocr = x.Text,
                     StartPosition = (float)x.StartPosition
                 }).ToArray();
