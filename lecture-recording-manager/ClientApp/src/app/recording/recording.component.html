@@ -74,7 +74,7 @@
             <nz-tag *ngIf="output.status == 4" [nzColor]="'green'">Published</nz-tag>
             <nz-tag *ngIf="output.status == 5" [nzColor]="'blue'">Publishing</nz-tag>
 
-            <nz-button-group *ngIf="output.status == 2 && output.jobType == 'LectureRecordingManager.Jobs.ProcessRecordingJob'">
+            <nz-button-group *ngIf="(output.status == 2 || output.status == 4) && output.jobType == 'LectureRecordingManager.Jobs.ProcessRecordingJob'">
               <button nz-button nz-dropdown [nzDropdownMenu]="menu1" nzPlacement="bottomRight">
                 <i nz-icon nzType="ellipsis"></i>
               </button>
@@ -83,7 +83,7 @@
             <nz-dropdown-menu #menu1="nzDropdownMenu">
               <ul nz-menu>
                 <li (click)="doOutputPreview(output.id)" nz-menu-item><i nz-icon nzType="play-circle" nzTheme="outline"></i> Play Recording</li>
-                <li nz-popconfirm nzPopconfirmTitle="Are you sure delete this recording?" (nzOnConfirm)="doDeleteOutput(output)" nz-menu-item><span nz-typography nzType="danger"><i nz-icon nzType="delete" nzTheme="outline"></i> Delete Recording</span></li>
+                <li *ngIf="output.status == 2" nz-popconfirm nzPopconfirmTitle="Are you sure delete this recording?" (nzOnConfirm)="doDeleteOutput(output)" nz-menu-item><span nz-typography nzType="danger"><i nz-icon nzType="delete" nzTheme="outline"></i> Delete Recording</span></li>
               </ul>
             </nz-dropdown-menu>
           </td>

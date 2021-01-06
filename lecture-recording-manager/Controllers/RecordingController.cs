@@ -273,7 +273,7 @@ namespace LectureRecordingManager.Controllers
             var output = await _context.RecordingOutputs
                 .Include(x => x.Recording)
                 .Include(x => x.Recording.Lecture)
-                .Where(x => x.JobType == typeof(ProcessRecordingJob).FullName && x.Status == RecordingStatus.PROCESSED)
+                .Where(x => x.JobType == typeof(ProcessRecordingJob).FullName && (x.Status == RecordingStatus.PROCESSED || x.Status == RecordingStatus.PUBLISHED))
                 .SingleOrDefaultAsync(x => x.Id == id);
 
             if (output == null)
@@ -293,7 +293,33 @@ namespace LectureRecordingManager.Controllers
                 videoFileName = "slides.mp4";
             }
 
-            return PhysicalFile(Path.Combine(output.Recording.Lecture.ConvertedPath, output.RecordingId.ToString(), "output_" + output.Id, videoFileName), "application/octet-stream", enableRangeProcessing: true);
+            // generate target video path
+            if (output.Status == RecordingStatus.PROCESSED)
+            {
+                videoFileName = Path.Combine(output.Recording.Lecture.ConvertedPath, output.RecordingId.ToString(), "output_" + output.Id, videoFileName);
+            }
+            else if (output.Status == RecordingStatus.PUBLISHED)
+            {
+                // publish each output separately
+                var configuration = JsonConvert.DeserializeObject<ProcessRecordingJobConfiguration>(output.JobConfiguration);
+                var publishFolder = Path.Combine(output.Recording.Lecture.PublishPath, "video", output.RecordingId.ToString());
+
+                if (configuration.OutputType == ProcessRecordingOutputType.Default || configuration.OutputType == ProcessRecordingOutputType.Video_720p)
+                {
+                    videoFileName = Path.Combine(publishFolder, "output_720p", videoFileName);
+                }
+                else if (configuration.OutputType == ProcessRecordingOutputType.Video_1080P)
+                {
+                    videoFileName = Path.Combine(publishFolder, "output_1080p", videoFileName);
+                }
+            }
+
+            if (!System.IO.File.Exists(videoFileName))
+            {
+                return NotFound();
+            }
+
+            return PhysicalFile(videoFileName, "application/octet-stream", enableRangeProcessing: true);
         }
 
         [HttpGet("{id}/chapters")]
