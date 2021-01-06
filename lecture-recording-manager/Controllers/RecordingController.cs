@@ -218,7 +218,15 @@ namespace LectureRecordingManager.Controllers
                 return NotFound();
             }
 
-            var stream = new FileStream(Path.Combine(recording.Lecture.ConvertedPath, recording.Id.ToString(), "preview", "thumbnail.jpg"), FileMode.Open);
+            // get file preview
+            var previewFileName = Path.Combine(recording.Lecture.ConvertedPath, recording.Id.ToString(), "preview", "thumbnail.jpg");
+
+            if (!System.IO.File.Exists(previewFileName))
+            {
+                return NotFound();
+            }
+
+            var stream = new FileStream(previewFileName, FileMode.Open);
             return File(stream, System.Net.Mime.MediaTypeNames.Image.Jpeg);
         }
 
@@ -248,7 +256,15 @@ namespace LectureRecordingManager.Controllers
                 videoFileName = "slides.mp4";
             }
 
-            return PhysicalFile(Path.Combine(recording.Lecture.ConvertedPath, recording.Id.ToString(), "preview", videoFileName), "application/octet-stream", enableRangeProcessing: true);
+            // get file preview
+            var previewFileName = Path.Combine(recording.Lecture.ConvertedPath, recording.Id.ToString(), "preview", videoFileName);
+
+            if (!System.IO.File.Exists(previewFileName))
+            {
+                return NotFound();
+            }
+
+            return PhysicalFile(previewFileName, "application/octet-stream", enableRangeProcessing: true);
         }
 
         [Route("rendered_video/{id}")]
