@@ -77,6 +77,8 @@ export class RecordingComponent implements OnInit {
       return '720p Video Processing';
     } else if (obj.OutputType === 2) {
       return '1080p Video Processing';
+    } else if (obj.OutputType === 3) {
+      return 'Legacy Video Processing';
     }
   }
 
