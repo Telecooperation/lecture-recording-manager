@@ -102,51 +102,64 @@ namespace LectureRecordingManager.Jobs
                 // convert files
                 RecordingMetadata metaData = null;
 
-                if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING)
+                try
                 {
-                    metaData = ConvertStudioRecording(inputFileName, outputFolder);
-
-                    recording.Duration = metaData.Duration;
-                }
-                else if (recording.Type == RecordingType.SIMPLE_RECORDING)
-                {
-                    metaData = ConvertSimpleRecording(inputFileName, outputFolder);
-
-                    recording.Duration = metaData.Duration;
-                }
-                else if (recording.Type == RecordingType.ZOOM_RECORDING)
-                {
-                    metaData = ConvertZoomRecording(inputFileName, outputFolder);
-
-                    recording.Duration = metaData.Duration;
-                }
-
-                if (metaData != null)
-                {
-                    _context.RecordingChapters.RemoveRange(recording.Chapters);
-
-                    // add slides
-                    foreach (var slide in metaData.Slides)
+                    if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING)
                     {
-                        var chapter = new RecordingChapter()
-                        {
-                            Recording = recording,
-                            StartPosition = slide.StartPosition,
-                            Text = slide.Ocr,
-                            Thumbnail = slide.Thumbnail
-                        };
+                        metaData = ConvertStudioRecording(inputFileName, outputFolder);
 
-                        _context.RecordingChapters.Add(chapter);
+                        recording.Duration = metaData.Duration;
                     }
+                    else if (recording.Type == RecordingType.SIMPLE_RECORDING)
+                    {
+                        metaData = ConvertSimpleRecording(inputFileName, outputFolder);
+
+                        recording.Duration = metaData.Duration;
+                    }
+                    else if (recording.Type == RecordingType.ZOOM_RECORDING)
+                    {
+                        metaData = ConvertZoomRecording(inputFileName, outputFolder);
+
+                        recording.Duration = metaData.Duration;
+                    }
+
+                    if (metaData != null)
+                    {
+                        _context.RecordingChapters.RemoveRange(recording.Chapters);
+
+                        // add slides
+                        foreach (var slide in metaData.Slides)
+                        {
+                            var chapter = new RecordingChapter()
+                            {
+                                Recording = recording,
+                                StartPosition = slide.StartPosition,
+                                Text = slide.Ocr,
+                                Thumbnail = slide.Thumbnail
+                            };
+
+                            _context.RecordingChapters.Add(chapter);
+                        }
+                    }
+
+                    // set status
+                    recordingOutput.Status = RecordingStatus.PROCESSED;
+                    recordingOutput.JobError = null;
+                    recordingOutput.DateFinished = DateTime.Now;
+
+                    await _context.SaveChangesAsync();
+                    await UpdateLectureRecordingStatus();
                 }
+                catch (Exception ex)
+                {
+                    recordingOutput.Status = RecordingStatus.ERROR;
+                    recordingOutput.JobError = ex.Message;
+                    recordingOutput.DateFinished = DateTime.Now;
+                    await _context.SaveChangesAsync();
 
-                // set status
-                recordingOutput.Status = RecordingStatus.PROCESSED;
-                recordingOutput.JobError = null;
-                recordingOutput.DateFinished = DateTime.Now;
-
-                await _context.SaveChangesAsync();
-                await UpdateLectureRecordingStatus();
+                    await UpdateLectureRecordingStatus();
+                    throw ex;
+                }
             }
 
         }

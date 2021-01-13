@@ -137,6 +137,7 @@ namespace LectureRecordingManager.Jobs
                     recordingOutput.Status = RecordingStatus.ERROR;
                     recordingOutput.JobError = ex.Message;
                     recordingOutput.DateFinished = DateTime.Now;
+                    await _context.SaveChangesAsync();
 
                     await UpdateLectureRecordingStatus();
 
