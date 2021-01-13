@@ -68,6 +68,11 @@ namespace LectureRecordingManager.Jobs
                         continue;
                     }
 
+                    // retrieve current sorting number
+                    var recordingSortingMax = await _context.Recordings
+                        .Where(x => x.LectureId == lecture.Id)
+                        .MaxAsync(x => x.Sorting);
+
                     // check publish folder, if the recording was already processed
                     var published = Directory.Exists(Path.Combine(lecture.PublishPath, "video", targetName));
                     dynamic metadata = JsonConvert.DeserializeObject(File.ReadAllText(file));
@@ -82,7 +87,8 @@ namespace LectureRecordingManager.Jobs
                         UploadDate = DateTime.ParseExact(targetName, "yyyy-MM-dd-HH-mm-ss", CultureInfo.InvariantCulture),
                         FilePath = Path.GetDirectoryName(file),
                         Lecture = lecture,
-                        Type = RecordingType.GREEN_SCREEN_RECORDING
+                        Type = RecordingType.GREEN_SCREEN_RECORDING,
+                        Sorting = recordingSortingMax + 1
                     };
 
                     _context.Recordings.Add(recording);
