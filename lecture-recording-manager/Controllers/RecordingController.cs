@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 
 namespace LectureRecordingManager.Controllers
@@ -215,7 +216,8 @@ namespace LectureRecordingManager.Controllers
 
             if (recording == null)
             {
-                return NotFound();
+                var fs = new FileStream("resources/no-photo.png", FileMode.Open);
+                return File(fs, "image/png");
             }
 
             // get file preview
@@ -223,7 +225,8 @@ namespace LectureRecordingManager.Controllers
 
             if (!System.IO.File.Exists(previewFileName))
             {
-                return NotFound();
+                var fs = new FileStream("resources/no-photo.png", FileMode.Open);
+                return File(fs, "image/png");
             }
 
             var stream = new FileStream(previewFileName, FileMode.Open);

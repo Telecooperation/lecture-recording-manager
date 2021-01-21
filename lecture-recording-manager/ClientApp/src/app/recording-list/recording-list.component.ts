@@ -42,6 +42,6 @@ export class RecordingListComponent implements OnInit {
 
   drop(event: CdkDragDrop<string[]>): void {
     moveItemInArray(this.recordings, event.previousIndex, event.currentIndex);
-    this.lectureService.sortRecordings(this._lectureId, this.recordings.map(x => x.id)).subscribe(x => this.recordings = x);
+    this.lectureService.sortRecordings(this._lectureId, this.recordings.map(x => x.id)).subscribe();
   }
 }
