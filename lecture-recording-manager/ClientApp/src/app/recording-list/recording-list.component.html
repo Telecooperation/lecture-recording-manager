@@ -12,7 +12,7 @@
       <td>
         <a [routerLink]="['/', 'recording', recording.id]">
           <div class="thumbnail">
-            <img [src]="'/api/recording/preview/' + recording.id | authImage | async" />
+            <img class="small-thumbnail" [src]="'/api/recording/preview/' + recording.id | authImage | async" />
             <img class="large-hover-preview" [src]="'/api/recording/preview/' + recording.id | authImage | async" />
           </div>
           {{recording.title}}

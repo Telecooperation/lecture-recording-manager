@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { UploadFile, NzNotificationService } from 'ng-zorro-antd';
+import { NzUploadFile } from 'ng-zorro-antd/upload';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { environment } from '../../environments/environment';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { LectureService } from '../services/lecture.service';
@@ -15,7 +16,7 @@ import { Lecture } from '../shared/lecture';
   styleUrls: ['./recording-upload.component.scss']
 })
 export class RecordingUploadComponent implements OnInit {
-  public fileList: UploadFile[] = []
+  public fileList: NzUploadFile[] = []
   public uploadUrl: string = environment.apiUrl + '/api/recording/upload';
 
   public form: FormGroup;
@@ -70,7 +71,7 @@ export class RecordingUploadComponent implements OnInit {
     });
   }
 
-  beforeUpload = (file: UploadFile): boolean => {
+  beforeUpload = (file: NzUploadFile): boolean => {
     this.fileList = this.fileList.concat(file);
     return false;
   };
