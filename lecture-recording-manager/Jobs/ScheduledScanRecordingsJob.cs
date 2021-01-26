@@ -69,9 +69,18 @@ namespace LectureRecordingManager.Jobs
                     }
 
                     // retrieve current sorting number
-                    var recordingSortingMax = await _context.Recordings
-                        .Where(x => x.LectureId == lecture.Id)
-                        .MaxAsync(x => x.Sorting);
+                    int recordingSortingMax = 0;
+
+                    try
+                    {
+                        recordingSortingMax = await _context.Recordings
+                            .Where(x => x.LectureId == lecture.Id)
+                            .MaxAsync(x => x.Sorting);
+                    }
+                    catch
+                    {
+                        // can happen when list is empty
+                    }
 
                     // check publish folder, if the recording was already processed
                     var published = Directory.Exists(Path.Combine(lecture.PublishPath, "video", targetName));
@@ -90,6 +99,11 @@ namespace LectureRecordingManager.Jobs
                         Type = RecordingType.GREEN_SCREEN_RECORDING,
                         Sorting = recordingSortingMax + 1
                     };
+
+                    if (string.IsNullOrEmpty(recording.Title))
+                    {
+                        continue;
+                    }
 
                     _context.Recordings.Add(recording);
                     await _context.SaveChangesAsync();
