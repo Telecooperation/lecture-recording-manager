@@ -205,6 +205,24 @@ namespace LectureRecordingManager.Controllers
             return recording;
         }
 
+        [HttpGet("process_hd/{id}")]
+        public async Task<ActionResult<Recording>> ProcessHdRecording(int id)
+        {
+            var recording = await _context.Recordings
+                .Include(x => x.Lecture)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (recording == null)
+            {
+                return NotFound();
+            }
+
+            // render 1080p
+            BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Execute(new ProcessRecordingJobConfiguration() { RecordingId = recording.Id, OutputType = ProcessRecordingOutputType.Video_1080P }));
+
+            return recording;
+        }
+
         [HttpGet("preview/{id}")]
         public async Task<ActionResult<Recording>> PreviewImage(int id)
         {

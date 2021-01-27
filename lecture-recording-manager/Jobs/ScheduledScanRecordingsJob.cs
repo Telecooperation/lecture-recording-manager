@@ -86,42 +86,49 @@ namespace LectureRecordingManager.Jobs
                     var published = Directory.Exists(Path.Combine(lecture.PublishPath, "video", targetName));
                     dynamic metadata = JsonConvert.DeserializeObject(File.ReadAllText(file));
 
-                    // create database entry
-                    var recording = new Recording()
+                    try
                     {
-                        CustomTargetName = targetName,
-                        Title = metadata["description"],
-                        Published = published,
-                        PublishDate = DateTime.Parse(metadata["lectureDate"].ToString()),
-                        UploadDate = DateTime.ParseExact(targetName, "yyyy-MM-dd-HH-mm-ss", CultureInfo.InvariantCulture),
-                        FilePath = Path.GetDirectoryName(file),
-                        Lecture = lecture,
-                        Type = RecordingType.GREEN_SCREEN_RECORDING,
-                        Sorting = recordingSortingMax + 1
-                    };
-
-                    if (string.IsNullOrEmpty(recording.Title))
-                    {
-                        continue;
-                    }
-
-                    _context.Recordings.Add(recording);
-                    await _context.SaveChangesAsync();
-
-                    // process if not yet processed?
-                    if (lecture.Active && !published)
-                    {
-                        // process upload (preview)
-                        BackgroundJob.Enqueue<PreviewRecordingJob>(x => x.Preview(recording.Id));
-
-                        // render 720p
-                        BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Execute(new ProcessRecordingJobConfiguration() { RecordingId = recording.Id, OutputType = ProcessRecordingOutputType.Video_720p }));
-
-                        // render 1080p
-                        if (lecture.RenderFullHd)
+                        // create database entry
+                        var recording = new Recording()
                         {
-                            BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Execute(new ProcessRecordingJobConfiguration() { RecordingId = recording.Id, OutputType = ProcessRecordingOutputType.Video_1080P }));
+                            CustomTargetName = targetName,
+                            Title = metadata["description"],
+                            Published = published,
+                            PublishDate = DateTime.Parse(metadata["lectureDate"].ToString()),
+                            UploadDate = DateTime.ParseExact(targetName, "yyyy-MM-dd-HH-mm-ss", CultureInfo.InvariantCulture),
+                            FilePath = Path.GetDirectoryName(file),
+                            Lecture = lecture,
+                            Type = RecordingType.GREEN_SCREEN_RECORDING,
+                            Sorting = recordingSortingMax + 1
+                        };
+
+                        if (string.IsNullOrEmpty(recording.Title))
+                        {
+                            continue;
                         }
+
+                        _context.Recordings.Add(recording);
+                        await _context.SaveChangesAsync();
+
+                        // process if not yet processed?
+                        if (lecture.Active && !published)
+                        {
+                            // process upload (preview)
+                            BackgroundJob.Enqueue<PreviewRecordingJob>(x => x.Preview(recording.Id));
+
+                            // render 720p
+                            BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Execute(new ProcessRecordingJobConfiguration() { RecordingId = recording.Id, OutputType = ProcessRecordingOutputType.Video_720p }));
+
+                            // render 1080p
+                            if (lecture.RenderFullHd)
+                            {
+                                BackgroundJob.Enqueue<ProcessRecordingJob>(x => x.Execute(new ProcessRecordingJobConfiguration() { RecordingId = recording.Id, OutputType = ProcessRecordingOutputType.Video_1080P }));
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // TODO:
                     }
                 }
             }

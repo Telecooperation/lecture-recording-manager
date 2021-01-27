@@ -101,6 +101,10 @@ export class RecordingComponent implements OnInit {
     this.lectureService.processRecording(this.recording).subscribe(x => this.loadRecording(x.id.toString()));
   }
 
+  doProcessHd(): void {
+    this.lectureService.processHdRecording(this.recording).subscribe(x => this.loadRecording(x.id.toString()));
+  }
+
   doPublish(): void {
     this.lectureService.publishRecording(this.recording).subscribe(x => this.loadRecording(x.id.toString()));
   }
