@@ -17,7 +17,9 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using RecordingProcessor.Studio;
 using System;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace LectureRecordingManager
@@ -203,6 +205,11 @@ namespace LectureRecordingManager
                 using (var context = serviceScope.ServiceProvider.GetService<DatabaseContext>())
                 {
                     context.Database.Migrate();
+
+                    // cleanup old "running" jobs
+                    context.RecordingOutputs.Where(x => x.Status == RecordingStatus.PROCESSING).ToList()
+                        .ForEach(x => x.Status = RecordingStatus.ERROR);
+                    context.SaveChanges();
                 }
             }
         }
