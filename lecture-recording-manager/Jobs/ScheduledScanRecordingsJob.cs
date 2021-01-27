@@ -4,6 +4,7 @@ using LectureRecordingManager.Jobs.Configuration;
 using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Globalization;
@@ -15,14 +16,17 @@ namespace LectureRecordingManager.Jobs
 {
     public class ScheduledScanRecordingsJob
     {
+        private readonly ILogger<ScheduledScanRecordingsJob> _logger;
         private readonly DatabaseContext _context;
         private readonly IHubContext<MessageHub> hub;
 
         public ScheduledScanRecordingsJob(DatabaseContext context,
-            IHubContext<MessageHub> hub)
+            IHubContext<MessageHub> hub,
+            ILogger<ScheduledScanRecordingsJob> _logger)
         {
             this._context = context;
             this.hub = hub;
+            this._logger = _logger;
         }
 
         [Queue("meta-queue")]
@@ -128,7 +132,7 @@ namespace LectureRecordingManager.Jobs
                     }
                     catch (Exception ex)
                     {
-                        // TODO:
+                        _logger.LogError(ex, "Could not process {file}", file);
                     }
                 }
             }
