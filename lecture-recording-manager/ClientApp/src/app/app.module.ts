@@ -41,6 +41,7 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzNotificationModule } from 'ng-zorro-antd/notification';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzInputModule } from 'ng-zorro-antd/input';
 
 
 @NgModule({
@@ -87,6 +88,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
     NzModalModule,
     NzSwitchModule,
     NzNotificationModule,
+    NzInputModule,
 
     DragDropModule
   ],
