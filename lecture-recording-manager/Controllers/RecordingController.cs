@@ -234,8 +234,7 @@ namespace LectureRecordingManager.Controllers
 
             if (recording == null)
             {
-                var fs = new FileStream("resources/no-photo.png", FileMode.Open);
-                return File(fs, "image/png");
+                return PhysicalFile("resources/no-photo.png", "image/png");
             }
 
             // get file preview
@@ -243,12 +242,10 @@ namespace LectureRecordingManager.Controllers
 
             if (!System.IO.File.Exists(previewFileName))
             {
-                var fs = new FileStream("resources/no-photo.png", FileMode.Open);
-                return File(fs, "image/png");
+                return PhysicalFile(previewFileName, "image/png");
             }
 
-            var stream = new FileStream(previewFileName, FileMode.Open);
-            return File(stream, System.Net.Mime.MediaTypeNames.Image.Jpeg);
+            return PhysicalFile(previewFileName, System.Net.Mime.MediaTypeNames.Image.Jpeg);
         }
 
         [Route("preview_video/{id}")]
@@ -365,8 +362,7 @@ namespace LectureRecordingManager.Controllers
                 return NotFound();
             }
 
-            var stream = new FileStream(Path.Combine(chapter.Recording.Lecture.ConvertedPath, chapter.Recording.Id.ToString(), "preview", chapter.Thumbnail), FileMode.Open);
-            return File(stream, System.Net.Mime.MediaTypeNames.Image.Jpeg);
+            return PhysicalFile(Path.Combine(chapter.Recording.Lecture.ConvertedPath, chapter.Recording.Id.ToString(), "preview", chapter.Thumbnail), MediaTypeNames.Image.Jpeg);
         }
 
         [HttpGet("publish/{id}")]
