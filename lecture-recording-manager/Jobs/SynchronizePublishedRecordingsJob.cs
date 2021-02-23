@@ -144,7 +144,7 @@ namespace LectureRecordingManager.Jobs
 
             metadata.Slides = recording.Chapters.OrderBy(x => x.StartPosition).Select(x => new Slide()
             {
-                Thumbnail = (legacy ? "video/" + recording.CustomTargetName + "/" : targetFolderName + "/output_720p/") + x.Thumbnail,
+                Thumbnail = (legacy ? recording.Lecture.PublishPath + "/video/" + recording.CustomTargetName + "/" : targetFolderName + "/output_720p/") + x.Thumbnail,
                 Ocr = x.Text,
                 StartPosition = (float)x.StartPosition
             }).ToArray();
