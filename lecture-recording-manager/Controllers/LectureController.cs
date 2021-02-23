@@ -64,6 +64,7 @@ namespace LectureRecordingManager.Controllers
             }
 
             var dbLecture = await _context.Lectures.FindAsync(id);
+            dbLecture.ShortHand = lecture.ShortHand;
             dbLecture.Title = lecture.Title;
             dbLecture.Description = lecture.Description;
             dbLecture.PublishPath = lecture.PublishPath;

@@ -1,4 +1,6 @@
-﻿using LectureRecordingManager.Models;
+﻿using Hangfire;
+using LectureRecordingManager.Jobs;
+using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -105,6 +107,14 @@ namespace LectureRecordingManager.Controllers
             await _context.SaveChangesAsync();
 
             return semester;
+        }
+
+        [HttpGet("synchronize")]
+        public ActionResult SynchronizeCourses()
+        {
+            BackgroundJob.Enqueue<SynchronizePublishedLecturesJob>(x => x.SynchronizeLectures());
+
+            return Ok();
         }
 
         private bool SemesterExists(int id)

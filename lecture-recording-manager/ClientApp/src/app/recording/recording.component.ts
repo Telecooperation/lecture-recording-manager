@@ -26,7 +26,7 @@ export class RecordingComponent implements OnInit {
   public outputIdPlayer: number;
 
   constructor(
-    private modal: NzModalService, 
+    private modal: NzModalService,
     private route: ActivatedRoute,
     private router: Router,
     private signalR: SignalRService,

@@ -2,6 +2,7 @@ import { Semester } from './semester';
 
 export class Lecture {
   public id: number;
+  public shortHand: string;
   public title: string;
   public description?: string;
 

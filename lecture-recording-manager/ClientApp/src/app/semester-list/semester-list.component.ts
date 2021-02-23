@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SemesterService } from '../services/semester.service';
 import { Semester } from '../shared/semester';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 @Component({
   selector: 'app-semester-list',
@@ -19,7 +20,9 @@ export class SemesterListComponent implements OnInit {
   };
   public isCreateModalVisible = false;
 
-  constructor(private semesterService: SemesterService) { }
+  constructor(
+    private semesterService: SemesterService,
+    private notifications: NzNotificationService) { }
 
   ngOnInit(): void {
     this.semesterService.getSemesters().subscribe(x => this.semesters = x);
@@ -37,6 +40,12 @@ export class SemesterListComponent implements OnInit {
     this.semesterService.postSemester(this.createSemester).subscribe(x => {
       this.isCreateModalVisible = false;
       this.ngOnInit();
+    });
+  }
+
+  doSynchronize(): void {
+    this.semesterService.synchronize().subscribe(x => {
+      this.notifications.info('Semester synchronized successfully', 'All published semesters are being synchronized.');
     });
   }
 

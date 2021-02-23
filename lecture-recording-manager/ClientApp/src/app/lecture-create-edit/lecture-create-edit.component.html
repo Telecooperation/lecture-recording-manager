@@ -13,6 +13,12 @@
   <nz-content>
     <form nz-form [formGroup]="form" (ngSubmit)="onSubmit()">
       <nz-form-item>
+        <nz-form-label [nzSpan]="7" nzRequired>Shorthand</nz-form-label>
+        <nz-form-control [nzSpan]="12">
+          <input nz-input formControlName="shortHand" placeholder="Shorthand or abbreviation (e.g., tk1-ws2021)" required />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
         <nz-form-label [nzSpan]="7" nzRequired>Title</nz-form-label>
         <nz-form-control [nzSpan]="12">
           <input nz-input formControlName="title" placeholder="Title of the lecture" required />

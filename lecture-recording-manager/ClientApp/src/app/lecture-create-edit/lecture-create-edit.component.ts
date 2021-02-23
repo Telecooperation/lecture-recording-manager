@@ -28,6 +28,7 @@ export class LectureCreateEditComponent implements OnInit {
     this.actionType = 'add';
 
     this.form = this.fb.group({
+      shortHand: [null, [Validators.required]],
       title: [null, [Validators.required]],
       semesterId: [null, [Validators.required]],
       description: [null],
@@ -48,6 +49,7 @@ export class LectureCreateEditComponent implements OnInit {
         this.lecture = x;
 
         this.form = this.fb.group({
+          shortHand: [x.shortHand, [Validators.required]],
           title: [x.title, [Validators.required]],
           semesterId: [x.semesterId, [Validators.required]],
           description: [x.description],

@@ -8,6 +8,9 @@ namespace LectureRecordingManager.Models
     {
         public int Id { get; set; }
 
+        [Column(TypeName = "varchar(255)")]
+        public string ShortHand { get; set; }
+
         [Required]
         [Column(TypeName = "varchar(255)")]
         public string Title { get; set; }

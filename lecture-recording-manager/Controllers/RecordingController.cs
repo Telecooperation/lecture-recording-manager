@@ -3,6 +3,7 @@ using LectureRecordingManager.Jobs;
 using LectureRecordingManager.Jobs.Configuration;
 using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,11 +25,13 @@ namespace LectureRecordingManager.Controllers
     {
         private readonly DatabaseContext _context;
         private readonly IConfiguration _config;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
-        public RecordingController(DatabaseContext context, IConfiguration config)
+        public RecordingController(DatabaseContext context, IConfiguration config, IWebHostEnvironment environment)
         {
             this._context = context;
             this._config = config;
+            this._hostEnvironment = environment;
         }
 
         [HttpGet("lecture/{lectureId}")]
@@ -234,7 +237,7 @@ namespace LectureRecordingManager.Controllers
 
             if (recording == null)
             {
-                return PhysicalFile("resources/no-photo.png", "image/png");
+                return PhysicalFile(Path.Combine(_hostEnvironment.WebRootPath, "no-photo.png"), "image/png");
             }
 
             // get file preview

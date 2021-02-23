@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LectureRecordingManager.Models
@@ -17,5 +19,8 @@ namespace LectureRecordingManager.Models
         public bool Published { get; set; }
 
         public bool Active { get; set; }
+
+        [JsonIgnore]
+        public List<Lecture> Lectures { get; set; }
     }
 }
