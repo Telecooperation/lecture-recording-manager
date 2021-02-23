@@ -42,6 +42,7 @@ import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzNotificationModule } from 'ng-zorro-antd/notification';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { RecordingAddComponent } from './recording-add/recording-add.component';
 
 
 @NgModule({
@@ -62,7 +63,9 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 
     UsersComponent,
 
-    UserAddComponent
+    UserAddComponent,
+
+    RecordingAddComponent
   ],
   imports: [
     BrowserModule,

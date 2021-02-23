@@ -4,6 +4,7 @@ using LectureRecordingManager.Jobs.Configuration;
 using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -15,12 +16,15 @@ namespace LectureRecordingManager.Jobs
     {
         private readonly DatabaseContext _context;
         private readonly IHubContext<MessageHub> hub;
+        private readonly IConfiguration _config;
 
         public PublishRecordingJob(DatabaseContext context,
-            IHubContext<MessageHub> hub)
+            IHubContext<MessageHub> hub,
+            IConfiguration config)
         {
             this._context = context;
             this.hub = hub;
+            this._config = config;
         }
 
         [Queue("publish-queue")]
@@ -33,46 +37,55 @@ namespace LectureRecordingManager.Jobs
 
             // only publish processed and existing recordings
             if (output == null ||
-                output.JobType != typeof(ProcessRecordingJob).FullName ||
+                (output.JobType != typeof(ProcessRecordingJob).FullName && output.JobType != "link") ||
                 (output.Status != RecordingStatus.PROCESSED && output.Status != RecordingStatus.SCHEDULED_PUBLISH))
             {
                 return;
             }
 
             // check if recording was already published
-            Directory.CreateDirectory(Path.Combine(output.Recording.Lecture.PublishPath, "video"));
-            Directory.CreateDirectory(Path.Combine(output.Recording.Lecture.PublishPath, "assets"));
+            Directory.CreateDirectory(Path.Combine(_config["PublishVideoPath"], output.Recording.Lecture.PublishPath, "video"));
+            Directory.CreateDirectory(Path.Combine(_config["PublishVideoPath"], output.Recording.Lecture.PublishPath, "assets"));
 
-            var publishFolder = Path.Combine(output.Recording.Lecture.PublishPath, "video", output.RecordingId.ToString());
-            Directory.CreateDirectory(publishFolder);
-
-            // publish each output separately
-            var outputFolder = Path.Combine(output.Recording.Lecture.ConvertedPath, output.RecordingId.ToString(), "output_" + output.Id);
-            var configuration = JsonConvert.DeserializeObject<ProcessRecordingJobConfiguration>(output.JobConfiguration);
-
-            if (configuration.OutputType == ProcessRecordingOutputType.Default || configuration.OutputType == ProcessRecordingOutputType.Video_720p)
+            if (output.Recording.LinkedRecording != null)
             {
-                var publishFolderOut = Path.Combine(publishFolder, "output_720p");
-
-                if (Directory.Exists(publishFolderOut))
-                    Directory.Delete(publishFolderOut, true);
-
-                Directory.Move(outputFolder, publishFolderOut);
-
+                // linked recording --> output is already published
                 output.Status = RecordingStatus.PUBLISHED;
                 output.Recording.Published = true;
             }
-            else if (configuration.OutputType == ProcessRecordingOutputType.Video_1080P)
+            else
             {
-                var publishFolderOut = Path.Combine(publishFolder, "output_1080p");
+                var publishFolder = Path.Combine(_config["PublishVideoPath"], output.Recording.Lecture.PublishPath, "video", output.RecordingId.ToString());
+                Directory.CreateDirectory(publishFolder);
 
-                if (Directory.Exists(publishFolderOut))
-                    Directory.Delete(publishFolderOut, true);
+                // publish each output separately
+                var outputFolder = Path.Combine(output.Recording.Lecture.ConvertedPath, output.RecordingId.ToString(), "output_" + output.Id);
+                var configuration = JsonConvert.DeserializeObject<ProcessRecordingJobConfiguration>(output.JobConfiguration);
 
-                Directory.Move(outputFolder, publishFolderOut);
+                if (configuration.OutputType == ProcessRecordingOutputType.Default || configuration.OutputType == ProcessRecordingOutputType.Video_720p)
+                {
+                    var publishFolderOut = Path.Combine(publishFolder, "output_720p");
 
-                output.Status = RecordingStatus.PUBLISHED;
-                output.Recording.Published = true;
+                    if (Directory.Exists(publishFolderOut))
+                        Directory.Delete(publishFolderOut, true);
+
+                    Directory.Move(outputFolder, publishFolderOut);
+
+                    output.Status = RecordingStatus.PUBLISHED;
+                    output.Recording.Published = true;
+                }
+                else if (configuration.OutputType == ProcessRecordingOutputType.Video_1080P)
+                {
+                    var publishFolderOut = Path.Combine(publishFolder, "output_1080p");
+
+                    if (Directory.Exists(publishFolderOut))
+                        Directory.Delete(publishFolderOut, true);
+
+                    Directory.Move(outputFolder, publishFolderOut);
+
+                    output.Status = RecordingStatus.PUBLISHED;
+                    output.Recording.Published = true;
+                }
             }
 
             if (!output.Recording.PublishDate.HasValue)

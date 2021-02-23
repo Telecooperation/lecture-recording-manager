@@ -14,9 +14,9 @@
 
       <nz-dropdown-menu #menu1="nzDropdownMenu">
         <ul nz-menu>
-          <li nz-menu-item (click)="doPreview()">Generate Preview</li>
-          <li nz-menu-item (click)="doProcess()">Process Recording</li>
-          <li nz-menu-item (click)="doProcessHd()">Only Process HD Recording</li>
+          <li nz-menu-item (click)="doPreview()" *ngIf="!recording.linkedRecording">Generate Preview</li>
+          <li nz-menu-item (click)="doProcess()" *ngIf="!recording.linkedRecording">Process Recording</li>
+          <li nz-menu-item (click)="doProcessHd()" *ngIf="!recording.linkedRecording">Only Process HD Recording</li>
           <li nz-menu-item (click)="doPublish()">Publish Now</li>
 
           <li nz-menu-item (click)="doDelete()"><span nz-typography nzType="danger"><i nz-icon nzType="delete" nzTheme="outline"></i> Delete Recording</span></li>
@@ -37,9 +37,9 @@
       <nz-descriptions [nzColumn]="2" nzSize="small">
         <nz-descriptions-item nzTitle="Description" nzSpan="2">{{recording.description}}</nz-descriptions-item>
         <nz-descriptions-item nzTitle="Duration">{{recording.duration | duration : false}}</nz-descriptions-item>
-        <nz-descriptions-item nzTitle="Upload Date">{{recording.uploadDate | date:'medium'}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Upload Date" *ngIf="!recording.linkedRecording">{{recording.uploadDate | date:'medium'}}</nz-descriptions-item>
         <nz-descriptions-item nzTitle="Publish Date">{{recording.publishDate | date:'medium'}}</nz-descriptions-item>
-        <nz-descriptions-item nzTitle="Storage Path">{{recording.filePath}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Storage Path" *ngIf="!recording.linkedRecording">{{recording.filePath}}</nz-descriptions-item>
       </nz-descriptions>
     </nz-page-header-content>
   </nz-page-header>
@@ -92,29 +92,37 @@
       </tbody>
     </nz-table>
 
-    <br />
-    <h3>Chapters</h3>
-    <nz-table #chapterTable [nzData]="chapters" [nzSize]="'small'" style="margin-bottom: 50px;">
-      <thead>
-        <tr>
-          <th nzWidth="60px">Chapter</th>
-          <th>Text</th>
-          <th nzWidth="150px">Timestamp</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let chapter of chapterTable.data">
-          <td>
-            <div class="thumbnail">
-              <img *ngIf="hasPreview()" [src]="'/api/recording/preview/chapter/' + chapter.id | authImage | async" height="45px" />
-              <img class="large-hover-preview" *ngIf="hasPreview()" [src]="'/api/recording/preview/chapter/' + chapter.id | authImage | async" />
-            </div>
-          </td>
-          <td>{{chapter.text | slice: 0:100}}</td>
-          <td>{{chapter.startPosition | duration : true}}</td>
-        </tr>
-      </tbody>
-    </nz-table>
+    <div *ngIf="recording.linkedRecording">
+      <br />
+      <h3>Linked Recording</h3>
+      <p>Linked to: <a [routerLink]="['/recording', recording.linkedRecording]">{{recording.linkedRecording}}</a></p>
+    </div>
+
+    <div *ngIf="!recording.linkedRecording">
+      <br />
+      <h3>Chapters</h3>
+      <nz-table #chapterTable [nzData]="chapters" [nzSize]="'small'" style="margin-bottom: 50px;">
+        <thead>
+          <tr>
+            <th nzWidth="60px">Chapter</th>
+            <th>Text</th>
+            <th nzWidth="150px">Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let chapter of chapterTable.data">
+            <td>
+              <div class="thumbnail">
+                <img *ngIf="hasPreview()" [src]="'/api/recording/preview/chapter/' + chapter.id | authImage | async" height="45px" />
+                <img class="large-hover-preview" *ngIf="hasPreview()" [src]="'/api/recording/preview/chapter/' + chapter.id | authImage | async" />
+              </div>
+            </td>
+            <td>{{chapter.text | slice: 0:100}}</td>
+            <td>{{chapter.startPosition | duration : true}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
   </nz-content>
 </nz-layout>
 

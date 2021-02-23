@@ -13,6 +13,8 @@ namespace LectureRecordingManager.Models
 
         public Lecture Lecture { get; set; }
 
+        public int? LinkedRecording { get; set; }
+
         public RecordingType Type { get; set; }
 
         [Required]

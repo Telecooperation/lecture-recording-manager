@@ -48,8 +48,9 @@ namespace LectureRecordingManager.Jobs
                     {
                         Id = lecture.ShortHand,
                         Name = lecture.Title,
-                        Folder = lecture.PublishPath.Replace(_config["PublishVideoPath"], ""),
+                        Folder = lecture.PublishPath,
                         Current = semester.DateStart < DateTime.Now && semester.DateEnd > DateTime.Now,
+                        Semester = semester.Name,
                         WeekView = false,
                         PublishMode = false
                     };

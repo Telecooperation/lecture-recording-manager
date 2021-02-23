@@ -112,8 +112,34 @@ namespace LectureRecordingManager.Controllers
         [HttpPost]
         public async Task<ActionResult<Recording>> PostRecording(Recording recording)
         {
+            // recording link?
+            if (string.IsNullOrEmpty(recording.Title) && recording.LinkedRecording != null)
+            {
+                var linkedRecording = await _context.Recordings.FindAsync(recording.LinkedRecording.Value);
+                recording.Title = linkedRecording.Title;
+                recording.Description = linkedRecording.Description;
+                recording.Duration = linkedRecording.Duration;
+            }
+
             _context.Recordings.Add(recording);
             await _context.SaveChangesAsync();
+
+            // add recording output if link
+            if (recording.LinkedRecording != null)
+            {
+                var output = new RecordingOutput()
+                {
+                    JobType = "link",
+                    Processed = true,
+                    Status = RecordingStatus.PROCESSED,
+                    DateStarted = DateTime.Now,
+                    DateFinished = DateTime.Now,
+                    Recording = recording
+                };
+
+                _context.RecordingOutputs.Add(output);
+                await _context.SaveChangesAsync();
+            }
 
             return CreatedAtAction(nameof(GetRecording), new { id = recording.Id }, recording);
         }
@@ -245,7 +271,7 @@ namespace LectureRecordingManager.Controllers
 
             if (!System.IO.File.Exists(previewFileName))
             {
-                return PhysicalFile(previewFileName, "image/png");
+                return PhysicalFile(Path.Combine(_hostEnvironment.WebRootPath, "no-photo.png"), "image/png");
             }
 
             return PhysicalFile(previewFileName, System.Net.Mime.MediaTypeNames.Image.Jpeg);
@@ -323,7 +349,7 @@ namespace LectureRecordingManager.Controllers
             {
                 // publish each output separately
                 var configuration = JsonConvert.DeserializeObject<ProcessRecordingJobConfiguration>(output.JobConfiguration);
-                var publishFolder = Path.Combine(output.Recording.Lecture.PublishPath, "video", output.RecordingId.ToString());
+                var publishFolder = Path.Combine(_config["PublishVideoPath"], output.Recording.Lecture.PublishPath, "video", output.RecordingId.ToString());
 
                 if (configuration.OutputType == ProcessRecordingOutputType.Default || configuration.OutputType == ProcessRecordingOutputType.Video_720p)
                 {
@@ -365,7 +391,14 @@ namespace LectureRecordingManager.Controllers
                 return NotFound();
             }
 
-            return PhysicalFile(Path.Combine(chapter.Recording.Lecture.ConvertedPath, chapter.Recording.Id.ToString(), "preview", chapter.Thumbnail), MediaTypeNames.Image.Jpeg);
+            var chapterPreviewFile = Path.Combine(chapter.Recording.Lecture.ConvertedPath, chapter.Recording.Id.ToString(), "preview", chapter.Thumbnail);
+
+            if (!System.IO.File.Exists(chapterPreviewFile))
+            {
+                return PhysicalFile(Path.Combine(_hostEnvironment.WebRootPath, "no-photo.png"), "image/png");
+            }
+
+            return PhysicalFile(chapterPreviewFile, MediaTypeNames.Image.Jpeg);
         }
 
         [HttpGet("publish/{id}")]
@@ -374,7 +407,7 @@ namespace LectureRecordingManager.Controllers
             // check for recordings that should be published
             var outputs = await _context.RecordingOutputs
                 .Where(x => x.Status == RecordingStatus.PROCESSED)
-                .Where(x => x.JobType == typeof(ProcessRecordingJob).FullName)
+                .Where(x => x.JobType == typeof(ProcessRecordingJob).FullName || x.JobType == "link")
                 .Where(x => x.RecordingId == id)
                 .ToListAsync();
 

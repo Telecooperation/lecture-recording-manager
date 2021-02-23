@@ -6,6 +6,7 @@
 
     <nz-page-header-extra>
       <button nz-button nzType="primary" [routerLink]="['/', 'lecture', lecture.id, 'upload']"><i nz-icon nzType="upload" nzTheme="outline"></i> Upload Recording</button>
+      <button nz-button [routerLink]="['/', 'lecture', lecture.id, 'link']"> Add Recording Link</button>
 
       <nz-button-group>
         <button nz-button [routerLink]="['/', 'lecture', 'edit', lecture.id]">Edit</button>

@@ -1,0 +1,45 @@
+<h2>Add recording link</h2>
+
+<form nz-form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7">Lecture</nz-form-label>
+    <nz-form-control [nzSpan]="12"><b>{{lecture.title}}</b></nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7">Semester</nz-form-label>
+    <nz-form-control [nzSpan]="12"><b>{{lecture.semester.name}}</b></nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7" nzRequired>Recording Id</nz-form-label>
+    <nz-form-control [nzSpan]="12">
+      <input nz-input formControlName="linkedRecording" placeholder="Id of the recording" required />
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7" nzRequired>Title</nz-form-label>
+    <nz-form-control [nzSpan]="12">
+      <input nz-input formControlName="title" placeholder="Title of the recording (if empty, will filled automatically)" />
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7">Description</nz-form-label>
+    <nz-form-control [nzSpan]="12">
+      <input nz-input formControlName="description" placeholder="Detailed description of the recording"/>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7">Publishing date</nz-form-label>
+    <nz-form-control [nzSpan]="12">
+      <nz-date-picker nzShowTime
+                      nzFormat="yyyy-MM-dd HH:mm:ss"
+                      nzPlaceHolder="Select Time"
+                      formControlName="publishDate"></nz-date-picker>
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item>
+    <nz-form-control [nzOffset]="7" [nzSpan]="12">
+      <button nz-button nzType="primary" [disabled]="!form.valid">Add Link</button>
+    </nz-form-control>
+  </nz-form-item>
+</form>

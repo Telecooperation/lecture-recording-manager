@@ -11,17 +11,12 @@ import { Recording } from '../shared/recording';
 import { Lecture } from '../shared/lecture';
 
 @Component({
-  selector: 'app-recording-upload',
-  templateUrl: './recording-upload.component.html',
-  styleUrls: ['./recording-upload.component.scss']
+  selector: 'app-recording-add',
+  templateUrl: './recording-add.component.html',
+  styleUrls: ['./recording-add.component.scss']
 })
-export class RecordingUploadComponent implements OnInit {
-  public fileList: NzUploadFile[] = []
-  public uploadUrl: string = environment.apiUrl + '/api/recording/upload';
-
+export class RecordingAddComponent implements OnInit {
   public form: FormGroup;
-  public uploading = false;
-
   public lecture: Lecture;
 
   constructor(
@@ -29,10 +24,11 @@ export class RecordingUploadComponent implements OnInit {
     private router: Router,
     private fb: FormBuilder,
     private notifications: NzNotificationService,
-    private lectureService: LectureService) {
+    private lectureService: LectureService
+  ) {
     this.form = this.fb.group({
+      linkedRecording: [null, [Validators.required]],
       title: [null, [Validators.required]],
-      type: [null, [Validators.required]],
       description: [null],
       publishDate: [null]
     });
@@ -44,35 +40,13 @@ export class RecordingUploadComponent implements OnInit {
   }
 
   onSubmit(): void {
-    this.uploading = true;
     const lectureId = this.route.snapshot.paramMap.get('lectureId');
 
     const recording: Recording = Object.assign({}, this.form.value);
     recording.lectureId = +lectureId;
 
     this.lectureService.postRecording(recording).subscribe(x => {
-      // upload files
-      this.lectureService.uploadRecording(x.id.toString(), true, this.fileList)
-      .pipe(filter(e => e instanceof HttpResponse))
-      .subscribe(
-        () => {
-          this.uploading = false;
-          this.fileList = [];
-          this.router.navigate(['/', 'lecture', lectureId]);
-        },
-        () => {
-          this.uploading = false;
-          this.notifications.error(
-            'Upload was not successful',
-            'The files could not be uploaded, please make sure that you filled all required fields.',
-            { nzPlacement: 'bottomRight' });
-        }
-      );
+      this.router.navigate(['/', 'lecture', lectureId]);
     });
-  }
-
-  beforeUpload = (file: NzUploadFile): boolean => {
-    this.fileList = this.fileList.concat(file);
-    return false;
   }
 }

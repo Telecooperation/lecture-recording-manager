@@ -4,6 +4,7 @@ using LectureRecordingManager.Jobs.Configuration;
 using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -19,14 +20,17 @@ namespace LectureRecordingManager.Jobs
         private readonly ILogger<ScheduledScanRecordingsJob> _logger;
         private readonly DatabaseContext _context;
         private readonly IHubContext<MessageHub> hub;
+        private readonly IConfiguration _config;
 
         public ScheduledScanRecordingsJob(DatabaseContext context,
             IHubContext<MessageHub> hub,
-            ILogger<ScheduledScanRecordingsJob> _logger)
+            ILogger<ScheduledScanRecordingsJob> _logger,
+            IConfiguration config)
         {
             this._context = context;
             this.hub = hub;
             this._logger = _logger;
+            _config = config;
         }
 
         [Queue("meta-queue")]
@@ -34,6 +38,7 @@ namespace LectureRecordingManager.Jobs
         {
             var lectures = await _context.Lectures
                 .Where(x => x.SourcePath != null && x.SourcePath != "")
+                .Where(x => x.Active)
                 .ToListAsync();
 
             foreach (var lecture in lectures)
@@ -87,7 +92,7 @@ namespace LectureRecordingManager.Jobs
                     }
 
                     // check publish folder, if the recording was already processed
-                    var published = Directory.Exists(Path.Combine(lecture.PublishPath, "video", targetName));
+                    var published = Directory.Exists(Path.Combine(_config["PublishVideoPath"], lecture.PublishPath, "video", targetName));
                     dynamic metadata = JsonConvert.DeserializeObject(File.ReadAllText(file));
 
                     try

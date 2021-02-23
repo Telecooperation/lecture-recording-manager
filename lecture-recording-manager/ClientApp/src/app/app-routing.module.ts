@@ -11,6 +11,7 @@ import { LoginComponent } from './authentication/login/login.component';
 import { AuthGuard } from './authentication/auth.guard';
 import { UsersComponent } from './authentication/users/users.component';
 import { UserAddComponent } from './authentication/user-add/user-add.component';
+import { RecordingAddComponent } from './recording-add/recording-add.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -26,6 +27,7 @@ const routes: Routes = [
 
   { path: 'lecture/:lectureId', component: LectureComponent, canActivate: [AuthGuard] },
   { path: 'lecture/:lectureId/upload', component: RecordingUploadComponent, canActivate: [AuthGuard] },
+  { path: 'lecture/:lectureId/link', component: RecordingAddComponent, canActivate: [AuthGuard] },
 
   { path: 'recording/:recordingId', component: RecordingComponent, canActivate: [AuthGuard] },
   { path: 'recording/:recordingId/edit', component: RecordingEditComponent, canActivate: [AuthGuard] },

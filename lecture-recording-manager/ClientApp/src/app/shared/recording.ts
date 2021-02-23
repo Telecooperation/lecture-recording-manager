@@ -3,6 +3,7 @@ import { RecordingOutput } from './recording-output';
 export class Recording {
   public id?: number;
   public lectureId?: number;
+  public linkedRecording?: number;
 
   public type: RecordingType;
   public title: string;
