@@ -365,6 +365,10 @@ namespace LectureRecordingManager.Controllers
                 {
                     videoFileName = Path.Combine(publishFolder, "output_1080p", videoFileName);
                 }
+                else if (configuration.OutputType == ProcessRecordingOutputType.Legacy)
+                {
+                    videoFileName = Path.Combine(_config["PublishVideoPath"], output.Recording.Lecture.PublishPath, "video", output.Recording.CustomTargetName, videoFileName);
+                }
             }
 
             if (!System.IO.File.Exists(videoFileName))

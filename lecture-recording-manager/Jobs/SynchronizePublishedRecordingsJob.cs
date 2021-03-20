@@ -71,11 +71,28 @@ namespace LectureRecordingManager.Jobs
                         .SingleOrDefaultAsync(x => x.Id == recording.LinkedRecording);
                     targetFolderName = linkedRecording.Lecture.PublishPath + "/video/" + linkedRecording.Id.ToString();
 
+                    var linkedOutput = linkedRecording.Outputs.First(x => x.JobType == typeof(ProcessRecordingJob).FullName && x.Status == RecordingStatus.PUBLISHED);
+                    var linkedConfig = JsonConvert.DeserializeObject<ProcessRecordingJobConfiguration>(linkedOutput.JobConfiguration);
+
+                    if (linkedConfig.OutputType == ProcessRecordingOutputType.Legacy)
+                    {
+                        targetFolderName = linkedRecording.Lecture.PublishPath + "/video/" + linkedRecording.CustomTargetName;
+                    }
+
                     var metadata = PublishRecording(linkedRecording, recording, targetFolderName);
                     lectureMetadata.Recordings.Add(metadata);
                 }
                 else
                 {
+                    var output = recording.Outputs.First(x => x.JobType == typeof(ProcessRecordingJob).FullName && x.Status == RecordingStatus.PUBLISHED);
+                    var configuration = JsonConvert.DeserializeObject<ProcessRecordingJobConfiguration>(output.JobConfiguration);
+
+                    // legacy?
+                    if (configuration.OutputType == ProcessRecordingOutputType.Legacy)
+                    {
+                        targetFolderName = recording.Lecture.PublishPath + "/video/" + recording.CustomTargetName;
+                    }
+
                     var metadata = PublishRecording(recording, recording, targetFolderName);
                     lectureMetadata.Recordings.Add(metadata);
                 }
@@ -134,7 +151,7 @@ namespace LectureRecordingManager.Jobs
                 // legacy?
                 if (configuration.OutputType == ProcessRecordingOutputType.Legacy)
                 {
-                    metadata.FileName = recording.Lecture.PublishPath +  "/video/" + recording.CustomTargetName + "/slides.mp4";
+                    metadata.FileName = recording.Lecture.PublishPath + "/video/" + recording.CustomTargetName + "/slides.mp4";
                     metadata.StageVideo = recording.Lecture.PublishPath + "/video/" + recording.CustomTargetName + "/stage.mp4";
                     metadata.PresenterFileName = recording.Lecture.PublishPath + "/video/" + recording.CustomTargetName + "/talkinghead.mp4";
 
