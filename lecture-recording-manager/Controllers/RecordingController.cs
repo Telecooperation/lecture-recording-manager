@@ -35,11 +35,17 @@ namespace LectureRecordingManager.Controllers
         }
 
         [HttpGet("lecture/{lectureId}")]
-        public async Task<ActionResult<IEnumerable<Recording>>> GetRecordingByLecture(int lectureId)
+        public async Task<ActionResult<IEnumerable<Recording>>> GetRecordingByLecture(int lectureId, bool linked = false)
         {
-            return await _context.Recordings
-                .Where(x => x.LectureId == lectureId)
-                .OrderBy(x => x.Sorting).ThenBy(x => x.UploadDate)
+            var query = _context.Recordings
+                .Where(x => x.LectureId == lectureId);
+
+            if (linked)
+            {
+                query = query.Where(x => x.LinkedRecording == null);
+            }
+
+            return await query.OrderBy(x => x.Sorting).ThenBy(x => x.UploadDate)
                 .ToListAsync();
         }
 

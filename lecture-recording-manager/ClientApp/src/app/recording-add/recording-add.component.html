@@ -1,6 +1,8 @@
 <h2>Add recording link</h2>
 
-<form nz-form [formGroup]="form" (ngSubmit)="onSubmit()">
+<nz-skeleton [nzActive]="true" *ngIf="!lecture"></nz-skeleton>
+
+<form nz-form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="lecture">
   <nz-form-item>
     <nz-form-label [nzSpan]="7">Lecture</nz-form-label>
     <nz-form-control [nzSpan]="12"><b>{{lecture.title}}</b></nz-form-control>
@@ -12,7 +14,8 @@
   <nz-form-item>
     <nz-form-label [nzSpan]="7" nzRequired>Recording Id</nz-form-label>
     <nz-form-control [nzSpan]="12">
-      <input nz-input formControlName="linkedRecording" placeholder="Id of the recording" required />
+      <!-- <input nz-input formControlName="linkedRecording" placeholder="Id of the recording" required /> -->
+      <app-select-recording formControlName="linkedRecording"></app-select-recording>
     </nz-form-control>
   </nz-form-item>
   <nz-form-item>

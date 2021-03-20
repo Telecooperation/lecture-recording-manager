@@ -95,7 +95,7 @@
     <div *ngIf="recording.linkedRecording">
       <br />
       <h3>Linked Recording</h3>
-      <p>Linked to: <a [routerLink]="['/recording', recording.linkedRecording]">{{recording.linkedRecording}}</a></p>
+      <p>Linked to: <button nz-button [routerLink]="['/', 'recording', recording.linkedRecording]">Recording {{recording.linkedRecording}}</button></p>
     </div>
 
     <div *ngIf="!recording.linkedRecording">

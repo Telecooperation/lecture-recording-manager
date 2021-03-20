@@ -42,8 +42,8 @@ export class LectureService {
     return this.http.delete(environment.apiUrl + '/api/lecture/' + lecture.id);
   }
 
-  getRecordingsByLecture(lectureId: string): Observable<Recording[]> {
-    return this.http.get<Recording[]>(environment.apiUrl + '/api/recording/lecture/' + lectureId);
+  getRecordingsByLecture(lectureId: string, linked: boolean = false): Observable<Recording[]> {
+    return this.http.get<Recording[]>(environment.apiUrl + '/api/recording/lecture/' + lectureId + '?linked=' + linked);
   }
 
   getRecording(recordingId: string): Observable<Recording> {

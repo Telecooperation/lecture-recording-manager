@@ -1,0 +1,23 @@
+<div>
+    <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Select a semester" [(ngModel)]="selectedSemester"
+        (ngModelChange)="updateLectures($event)" required>
+        <nz-option *ngFor="let semester of semesters | async" [nzLabel]="semester.name" [nzValue]="semester.id">
+        </nz-option>
+    </nz-select>
+
+    <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Select a lecture" [(ngModel)]="selectedLecture"
+        (ngModelChange)="updateRecordings($event)" [nzDisabled]="!selectedSemester" required>
+        <nz-option *ngFor="let lecture of lectures | async" [nzLabel]="lecture.title" [nzValue]="lecture.id">
+        </nz-option>
+    </nz-select>
+
+    <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Select a recording" [(ngModel)]="recording"
+        [nzDisabled]="!selectedLecture" (ngModelChange)="updateRecording($event)" required>
+        <nz-option *ngFor="let recording of recordings | async" [nzLabel]="recording.title" [nzValue]="recording">
+        </nz-option>
+    </nz-select>
+
+    <div *ngIf="recording" style="margin-top: 10px">
+        <strong>{{recording.title}}</strong>
+    </div>
+</div>
