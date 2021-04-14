@@ -136,16 +136,24 @@ namespace LectureRecordingManager.Jobs
                 if (configuration.OutputType == ProcessRecordingOutputType.Default || configuration.OutputType == ProcessRecordingOutputType.Video_720p)
                 {
                     metadata.FileName = targetFolderName + "/output_720p/slides.mp4";
-                    metadata.StageVideo = targetFolderName + "/output_720p/stage.mp4";
-                    metadata.PresenterFileName = targetFolderName + "/output_720p/talkinghead.mp4";
+
+                    if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING || recording.Type == RecordingType.SIMPLE_RECORDING)
+                    {
+                        metadata.StageVideo = targetFolderName + "/output_720p/stage.mp4";
+                        metadata.PresenterFileName = targetFolderName + "/output_720p/talkinghead.mp4";
+                    }
                 }
 
                 // 1080p processed?
                 if (configuration.OutputType == ProcessRecordingOutputType.Video_1080P)
                 {
                     metadata.FileNameHd = targetFolderName + "/output_1080p/slides.mp4";
-                    metadata.StageVideoHd = targetFolderName + "/output_1080p/stage.mp4";
-                    metadata.PresenterFileNameHd = targetFolderName + "/output_1080p/talkinghead.mp4";
+
+                    if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING || recording.Type == RecordingType.SIMPLE_RECORDING)
+                    {
+                        metadata.StageVideoHd = targetFolderName + "/output_1080p/stage.mp4";
+                        metadata.PresenterFileNameHd = targetFolderName + "/output_1080p/talkinghead.mp4";
+                    }
                 }
 
                 // legacy?
