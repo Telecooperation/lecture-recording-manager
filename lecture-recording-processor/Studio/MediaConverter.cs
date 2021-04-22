@@ -128,7 +128,7 @@ namespace RecordingProcessor.Studio
                 Thumbnail = "thumbs/" + thumbName,
                 Ocr = ""
             } };
-            finalRecording.Duration = FFmpegHelper.GetMediaLength(config.SlideVideoPath).TotalSeconds;
+            finalRecording.Duration = FFmpegHelper.GetMediaLength(targetVideoPath).TotalSeconds;
 
             FFmpegHelper.ExportThumbnail(5f, Path.Combine(config.OutputDirectory, "slides.mp4"), config.OutputDirectory, "thumbnail");
 
