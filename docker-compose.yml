@@ -1,0 +1,30 @@
+version: '3.9'
+services:
+    lecture-database:
+        image: postgres:13-alpine
+        container_name: lecturedatabase
+        environment:
+            - POSTGRES_PASSWORD=test123
+            - POSTGRES_DB=lecture_manager
+            - PGDATA=/var/lib/postgresql/data/pgdata
+        volumes:
+            - ./docker/database:/var/lib/postgresql/data/pgdata
+        ports:
+            - 5432:5432
+        
+    lecture-manager:
+        image: lecturemanager
+        build:
+            context: .
+            dockerfile: ./Dockerfile
+        container_name: lecturemanager
+        depends_on:
+            - lecture-database
+        ports:
+            - 8080:80
+        volumes:
+            - ./docker/uploaded:/data/uploaded
+            - ./docker/published:/data/published
+            - ./docker/converted:/data/converted
+            - ./docker/appsettings.json:/app/appsettings.json
+#        entrypoint: ["./wait-for-it.sh", "lecturedatabase:5432", "-t" "120", "--", "dotnet", "lecture-recording-manager.dll"]

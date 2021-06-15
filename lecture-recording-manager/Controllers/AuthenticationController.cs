@@ -34,6 +34,13 @@ namespace LectureRecordingManager.Controllers
             var user = await userManager.FindByNameAsync(model.Username);
             if (user != null && await userManager.CheckPasswordAsync(user, model.Password))
             {
+                // check if user is locked out
+                if (user.LockoutEnabled || await userManager.IsLockedOutAsync(user))
+                {
+                    return Unauthorized();
+                }
+
+                // obtain user roles
                 var userRoles = await userManager.GetRolesAsync(user);
 
                 var authClaims = new List<Claim>
