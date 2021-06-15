@@ -64,6 +64,7 @@ namespace LectureRecordingManager.Jobs
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 
             var jsonString = JsonConvert.SerializeObject(courses, settings);
+            Directory.CreateDirectory(Path.Combine(_config["PublishVideoPath"], "assets"));
             File.WriteAllText(Path.Combine(_config["PublishVideoPath"], "assets", "courses.json"), jsonString);
         }
     }
