@@ -225,7 +225,14 @@ namespace LectureRecordingManager.Jobs
                 ExportJson = false
             };
 
-            return converter.ConvertMedia(config);
+            if (File.Exists(thVideoPath))
+            {
+                return converter.ConvertMedia(config);
+            }
+            else
+            {
+                return converter.ConvertMediaSingle(config);
+            }
         }
 
         private RecordingMetadata ConvertZoomRecording(string inputFileName, string outputFolder)

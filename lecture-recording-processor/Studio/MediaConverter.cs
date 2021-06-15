@@ -67,6 +67,48 @@ namespace RecordingProcessor.Studio
             return finalRecording;
         }
 
+        public RecordingMetadata ConvertMediaSingle(ConversionConfiguration config)
+        {
+            // generate output directory
+            if (Directory.Exists(config.OutputDirectory))
+                Directory.Delete(config.OutputDirectory, true);
+
+            Directory.CreateDirectory(config.OutputDirectory);
+
+            // convert file
+            ConvertVideoFile(config, false);
+
+            // generate recording object
+            var finalRecording = new RecordingMetadata();
+            finalRecording.FileName = "slides.mp4";
+            finalRecording.Slides = BuildThumbnails(config, "slides.mp4");
+            finalRecording.Duration = FFmpegHelper.GetMediaLength(config.SlideVideoPath).TotalSeconds;
+
+            return finalRecording;
+        }
+
+        public RecordingMetadata ConvertPreviewMediaSingle(ConversionConfiguration config)
+        {
+            // generate output directory
+            if (Directory.Exists(config.OutputDirectory))
+                Directory.Delete(config.OutputDirectory, true);
+
+            Directory.CreateDirectory(config.OutputDirectory);
+
+            // convert file
+            ConvertVideoFile(config, true);
+
+            // generate recording object
+            var finalRecording = new RecordingMetadata();
+            finalRecording.FileName = "slides.mp4";
+            finalRecording.Slides = BuildThumbnails(config, "slides.mp4");
+            finalRecording.Duration = FFmpegHelper.GetMediaLength(config.SlideVideoPath).TotalSeconds;
+
+            FFmpegHelper.ExportThumbnail(5f, Path.Combine(config.OutputDirectory, "slides.mp4"), config.OutputDirectory, "thumbnail");
+
+            return finalRecording;
+        }
+
         public RecordingMetadata ConvertZoomMedia(ConversionConfiguration config)
         {
             // generate output directory
@@ -313,6 +355,41 @@ namespace RecordingProcessor.Studio
                             "-map \"[slides1]\" -f mp4 -vcodec libx264 -crf 23 -preset veryfast -tune stillimage -profile:v baseline -level 3.0 -pix_fmt yuv420p -r 30 " + (preview ? " -t 10 " : "") + "\"" + Path.Combine(config.OutputDirectory, "slides.mp4") + "\" " +
                             "-map \"[th_ck_ct]\" -map \"[1a1]\" -f mp4 -vcodec libx264 -crf 23 -preset veryfast -profile:v baseline -level 3.0 -pix_fmt yuv420p -r 30 -acodec aac -b:a 192k " + (preview ? " -t 10 " : "") + "\"" + Path.Combine(config.OutputDirectory, "talkinghead.mp4") + "\" " +
                             "-map \"[stage]\" -map \"[1a2]\" -f mp4 -vcodec libx264 -crf 23 -preset veryfast -profile:v baseline -level 3.0 -pix_fmt yuv420p -r 30 -acodec aac -b:a 192k " + (preview ? " -t 10 " : "") + "\"" + Path.Combine(config.OutputDirectory, "stage.mp4") + "\" ";
+
+            _logger.LogInformation("Execute ffmpeg: {0}", args);
+
+            Process p = FFmpegHelper.FFmpeg(args, false);
+            p.Start();
+            p.WaitForExit();
+        }
+
+        private void ConvertVideoFile(ConversionConfiguration config, bool preview)
+        {
+            var lenSlideVideo = FFmpegHelper.GetMediaLength(config.SlideVideoPath);
+
+            // normalize audio
+            var audioLevels = FFmpegHelper.GetAudioLevels(config.SlideVideoPath);
+            string audioFilter = null;
+
+            if (audioLevels != null)
+            {
+                audioFilter = $"[1:a]loudnorm=I=-23:LRA=11:tp=-1:measured_I={audioLevels.Input_I}:measured_LRA={audioLevels.Input_Lra}:measured_tp={audioLevels.Input_Tp}:measured_thresh={audioLevels.Input_Thresh}:offset={audioLevels.Target_Offset}:linear=true[1a]";
+            }
+
+            // run processing
+            string args = "-i \"" + config.SlideVideoPath + "\" ";
+
+            if (audioFilter != null)
+            {
+                // audio filters
+                args += "-filter_complex " +
+                "\"" +
+
+                audioFilter +
+                "\" ";
+            }
+
+            args += "-f mp4 -vcodec libx264 -crf 23 -preset veryfast -tune stillimage -profile:v baseline -level 3.0 -pix_fmt yuv420p -r 30 " + (preview ? " -t 10 " : "") + "\"" + Path.Combine(config.OutputDirectory, "slides.mp4") + "\" ";
 
             _logger.LogInformation("Execute ffmpeg: {0}", args);
 

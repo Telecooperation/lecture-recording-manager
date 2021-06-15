@@ -1,4 +1,5 @@
 ﻿using LectureRecordingManager.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 namespace LectureRecordingManager.Controllers
 {
     [ApiController]
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {

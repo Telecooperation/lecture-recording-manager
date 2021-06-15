@@ -161,7 +161,6 @@ namespace LectureRecordingManager.Jobs
                     throw ex;
                 }
             }
-
         }
 
         private RecordingMetadata ConvertStudioRecording(string inputFileName, string outputFolder)
@@ -231,7 +230,14 @@ namespace LectureRecordingManager.Jobs
                 ExportJson = false
             };
 
-            return converter.ConvertPreviewMedia(config);
+            if (File.Exists(thVideoPath))
+            {
+                return converter.ConvertPreviewMedia(config);
+            }
+            else
+            {
+                return converter.ConvertPreviewMediaSingle(config);
+            }
         }
 
         private RecordingMetadata ConvertZoomRecording(string inputFileName, string outputFolder)
