@@ -373,7 +373,7 @@ namespace RecordingProcessor.Studio
 
             if (audioLevels != null)
             {
-                audioFilter = $"[1:a]loudnorm=I=-23:LRA=11:tp=-1:measured_I={audioLevels.Input_I}:measured_LRA={audioLevels.Input_Lra}:measured_tp={audioLevels.Input_Tp}:measured_thresh={audioLevels.Input_Thresh}:offset={audioLevels.Target_Offset}:linear=true[1a]";
+                audioFilter = $"loudnorm=I=-23:LRA=11:tp=-1:measured_I={audioLevels.Input_I}:measured_LRA={audioLevels.Input_Lra}:measured_tp={audioLevels.Input_Tp}:measured_thresh={audioLevels.Input_Thresh}:offset={audioLevels.Target_Offset}:linear=true";
             }
 
             // run processing
@@ -382,11 +382,7 @@ namespace RecordingProcessor.Studio
             if (audioFilter != null)
             {
                 // audio filters
-                args += "-filter_complex " +
-                "\"" +
-
-                audioFilter +
-                "\" ";
+                args += "-af " + audioFilter + " ";
             }
 
             args += "-f mp4 -vcodec libx264 -crf 23 -preset veryfast -tune stillimage -profile:v baseline -level 3.0 -pix_fmt yuv420p -r 30 " + (preview ? " -t 10 " : "") + "\"" + Path.Combine(config.OutputDirectory, "slides.mp4") + "\" ";
