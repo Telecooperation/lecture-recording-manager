@@ -23,3 +23,23 @@ dotnet build --configuration Release --no-restore
 Modify the ```appsettings.json``` and adjust database connection, ```UploadVideoPath``` (directory for storing the uploaded videos), and ```PublishVideoPath``` (directory for storing the published videos).
 
 Don't forget to set correct folder paths for each lecture (source, publish, convert).
+
+## Use Docker
+Instead of running the application directly, there is also a docker-compose file to run the entire platform using:
+```console
+docker-compose up
+```
+
+The compose file will generate corresponding folders under `/docker` and will also persist the database and all other files there.
+
+To create the first user, you'll need to call the user registration API manually:
+```console
+curl --header "Content-Type: application/json" \
+--request POST --data '
+{
+	"username": "testuser",
+	"email": "test@testurl.com",
+	"password": "test12345!"
+}' \
+http://localhost:8080/api/user/register
+```
