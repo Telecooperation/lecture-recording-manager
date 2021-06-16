@@ -12,3 +12,5 @@
 /lecture-recording-processor/bin
 /convertedPath
 /out
+/docker/mgr
+/docker/database

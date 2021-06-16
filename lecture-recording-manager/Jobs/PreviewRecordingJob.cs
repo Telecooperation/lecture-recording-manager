@@ -69,7 +69,10 @@ namespace LectureRecordingManager.Jobs
                 .FindAsync(recording.LectureId);
 
             // start encoding preview
-            if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING || recording.Type == RecordingType.SIMPLE_RECORDING || recording.Type == RecordingType.ZOOM_RECORDING)
+            if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING
+                || recording.Type == RecordingType.SIMPLE_RECORDING
+                || recording.Type == RecordingType.ZOOM_RECORDING
+                || recording.Type == RecordingType.ONLY_SCREEN)
             {
                 // file path is file?
                 string outputFolder = Path.Combine(lecture.ConvertedPath, recording.Id.ToString(), "preview");
@@ -110,7 +113,7 @@ namespace LectureRecordingManager.Jobs
 
                         recording.Duration = metaData.Duration;
                     }
-                    else if (recording.Type == RecordingType.SIMPLE_RECORDING)
+                    else if (recording.Type == RecordingType.SIMPLE_RECORDING || recording.Type == RecordingType.ONLY_SCREEN)
                     {
                         metaData = ConvertSimpleRecording(inputFileName, outputFolder);
 

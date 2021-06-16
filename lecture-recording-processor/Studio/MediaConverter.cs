@@ -37,7 +37,7 @@ namespace RecordingProcessor.Studio
             finalRecording.FileName = "slides.mp4";
             finalRecording.PresenterFileName = "talkinghead.mp4";
             finalRecording.StageVideo = "stage.mp4";
-            finalRecording.Slides = BuildThumbnails(config, "slides.mp4");
+            finalRecording.Slides = BuildThumbnails(config);
             finalRecording.Duration = FFmpegHelper.GetMediaLength(config.SlideVideoPath).TotalSeconds;
 
             return finalRecording;
@@ -59,7 +59,7 @@ namespace RecordingProcessor.Studio
             finalRecording.FileName = "slides.mp4";
             finalRecording.PresenterFileName = "talkinghead.mp4";
             finalRecording.StageVideo = "stage.mp4";
-            finalRecording.Slides = BuildThumbnails(config, "slides.mp4");
+            finalRecording.Slides = BuildThumbnails(config);
             finalRecording.Duration = FFmpegHelper.GetMediaLength(config.SlideVideoPath).TotalSeconds;
 
             FFmpegHelper.ExportThumbnail(5f, Path.Combine(config.OutputDirectory, "stage.mp4"), config.OutputDirectory, "thumbnail");
@@ -81,7 +81,7 @@ namespace RecordingProcessor.Studio
             // generate recording object
             var finalRecording = new RecordingMetadata();
             finalRecording.FileName = "slides.mp4";
-            finalRecording.Slides = BuildThumbnails(config, "slides.mp4");
+            finalRecording.Slides = BuildThumbnails(config);
             finalRecording.Duration = FFmpegHelper.GetMediaLength(config.SlideVideoPath).TotalSeconds;
 
             return finalRecording;
@@ -101,7 +101,7 @@ namespace RecordingProcessor.Studio
             // generate recording object
             var finalRecording = new RecordingMetadata();
             finalRecording.FileName = "slides.mp4";
-            finalRecording.Slides = BuildThumbnails(config, "slides.mp4");
+            finalRecording.Slides = BuildThumbnails(config);
             finalRecording.Duration = FFmpegHelper.GetMediaLength(config.SlideVideoPath).TotalSeconds;
 
             FFmpegHelper.ExportThumbnail(5f, Path.Combine(config.OutputDirectory, "slides.mp4"), config.OutputDirectory, "thumbnail");
@@ -177,19 +177,19 @@ namespace RecordingProcessor.Studio
             return finalRecording;
         }
 
-        public Slide[] BuildThumbnails(ConversionConfiguration config, string slidesFileName)
+        public Slide[] BuildThumbnails(ConversionConfiguration config)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                return BuildThumbnailsUnix(config, slidesFileName);
+                return BuildThumbnailsUnix(config);
             }
             else
             {
-                return BuildThumbnailsWin(config, slidesFileName);
+                return BuildThumbnailsWin(config);
             }
         }
 
-        private Slide[] BuildThumbnailsWin(ConversionConfiguration config, string slidesFileName)
+        private Slide[] BuildThumbnailsWin(ConversionConfiguration config)
         {
             var thumbOutDir = Path.Combine(config.OutputDirectory, "thumbs");
             Directory.CreateDirectory(thumbOutDir);
@@ -247,7 +247,7 @@ namespace RecordingProcessor.Studio
             return result.ToArray();
         }
 
-        private Slide[] BuildThumbnailsUnix(ConversionConfiguration config, string slidesFileName)
+        private Slide[] BuildThumbnailsUnix(ConversionConfiguration config)
         {
             var thumbOutDir = Path.Combine(config.OutputDirectory, "thumbs");
             Directory.CreateDirectory(thumbOutDir);

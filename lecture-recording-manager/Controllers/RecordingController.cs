@@ -302,16 +302,9 @@ namespace LectureRecordingManager.Controllers
 
             if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING || recording.Type == RecordingType.SIMPLE_RECORDING)
             {
-                if (System.IO.File.Exists(Path.Combine(videoFileName, "stage.mp4")))
-                {
-                    videoFileName = Path.Combine(videoFileName, "stage.mp4");
-                }
-                else
-                {
-                    videoFileName = Path.Combine(videoFileName, "slides.mp4");
-                }
+                videoFileName = Path.Combine(videoFileName, "stage.mp4");
             }
-            else if (recording.Type == RecordingType.ZOOM_RECORDING)
+            else if (recording.Type == RecordingType.ZOOM_RECORDING || recording.Type == RecordingType.ONLY_SCREEN)
             {
                 videoFileName = Path.Combine(videoFileName, "slides.mp4");
             }
@@ -346,7 +339,7 @@ namespace LectureRecordingManager.Controllers
             {
                 videoFileName = "stage.mp4";
             }
-            else if (output.Recording.Type == RecordingType.ZOOM_RECORDING)
+            else if (output.Recording.Type == RecordingType.ZOOM_RECORDING || output.Recording.Type == RecordingType.ONLY_SCREEN)
             {
                 videoFileName = "slides.mp4";
             }

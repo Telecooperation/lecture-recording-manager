@@ -23,8 +23,5 @@ services:
         ports:
             - 8080:80
         volumes:
-            - ./docker/uploaded:/data/uploaded
-            - ./docker/published:/data/published
-            - ./docker/converted:/data/converted
-            - ./docker/sources:/data/sources
+            - ./docker/mgr:/data
             - ./docker/appsettings.json:/app/appsettings.json
