@@ -54,7 +54,7 @@ Select the database:
 `\connect lecture_manager`
 
 And unlock your account:
-`UPDATE "AspNetUsers" SET "LockoutEnabled" = false WHERE "UserName" = "testuser";`
+`UPDATE "AspNetUsers" SET "LockoutEnabled" = false WHERE "UserName" = 'testuser';`
 
 Now you should be able to login.
 
