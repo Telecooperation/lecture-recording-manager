@@ -45,4 +45,17 @@ http://localhost:8080/api/user/register
 ```
 The generated user is locked out by default, so it must be activated manually via the corresponding database entry.
 
+First, connect to yout postgres installation:
+`psql -U postgres -W`
+If you are using docker, the easiest way to get there is opening a shell within the container:
+`docker exec -ti lecturedatabase /bin/bash`
+
+Select the database:
+`\connect lecture_manager`
+
+And unlock your account:
+`UPDATE "AspNetUsers" SET "LockoutEnabled" = false WHERE "UserName" = 'testuser';`
+
+Now you should be able to login.
+
 Finally, you can also adjust the folders used in the docker container by adjusting the docker-compose file.

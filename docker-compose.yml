@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3.7'
 services:
     lecture-database:
         image: postgres:13-alpine
@@ -13,10 +13,7 @@ services:
             - 5432:5432
         
     lecture-manager:
-        image: lecturemanager
-        build:
-            context: .
-            dockerfile: ./Dockerfile
+        image: ghcr.io/telecooperation/lecture-recording-manager:latest
         container_name: lecturemanager
         depends_on:
             - lecture-database
