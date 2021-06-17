@@ -32,6 +32,8 @@ WORKDIR /app
 COPY --from=build-env /app/out .
 COPY --from=build-env /app/wait-for-it.sh ./wait-for-it.sh
 
+RUN chmod +x ./resources/ffmpeg/unix/x64/ffmpeg
+RUN chmod +x ./resources/ffmpeg/unix/x86/ffmpeg
 RUN chmod +x ./wait-for-it.sh
 
 #ENTRYPOINT ["/bin/bash", "-c"]
