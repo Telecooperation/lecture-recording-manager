@@ -60,6 +60,8 @@ namespace LectureRecordingManager.Jobs
             }
 
             // serialize to disk
+            Directory.CreateDirectory(Path.Combine(_config["PublishVideoPath"], "assets"));
+
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 

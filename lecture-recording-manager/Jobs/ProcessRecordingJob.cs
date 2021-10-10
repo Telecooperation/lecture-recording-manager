@@ -70,7 +70,10 @@ namespace LectureRecordingManager.Jobs
                 .FindAsync(recording.LectureId);
 
             // start encoding
-            if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING || recording.Type == RecordingType.SIMPLE_RECORDING || recording.Type == RecordingType.ZOOM_RECORDING)
+            if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING
+                || recording.Type == RecordingType.SIMPLE_RECORDING
+                || recording.Type == RecordingType.ZOOM_RECORDING
+                || recording.Type == RecordingType.ONLY_SCREEN)
             {
                 // file path is file?
                 string outputFolder = Path.Combine(lecture.ConvertedPath, recording.Id.ToString(), "output_" + recordingOutput.Id);
@@ -116,7 +119,7 @@ namespace LectureRecordingManager.Jobs
                     {
                         metaData = ConvertStudioRecording(inputFileName, outputFolder, GetDimension(configuration.OutputType));
                     }
-                    else if (recording.Type == RecordingType.SIMPLE_RECORDING)
+                    else if (recording.Type == RecordingType.SIMPLE_RECORDING || recording.Type == RecordingType.ONLY_SCREEN)
                     {
                         metaData = ConvertSimpleRecording(inputFileName, outputFolder, GetDimension(configuration.OutputType));
                     }
@@ -148,11 +151,7 @@ namespace LectureRecordingManager.Jobs
 
         private Dimension GetDimension(ProcessRecordingOutputType outputType)
         {
-            if (outputType == ProcessRecordingOutputType.Default || outputType == ProcessRecordingOutputType.Video_720p)
-            {
-                return Dimension.Dim720p;
-            }
-            else if (outputType == ProcessRecordingOutputType.Video_1080P)
+            if (outputType == ProcessRecordingOutputType.Video_1080P)
             {
                 return Dimension.Dim1080p;
             }
@@ -225,7 +224,14 @@ namespace LectureRecordingManager.Jobs
                 ExportJson = false
             };
 
-            return converter.ConvertMedia(config);
+            if (File.Exists(thVideoPath))
+            {
+                return converter.ConvertMedia(config);
+            }
+            else
+            {
+                return converter.ConvertMediaSingle(config);
+            }
         }
 
         private RecordingMetadata ConvertZoomRecording(string inputFileName, string outputFolder)

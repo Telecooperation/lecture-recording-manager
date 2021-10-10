@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Recording } from '../shared/recording';
 import { LectureService } from '../services/lecture.service';
@@ -35,13 +35,15 @@ export class RecordingComponent implements OnInit {
     private lectureService: LectureService
   ) {
     this.subscribeToEvents();
+
+    this.route.params.subscribe(queryParams => {
+      const recordingId = queryParams.recordingId; // .paramMap.get('recordingId');
+      this.loadRecording(recordingId);
+      this.token = this.authenticationService.currentUserValue.token;
+    });
   }
 
-  ngOnInit(): void {
-    const recordingId = this.route.snapshot.paramMap.get('recordingId');
-    this.loadRecording(recordingId);
-    this.token = this.authenticationService.currentUserValue.token;
-  }
+  ngOnInit(): void { }
 
   private subscribeToEvents(): void {
     this.signalR.statusChanged.subscribe((msg: Message) => {
@@ -92,7 +94,7 @@ export class RecordingComponent implements OnInit {
       this.notifications.success(
         'Recording deleted successfully',
         'The recording <b>' + this.recording.title + '</b> deleted successfully.',
-        { nzPlacement: 'bottomRight'});
+        { nzPlacement: 'bottomRight' });
       this.router.navigate(['/', 'lecture', this.recording.lectureId]);
     });
   }
@@ -113,7 +115,7 @@ export class RecordingComponent implements OnInit {
     this.notifications.info(
       'Recording preview started',
       'The recording preview of <b>' + this.recording.title + '</b> will be created.',
-      { nzPlacement: 'bottomRight'});
+      { nzPlacement: 'bottomRight' });
 
     this.lectureService.processPreview(this.recording).subscribe(x => this.loadRecording(x.id.toString()));
   }

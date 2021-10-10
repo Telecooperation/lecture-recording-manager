@@ -4,6 +4,7 @@ using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -124,6 +125,108 @@ namespace LectureRecordingManager.Controllers
 
             return Ok();
         }
+
+        //[HttpGet("import")]
+        //public async Task<IActionResult> ImportLecture()
+        //{
+        //    var lecture = await _context.Lectures.FindAsync(1);
+
+        //    var metaFiles = System.IO.Directory.GetFiles("\\\\teaching.tk.informatik.tu-darmstadt.de\\recordings\\Public\\videos\\TK3\\SoSe20-Ex\\video", "*.json", System.IO.SearchOption.AllDirectories);
+
+        //    foreach (var metaFile in metaFiles)
+        //    {
+        //        var meta = JsonConvert.DeserializeObject<RecordingProcessor.Model.RecordingMetadata>(System.IO.File.ReadAllText(metaFile));
+        //        var folder = System.IO.Path.GetDirectoryName(metaFile);
+
+        //        var rec = new Recording()
+        //        {
+        //            Lecture = lecture,
+        //            Title = meta.Name,
+        //            Description = meta.Description,
+        //            PublishDate = meta.Date,
+        //            UploadDate = meta.Date,
+        //            Duration = meta.Duration,
+        //            Published = true,
+        //            Type = RecordingType.GREEN_SCREEN_RECORDING,
+        //            CustomTargetName = folder.Substring(folder.LastIndexOf('\\') + 1),
+        //            Chapters = meta.Slides?.Select(x => new RecordingChapter()
+        //            {
+        //                Text = x.Ocr,
+        //                Thumbnail = x.Thumbnail.Replace(folder, ""),
+        //                StartPosition = x.StartPosition
+        //            }).ToList(),
+        //            Outputs = new List<RecordingOutput>()
+        //                        {
+        //                            new RecordingOutput()
+        //                            {
+        //                                JobType = "LectureRecordingManager.Jobs.ProcessRecordingJob",
+        //                                DateStarted = meta.Date,
+        //                                DateFinished = meta.Date,
+        //                                Processed = true,
+        //                                Status = RecordingStatus.PROCESSED,
+        //                                JobConfiguration = "{ \"OutputType\": 3 }"
+        //                            }
+        //                        },
+        //            Sorting = 0
+        //        };
+
+        //        _context.Recordings.Add(rec);
+        //    }
+
+        //    await _context.SaveChangesAsync();
+        //    return Ok();
+        //}
+
+        //[HttpGet("import")]
+        //public async Task<IActionResult> ImportLecture()
+        //{
+        //    var lecture = await _context.Lectures.FindAsync(1);
+
+        //    var file = JsonConvert.DeserializeObject<RecordingProcessor.Model.Lecture>(System.IO.File.ReadAllText("C:\\Users\\AlexanderSeeliger\\Git\\lecture-recording-manager\\lecture.json"));
+
+        //    foreach (var recording in file.Recordings)
+        //    {
+        //        var folder = (!string.IsNullOrEmpty(recording.FileName)) ? recording.FileName.Replace("/slides.mp4", "") : recording.StageVideo.Replace("/stage_720p.mp4", "");
+
+        //        var rec = new Recording()
+        //        {
+        //            Lecture = lecture,
+        //            Title = recording.Name,
+        //            Description = recording.Description,
+        //            PublishDate = recording.Date,
+        //            UploadDate = recording.Date,
+        //            Duration = recording.Duration,
+        //            Published = true,
+        //            Type = RecordingType.GREEN_SCREEN_RECORDING,
+        //            CustomTargetName = folder.Substring(folder.LastIndexOf('/') + 1),
+        //            Chapters = recording?.Slides?.Select(x => new RecordingChapter()
+        //            {
+        //                Text = x.Ocr,
+        //                Thumbnail = x.Thumbnail.Replace(folder, ""),
+        //                StartPosition = x.StartPosition
+        //            }).ToList(),
+        //            Outputs = new List<RecordingOutput>()
+        //            {
+        //                new RecordingOutput()
+        //                {
+        //                    JobType = "LectureRecordingManager.Jobs.ProcessRecordingJob",
+        //                    DateStarted = recording.Date,
+        //                    DateFinished = recording.Date,
+        //                    Processed = true,
+        //                    Status = RecordingStatus.PROCESSED,
+        //                    JobConfiguration = "{ \"OutputType\": 3 }"
+        //                }
+        //            },
+        //            Sorting = 0
+        //        };
+
+        //        _context.Recordings.Add(rec);
+        //    }
+
+        //    await _context.SaveChangesAsync();
+
+        //    return Ok();
+        //}
 
         private bool LectureExists(int id)
         {

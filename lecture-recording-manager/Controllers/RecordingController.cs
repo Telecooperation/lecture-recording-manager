@@ -298,26 +298,24 @@ namespace LectureRecordingManager.Controllers
             }
 
             // preview video path
-            string videoFileName = "";
+            string videoFileName = Path.Combine(recording.Lecture.ConvertedPath, recording.Id.ToString(), "preview");
 
             if (recording.Type == RecordingType.GREEN_SCREEN_RECORDING || recording.Type == RecordingType.SIMPLE_RECORDING)
             {
-                videoFileName = "stage.mp4";
+                videoFileName = Path.Combine(videoFileName, "stage.mp4");
             }
-            else if (recording.Type == RecordingType.ZOOM_RECORDING)
+            else if (recording.Type == RecordingType.ZOOM_RECORDING || recording.Type == RecordingType.ONLY_SCREEN)
             {
-                videoFileName = "slides.mp4";
+                videoFileName = Path.Combine(videoFileName, "slides.mp4");
             }
 
             // get file preview
-            var previewFileName = Path.Combine(recording.Lecture.ConvertedPath, recording.Id.ToString(), "preview", videoFileName);
-
-            if (!System.IO.File.Exists(previewFileName))
+            if (!System.IO.File.Exists(videoFileName))
             {
                 return NotFound();
             }
 
-            return PhysicalFile(previewFileName, "application/octet-stream", enableRangeProcessing: true);
+            return PhysicalFile(videoFileName, "application/octet-stream", enableRangeProcessing: true);
         }
 
         [Route("rendered_video/{id}")]
@@ -341,7 +339,7 @@ namespace LectureRecordingManager.Controllers
             {
                 videoFileName = "stage.mp4";
             }
-            else if (output.Recording.Type == RecordingType.ZOOM_RECORDING)
+            else if (output.Recording.Type == RecordingType.ZOOM_RECORDING || output.Recording.Type == RecordingType.ONLY_SCREEN)
             {
                 videoFileName = "slides.mp4";
             }

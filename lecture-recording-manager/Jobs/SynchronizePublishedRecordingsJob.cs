@@ -125,6 +125,8 @@ namespace LectureRecordingManager.Jobs
                 Date = metadataRecording.PublishDate.Value
             };
 
+            var publishFolder = Path.Combine(_config["PublishVideoPath"], recording.Lecture.PublishPath, "video", recording.Id.ToString());
+
             // check outputs
             foreach (var output in recording.Outputs
                 .Where(x => x.Status == RecordingStatus.PUBLISHED)
@@ -136,16 +138,32 @@ namespace LectureRecordingManager.Jobs
                 if (configuration.OutputType == ProcessRecordingOutputType.Default || configuration.OutputType == ProcessRecordingOutputType.Video_720p)
                 {
                     metadata.FileName = targetFolderName + "/output_720p/slides.mp4";
-                    metadata.StageVideo = targetFolderName + "/output_720p/stage.mp4";
-                    metadata.PresenterFileName = targetFolderName + "/output_720p/talkinghead.mp4";
+
+                    if (File.Exists(Path.Combine(publishFolder, targetFolderName + "/output_720p/stage.mp4")))
+                    {
+                        metadata.StageVideo = targetFolderName + "/output_720p/stage.mp4";
+                    }
+
+                    if (File.Exists(Path.Combine(publishFolder, targetFolderName + "/output_720p/talkinghead.mp4")))
+                    {
+                        metadata.PresenterFileName = targetFolderName + "/output_720p/talkinghead.mp4";
+                    }
                 }
 
                 // 1080p processed?
                 if (configuration.OutputType == ProcessRecordingOutputType.Video_1080P)
                 {
                     metadata.FileNameHd = targetFolderName + "/output_1080p/slides.mp4";
-                    metadata.StageVideoHd = targetFolderName + "/output_1080p/stage.mp4";
-                    metadata.PresenterFileNameHd = targetFolderName + "/output_1080p/talkinghead.mp4";
+
+                    if (File.Exists(Path.Combine(publishFolder, targetFolderName + "/output_1080p/stage.mp4")))
+                    {
+                        metadata.StageVideo = targetFolderName + "/output_1080p/stage.mp4";
+                    }
+
+                    if (File.Exists(Path.Combine(publishFolder, targetFolderName + "/output_1080p/talkinghead.mp4")))
+                    {
+                        metadata.PresenterFileName = targetFolderName + "/output_1080p/talkinghead.mp4";
+                    }
                 }
 
                 // legacy?
