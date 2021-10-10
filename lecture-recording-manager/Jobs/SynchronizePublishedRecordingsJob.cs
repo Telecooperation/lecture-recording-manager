@@ -125,7 +125,7 @@ namespace LectureRecordingManager.Jobs
                 Date = metadataRecording.PublishDate.Value
             };
 
-            var publishFolder = Path.Combine(_config["PublishVideoPath"], recording.Lecture.PublishPath, "video", recording.Id.ToString());
+            var publishFolder = _config["PublishVideoPath"];
 
             // check outputs
             foreach (var output in recording.Outputs
