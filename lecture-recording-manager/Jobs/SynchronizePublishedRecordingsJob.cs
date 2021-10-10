@@ -157,12 +157,12 @@ namespace LectureRecordingManager.Jobs
 
                     if (File.Exists(Path.Combine(publishFolder, targetFolderName + "/output_1080p/stage.mp4")))
                     {
-                        metadata.StageVideo = targetFolderName + "/output_1080p/stage.mp4";
+                        metadata.StageVideoHd = targetFolderName + "/output_1080p/stage.mp4";
                     }
 
                     if (File.Exists(Path.Combine(publishFolder, targetFolderName + "/output_1080p/talkinghead.mp4")))
                     {
-                        metadata.PresenterFileName = targetFolderName + "/output_1080p/talkinghead.mp4";
+                        metadata.PresenterFileNameHd = targetFolderName + "/output_1080p/talkinghead.mp4";
                     }
                 }
 
