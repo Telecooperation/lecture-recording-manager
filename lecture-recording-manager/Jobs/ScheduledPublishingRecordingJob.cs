@@ -27,7 +27,7 @@ namespace LectureRecordingManager.Jobs
             // check for recordings that should be published
             var outputs = await _context.RecordingOutputs
                 .Where(x => x.Status == RecordingStatus.PROCESSED)
-                .Where(x => x.JobType == typeof(ProcessRecordingJob).FullName)
+                .Where(x => x.JobType == typeof(ProcessRecordingJob).FullName || x.JobType == "link")
                 .Where(x => x.Recording.PublishDate.HasValue && x.Recording.PublishDate < DateTime.Now)
                 .Where(x => x.Recording.Lecture.Active)
                 .ToListAsync();
