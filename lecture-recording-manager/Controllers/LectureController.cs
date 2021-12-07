@@ -28,6 +28,8 @@ namespace LectureRecordingManager.Controllers
         {
             return await _context.Lectures
                 .Include(x => x.Semester)
+                .OrderByDescending(x => x.Semester.DateStart)
+                .ThenBy(x => x.Title)
                 .ToListAsync();
         }
 

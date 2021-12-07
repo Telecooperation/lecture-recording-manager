@@ -14,8 +14,8 @@
       <thead>
         <tr>
           <th nzWidth="10px"></th>
+          <th nzWidth="250px">Timespan</th>
           <th>Semester</th>
-          <th>Timespan</th>
           <th nzWidth="30px">Actions</th>
         </tr>
       </thead>
@@ -27,10 +27,10 @@
               <i *ngIf="!semester.active" nz-icon nzType="close-circle" nzTheme="outline"></i>
             </span>
           </td>
+          <td>{{semester.dateStart | date}} to {{semester.dateEnd | date}}</td>
           <td>
             <a [routerLink]="['/', 'lectures', 'semester', semester.id]">{{semester.name}}</a>
           </td>
-          <td>{{semester.dateStart | date}} to {{semester.dateEnd | date}}</td>
           <td>
             <button nz-button (click)="showEdit(semester)">Edit</button>
           </td>
@@ -41,7 +41,7 @@
 </nz-layout>
 
 <nz-modal [(nzVisible)]="isCreateModalVisible" nzTitle="Create new semester" (nzOnCancel)="closeCreate()" (nzOnOk)="doCreate()">
-  <form nz-form>
+  <form nz-form *nzModalContent>
     <nz-form-item>
       <nz-form-label [nzSpan]="7" nzRequired>Title</nz-form-label>
       <nz-form-control [nzSpan]="12">
@@ -84,7 +84,7 @@
 </nz-modal>
 
 <nz-modal [(nzVisible)]="isEditModalVisible" nzTitle="Update semester" (nzOnCancel)="closeEdit()" (nzOnOk)="doEdit()">
-  <form nz-form>
+  <form nz-form *nzModalContent>
     <nz-form-item>
       <nz-form-label [nzSpan]="7" nzRequired>Title</nz-form-label>
       <nz-form-control [nzSpan]="12">

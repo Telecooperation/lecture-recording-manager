@@ -13,19 +13,19 @@
     <nz-table #lectureTable [nzData]="lectures">
       <thead>
         <tr>
+          <th nzWidth="250px">Semester</th>
+          <th nzWidth="30px">Published</th>
           <th>Lecture</th>
-          <th>Semester</th>
-          <th>Published</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let lecture of lectureTable.data">
-          <td><a [routerLink]="['/', 'lecture', lecture.id]">{{lecture.title}}</a></td>
           <td><nz-tag [nzColor]="'gold'">{{lecture.semester.name}}</nz-tag></td>
-          <td>
+          <td style="text-align: center;">
             <i *ngIf="lecture.publish" nz-icon nzType="check-circle" nzTheme="outline"></i>
             <i *ngIf="!lecture.publish" nz-icon nzType="close-circle" nzTheme="outline"></i>
           </td>
+          <td><a [routerLink]="['/', 'lecture', lecture.id]">{{lecture.title}}</a></td>
         </tr>
       </tbody>
     </nz-table>

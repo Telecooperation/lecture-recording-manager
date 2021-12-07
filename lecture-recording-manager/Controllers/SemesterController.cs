@@ -25,7 +25,7 @@ namespace LectureRecordingManager.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Semester>>> GetSemesters()
         {
-            return await _context.Semesters.ToListAsync();
+            return await _context.Semesters.OrderByDescending(x => x.DateStart).ToListAsync();
         }
 
         [HttpGet("{id}")]
