@@ -20,6 +20,15 @@ export class SemesterListComponent implements OnInit {
   };
   public isCreateModalVisible = false;
 
+  public editSemester: Semester = {
+    name: '',
+    dateStart: new Date(),
+    dateEnd: new Date(),
+    active: false,
+    published: false
+  };
+  public isEditModalVisible = false;
+
   constructor(
     private semesterService: SemesterService,
     private notifications: NzNotificationService) { }
@@ -39,6 +48,22 @@ export class SemesterListComponent implements OnInit {
   doCreate(): void {
     this.semesterService.postSemester(this.createSemester).subscribe(x => {
       this.isCreateModalVisible = false;
+      this.ngOnInit();
+    });
+  }
+
+  showEdit(semester: Semester): void {
+    this.editSemester = { ...semester };
+    this.isEditModalVisible = true;
+  }
+
+  closeEdit(): void {
+    this.isEditModalVisible = false;
+  }
+
+  doEdit(): void {
+    this.semesterService.putSemester(this.editSemester.id, this.editSemester).subscribe(x => {
+      this.isEditModalVisible = false;
       this.ngOnInit();
     });
   }

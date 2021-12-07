@@ -161,7 +161,7 @@ namespace LectureRecordingManager.Jobs
                     await _context.SaveChangesAsync();
 
                     await UpdateLectureRecordingStatus();
-                    throw ex;
+                    throw;
                 }
             }
         }

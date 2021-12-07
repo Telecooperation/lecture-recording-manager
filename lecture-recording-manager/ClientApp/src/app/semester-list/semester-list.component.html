@@ -13,18 +13,27 @@
     <nz-table #semesterTable [nzData]="semesters">
       <thead>
         <tr>
+          <th nzWidth="10px"></th>
           <th>Semester</th>
-          <th>Start</th>
-          <th>End</th>
-          <th>Active</th>
+          <th>Timespan</th>
+          <th nzWidth="30px">Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let semester of semesterTable.data">
-          <td><a [routerLink]="['/', 'lectures', 'semester', semester.id]">{{semester.name}}</a></td>
-          <td>{{semester.dateStart}}</td>
-          <td>{{semester.dateEnd}}</td>
-          <td>{{semester.active}}</td>
+          <td>
+            <span>
+              <i *ngIf="semester.active" nz-icon nzType="check-circle" nzTheme="outline"></i>
+              <i *ngIf="!semester.active" nz-icon nzType="close-circle" nzTheme="outline"></i>
+            </span>
+          </td>
+          <td>
+            <a [routerLink]="['/', 'lectures', 'semester', semester.id]">{{semester.name}}</a>
+          </td>
+          <td>{{semester.dateStart | date}} to {{semester.dateEnd | date}}</td>
+          <td>
+            <button nz-button (click)="showEdit(semester)">Edit</button>
+          </td>
         </tr>
       </tbody>
     </nz-table>
@@ -69,6 +78,49 @@
       <nz-form-label [nzSpan]="7">Active</nz-form-label>
       <nz-form-control [nzSpan]="12">
         <nz-switch name="active" [(ngModel)]="createSemester.active"></nz-switch>
+      </nz-form-control>
+    </nz-form-item>
+  </form>
+</nz-modal>
+
+<nz-modal [(nzVisible)]="isEditModalVisible" nzTitle="Update semester" (nzOnCancel)="closeEdit()" (nzOnOk)="doEdit()">
+  <form nz-form>
+    <nz-form-item>
+      <nz-form-label [nzSpan]="7" nzRequired>Title</nz-form-label>
+      <nz-form-control [nzSpan]="12">
+        <input nz-input name="title" placeholder="Title of the semester" required [(ngModel)]="editSemester.name" />
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-label [nzSpan]="7" nzRequired>Start Date</nz-form-label>
+      <nz-form-control [nzSpan]="12">
+        <nz-date-picker 
+          name="dateStart"
+          [(ngModel)]="editSemester.dateStart"
+          nzFormat="yyyy-MM-dd HH:mm:ss"
+          [nzShowTime]="{ }"></nz-date-picker>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-label [nzSpan]="7">End Date</nz-form-label>
+      <nz-form-control [nzSpan]="12">
+        <nz-date-picker 
+          name="dateEnd"
+          [(ngModel)]="editSemester.dateEnd"
+          nzFormat="yyyy-MM-dd HH:mm:ss"
+          [nzShowTime]="{ }"></nz-date-picker>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-label [nzSpan]="7">Published</nz-form-label>
+      <nz-form-control [nzSpan]="12">
+        <nz-switch name="published" [(ngModel)]="editSemester.published"></nz-switch>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-label [nzSpan]="7">Active</nz-form-label>
+      <nz-form-control [nzSpan]="12">
+        <nz-switch name="active" [(ngModel)]="editSemester.active"></nz-switch>
       </nz-form-control>
     </nz-form-item>
   </form>

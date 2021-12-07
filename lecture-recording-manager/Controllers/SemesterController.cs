@@ -1,12 +1,12 @@
-﻿using Hangfire;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Hangfire;
 using LectureRecordingManager.Jobs;
 using LectureRecordingManager.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace LectureRecordingManager.Controllers
 {
@@ -64,7 +64,12 @@ namespace LectureRecordingManager.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(semester).State = EntityState.Modified;
+            var dbSemester = await _context.Semesters.FindAsync(id);
+            dbSemester.Name = semester.Name;
+            dbSemester.DateStart = semester.DateStart;
+            dbSemester.DateEnd = semester.DateEnd;
+            dbSemester.Active = semester.Active;
+            dbSemester.Published = semester.Published;
 
             try
             {

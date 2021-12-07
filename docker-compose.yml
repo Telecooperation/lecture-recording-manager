@@ -12,13 +12,13 @@ services:
         ports:
             - 5432:5432
         
-    lecture-manager:
-        image: ghcr.io/telecooperation/lecture-recording-manager:latest
-        container_name: lecturemanager
-        depends_on:
-            - lecture-database
-        ports:
-            - 8080:80
-        volumes:
-            - ./docker/mgr:/data
-            - ./docker/appsettings.json:/app/appsettings.json
+    # lecture-manager:
+    #     image: ghcr.io/telecooperation/lecture-recording-manager:latest
+    #     container_name: lecturemanager
+    #     depends_on:
+    #         - lecture-database
+    #     ports:
+    #         - 8080:80
+    #     volumes:
+    #         - ./docker/mgr:/data
+    #         - ./docker/appsettings.json:/app/appsettings.json

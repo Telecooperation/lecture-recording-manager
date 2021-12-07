@@ -144,7 +144,7 @@ namespace LectureRecordingManager.Jobs
 
                     await UpdateLectureRecordingStatus();
 
-                    throw ex;
+                    throw;
                 }
             }
         }
