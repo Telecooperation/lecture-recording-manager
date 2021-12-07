@@ -10,7 +10,7 @@ This repository contains the source code of the TK Lecture Manager for managing 
 
 ## Requirements
 * PostgreSQL Database for storing the recording meta data
-* dotnet 5.0 SDK (https://dotnet.microsoft.com/) for compiling
+* dotnet 6.0 SDK (https://dotnet.microsoft.com/) for compiling
 * (only on unix) ```tesseract-ocr``` package
 
 ## Build project
